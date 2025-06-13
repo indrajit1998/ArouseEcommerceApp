@@ -1,0 +1,265 @@
+name: arouse_automotive_day1
+description: "A new Flutter project."
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+# In Windows, build-name is used as the major, minor, and patch parts
+# of the product and file versions while build-number is used as the build suffix.
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.2
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.8
+  font_awesome_flutter: ^10.7.0
+  flutter_carousel_widget: ^3.1.0
+  dotted_border: ^2.1.0
+  carousel_slider: ^5.0.0
+  auto_size_text: ^3.0.0
+  http: ^1.3.0
+  video_player: ^2.9.5
+  smooth_page_indicator: ^1.1.0
+  permission_handler: ^11.4.0
+  image_picker: ^1.1.2
+  table_calendar: ^3.0.9
+  google_maps_flutter: ^2.2.0
+  flutter_polyline_points: ^2.1.0
+  shared_preferences: ^2.1.0
+  webview_flutter: ^4.11.0
+  webview_flutter_android: ^4.4.1
+  webview_flutter_wkwebview: ^3.20.0
+  flutter_inappwebview: ^6.0.0
+  universal_html: ^2.2.4
+  url_launcher: ^6.2.1
+  device_info_plus: ^11.3.3
+  agora_rtc_engine: ^6.2.2
+  connectivity_plus: ^5.0.0
+  jwt_decoder: ^2.0.1
+  intl: ^0.18.0
+  file_picker: ^10.1.5
+  file_selector: ^1.0.3
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
+  cached_network_image: ^3.3.1
+  
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices. The lint set provided by the package is
+  # activated in the `analysis_options.yaml` file located at the root of your
+  # package. See that file for information about deactivating specific lint
+  # rules and activating additional ones.
+  flutter_lints: ^5.0.0
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  assets:
+   - assets/image.png
+   - assets/menu.png
+   - assets/wishlist.png
+   - assets/search.png
+   - assets/carbackground.jpeg
+   - assets/blackCar.png
+   - assets/whiteCar.png
+   - assets/redCar.png
+   - assets/audi.jpeg
+   - assets/bmw.jpeg
+   - assets/ford.jpeg
+   - assets/mercedes.jpeg
+   - assets/peugeot.jpeg
+   - assets/volkswagan.jpeg
+   - assets/videoImage.jpeg
+   - assets/manuel.png
+   - assets/diesel.webp
+   - assets/compare.png
+   - assets/degrees.png
+   - assets/financialOffer.png
+   - assets/dealership.png
+   - assets/transparent.png
+   - assets/expertCar.png
+   - assets/Home_Images/Customers_say_Images/ladyImage.jpeg
+   - assets/Home_Images/Blog_cars/blogCar1.jpeg
+   - assets/Home_Images/Blog_cars/blogCar2.jpeg
+   - assets/Home_Images/Blog_cars/blogCar3.jpeg
+   - assets/Home_Images/Footer_Images/lookingCar.png
+   - assets/Home_Images/Footer_Images/carFinance.png
+   - assets/Home_Images/Compare_Cars/Ford_transit1.jpeg
+   - assets/Home_Images/Compare_Cars/close.png
+   - assets/Home_Images/Compare_Cars/vs.png
+   - assets/Home_Images/Compare_Cars/plus.png
+   - assets/Home_Images/ContactUs/email.png
+   - assets/Home_Images/ContactUs/phone.png
+   - assets/Web_Images/AppBar_Images/luxury_stars.png
+   - assets/Web_Images/Customer_Says/Customer1.jpeg
+   - assets/Arous_Sales_ERP_Images/Password_Recovery/manager.png
+   - assets/Arous_Sales_ERP_Images/App_Tour_Video/right_arrow.png
+   - assets/Arous_Sales_ERP_Images/App_Tour_Video/AppTourImage.png
+   - assets/Arous_Sales_ERP_Images/App_Tour_Video/playImage.png
+   - assets/Arous_Sales_ERP_Images/Side_Bar_Menu/Side_Bar_Background.png
+   - assets/Arous_Sales_ERP_Images/Side_Bar_Menu/Side_bar_Image.png
+   - assets/Arous_Sales_ERP_Images/Side_Bar_Menu/order.png
+   - assets/Arous_Sales_ERP_Images/Side_Bar_Menu/Map_location.png
+   - assets/Arous_Sales_ERP_Images/Side_Bar_Menu/edit_square.png
+   - assets/Arous_Sales_ERP_Images/Side_Bar_Menu/home.png
+   - assets/Arous_Sales_ERP_Images/Side_Bar_Menu/client.png
+   - assets/Arous_Sales_ERP_Images/Side_Bar_Menu/tasks.png
+   - assets/Arous_Sales_ERP_Images/Side_Bar_Menu/exit.png
+   - assets/Arous_Sales_ERP_Images/Bottom_Bar/Dashboard.png
+   - assets/Arous_Sales_ERP_Images/Notifications/Img1.png
+   - assets/Arous_Sales_ERP_Images/Notifications/Img2.png
+   - assets/Arous_Sales_ERP_Images/Notifications/Img3.png
+   - assets/Arous_Sales_ERP_Images/Notifications/Img4.png
+   - assets/Arous_Sales_ERP_Images/Notifications/Img5.png
+   - assets/Arous_Sales_ERP_Images/Notifications/Img6.png
+   - assets/Arous_Sales_ERP_Images/Home/Circle.png
+   - assets/Arous_Sales_ERP_Images/Home/Mitchell.png
+   - assets/Arous_Sales_ERP_Images/Home/CircleBlue.png
+   - assets/Arous_Sales_ERP_Images/Home/Chen.png
+   - assets/Arous_Sales_ERP_Images/Home/AssingTask.png
+   - assets/Arous_Sales_ERP_Images/Tasks/search.png
+   - assets/Arous_Sales_ERP_Images/Tasks/filter.png
+   - assets/Arous_Sales_ERP_Images/Tasks/downArrow.png
+   - assets/Arous_Sales_ERP_Images/Tasks/blankImage.png
+   - assets/Arous_Sales_ERP_Images/Tasks/location.png
+   - assets/Arous_Sales_ERP_Images/Tasks/AddImage.png
+   - assets/Arous_Sales_ERP_Images/Tasks/backgroundImage.png
+   - assets/Arous_Sales_ERP_Images/Client/backgroundImage.png
+   - assets/Arous_Sales_ERP_Images/Client/filter.png
+   - assets/Arous_Sales_ERP_Images/Client/blankImage.png
+   - assets/Arous_Sales_ERP_Images/Client/windowsBackground.png
+   - assets/Arous_Sales_ERP_Images/Client/windows.png
+   - assets/Arous_Sales_ERP_Images/Client/amazon.png
+   - assets/Arous_Sales_ERP_Images/Client/google.png
+   - assets/Arous_Sales_ERP_Images/Client/call.png
+   - assets/Arous_Sales_ERP_Images/Client/location.png
+   - assets/Arous_Sales_ERP_Images/Orders/calendar.png
+   - assets/Arous_Sales_ERP_Images/Orders/blankImage.png
+   - assets/Arous_Sales_ERP_Images/Orders/AddImage.png
+   - assets/Arous_Sales_ERP_Images/AddClients/area.png
+   - assets/Arous_Sales_ERP_Images/AddClients/call.png
+   - assets/Arous_Sales_ERP_Images/AddClients/category.png
+   - assets/Arous_Sales_ERP_Images/AddClients/downArrow.png
+   - assets/Arous_Sales_ERP_Images/AddClients/email.png
+   - assets/Arous_Sales_ERP_Images/AddClients/gst.png
+   - assets/Arous_Sales_ERP_Images/AddClients/location.png
+   - assets/Arous_Sales_ERP_Images/AddClients/person.png
+   - assets/Arous_Sales_ERP_Images/AddClients/pinLocation.png
+   - assets/Arous_Sales_ERP_Images/AddClients/vendorName.png
+   - assets/Arous_Sales_ERP_Images/Client/client/companyImage.png
+   - assets/Arous_Sales_ERP_Images/Client/client/blankImage.png
+   - assets/Arous_Sales_ERP_Images/Client/client/tick.png
+   - assets/Arous_Sales_ERP_Images/Client/client/addImage.png
+   - assets/Arous_Sales_ERP_Images/Client/client/backImage.png
+   - assets/Arous_Sales_ERP_Images/Client/client/orderVehicle.png
+   - assets/Arous_Sales_ERP_Images/Client/client/plan.png
+   - assets/Arous_Sales_ERP_Images/Client/client/rightArrow.png
+   - assets/Arous_Sales_ERP_Images/AddPlan/search.png
+   - assets/Arous_Sales_ERP_Images/AddPlan/arrowDown.png
+   - assets/Arous_Sales_ERP_Images/AddPlan/companyImage.png
+   - assets/Arous_Sales_ERP_Images/AddPlan/calendar.png
+   - assets/Arous_Sales_ERP_Images/AddPlan/time.png
+   - assets/Arous_Sales_ERP_Images/AddPlan/fileAttach.png
+   - assets/Arous_Sales_ERP_Images/History/blueBackground.png
+   - assets/Arous_Sales_ERP_Images/History/filter.png
+   - assets/Arous_Sales_ERP_Images/History/blankImage.png
+   - assets/Arous_Sales_ERP_Images/History/rightArrow.png
+   - assets/Arous_Sales_ERP_Images/History/attachFile.png
+   - assets/Arous_Sales_ERP_Images/MeetingSchedule/calendar.png
+   - assets/Arous_Sales_ERP_Images/MeetingSchedule/downArrow.png
+   - assets/Arous_Sales_ERP_Images/MeetingSchedule/time.png
+   - assets/Arous_Sales_ERP_Images/MeetingSchedule/dashTime.png
+   - assets/Arous_Sales_ERP_Images/newOrders/blankImage.png
+   - assets/Arous_Sales_ERP_Images/newOrders/blankImage1.png
+   - assets/Arous_Sales_ERP_Images/newOrders/normalChair.png
+   - assets/Arous_Sales_ERP_Images/newOrders/premiumChair.png
+   - assets/Arous_Sales_ERP_Images/newOrders/minus.png
+   - assets/Arous_Sales_ERP_Images/newOrders/add.png
+   - assets/Arous_Sales_ERP_Images/newOrders/blueButton.png
+   - assets/Arous_Sales_ERP_Images/ConfirmOrder/confirmOrder.png
+   - assets/Arous_Sales_ERP_Images/ConfirmOrder/fullPaage.png
+   - assets/Arous_Sales_ERP_Images/ConfirmOrder/backgroundEmpty.png
+   - assets/Arous_Sales_ERP_Images/ConfirmOrder/backArrow.png
+   - assets/Arous_Sales_ERP_Images/EditOrder/location.png
+   - assets/Arous_Sales_ERP_Images/EditOrder/person.png
+   - assets/Arous_Sales_ERP_Images/ViewOrderDetails/desk.png
+   - assets/Arous_Sales_ERP_Images/ViewOrderDetails/sleepChair.png
+   - assets/Arous_Sales_ERP_Images/ViewOrderDetails/underline.png
+   - assets/Web_Images/BookAtestDriveDialogue/dialogue_background.jpeg
+   - assets/Web_Images/ViewCarDetails/carBookOnline.png
+   - assets/Web_Images/ViewCarDetails/vehicleInfo.png
+   - assets/Web_Images/ViewVariants/variantDetails.png
+   - assets/Web_Images/ViewVariants/gearBox.jpg
+   - assets/Web_Images/ViewVariants/ledTV.jpg
+   - assets/Web_Images/ViewVariants/speedoMeter.jpg
+   - assets/Web_Images/ViewVariants/pdf-file.png
+   - assets/Web_Images/ViewVariants/downloads.png
+   - assets/Web_Images/BookOnline/Wheel.png
+  #   - images/a_dot_ham.jpeg
+
+  # An image asset can refer to one or more resolution-specific "variants", see
+  # https://flutter.dev/to/resolution-aware-images
+
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.dev/to/asset-from-package
+
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section. Each entry in this list should have a
+  # "family" key with the font family name, and a "fonts" key with a
+  # list giving the asset and other descriptors for the font. For
+  # example:
+  fonts:
+    - family: DMSans
+      fonts:
+        - asset: fonts/DMSans-VariableFont_opsz,wght.ttf
+  #       - asset: fonts/Schyler-Italic.ttf
+  #         style: italic
+    - family: Inter
+      fonts:
+        - asset: fonts/Inter-VariableFont_opsz,wght.ttf
+  #       - asset: fonts/TrajanPro_Bold.ttf
+  #         weight: 700
+    - family: Poppins
+      fonts:
+        - asset: fonts/Poppins-Regular.ttf
+    - family: WorkSans
+      fonts:
+        - asset: fonts/WorkSans-VariableFont_wght.ttf
+  #
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.dev/to/font-from-package
