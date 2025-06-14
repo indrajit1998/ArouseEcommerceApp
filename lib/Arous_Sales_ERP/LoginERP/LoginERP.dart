@@ -19,7 +19,8 @@ class _LoginerpState extends State<Loginerp> {
   final TextEditingController passwordController = TextEditingController();
 
 Future<void> loginUser() async {
-  final String apiUrl = "http://10.0.2.2:7500/api/user/login";
+  
+  final String apiUrl = "http://127.0.0.1:7500/api/user/login";
 
   try {
     print("Sending login request...");

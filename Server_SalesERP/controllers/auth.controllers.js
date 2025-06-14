@@ -1,4 +1,4 @@
-const User = require("../lib/models/user");
+const User = require("../lib/models/User");
 const { comparePassword, hashPassword } = require("../helper/bcryptHelper");
 const { accessToken } = require("../helper/jwtHelper");
 
