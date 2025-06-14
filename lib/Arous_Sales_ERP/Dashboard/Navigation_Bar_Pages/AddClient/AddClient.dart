@@ -82,7 +82,7 @@ class _AddclientState extends State<Addclient> {
     isSaving = true;
   });
 
-    final String apiUrl = "http://10.0.2.2:7500/api/client/add";
+    final String apiUrl = "http://127.0.0.1:7500/api/client/add";
 
     try {
       final response = await http.post(

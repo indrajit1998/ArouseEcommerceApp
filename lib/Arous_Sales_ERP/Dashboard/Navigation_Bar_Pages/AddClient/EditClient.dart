@@ -73,7 +73,7 @@ class _EditclientState extends State<Editclient> {
       return;
     }
 
-    final String apiUrl = "http://10.0.2.2:7500/api/client/get/$vendorId";
+    final String apiUrl = "http://127.0.0.1:7500/api/client/get/$vendorId";
     try {
       final response = await http.get(
         Uri.parse(apiUrl),
@@ -161,7 +161,7 @@ class _EditclientState extends State<Editclient> {
     }
 
       if (vendorNameController.text != originalVendorName) {
-        final checkUrl = "http://10.0.2.2:7500/api/client/checkVendorName";
+        final checkUrl = "http://127.0.0.1:7500/api/client/checkVendorName";
         try {
           final checkResponse = await http.post(
             Uri.parse(checkUrl),
@@ -206,7 +206,7 @@ class _EditclientState extends State<Editclient> {
     });
 
 
-    final String apiUrl = "http://10.0.2.2:7500/api/client/update/$vendorId";
+    final String apiUrl = "http://127.0.0.1:7500/api/client/update/$vendorId";
 
     try {
       final response = await http.put(

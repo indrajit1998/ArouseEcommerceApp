@@ -57,7 +57,7 @@ class _TaskState extends State<Task> {
   }
 
   Future<void> _loadClients() async {
-    const String apiUrl = "http://10.0.2.2:7500/api/client/getall";
+    const String apiUrl = "http://127.0.0.1:7500/api/client/getall";
     try {
       final token = await getToken();
       if (token == null) {

@@ -57,7 +57,7 @@ class _OrdersummeryState extends State<Ordersummery> {
   }
 
   Future<String?> refreshToken() async {
-    final String refreshTokenApiUrl = "http://10.0.2.2:7500/api/auth/refreshToken";
+    final String refreshTokenApiUrl = "http://127.0.0.1:7500/api/auth/refreshToken";
     try {
       final prefs = await SharedPreferences.getInstance();
       final refreshToken = prefs.getString('refreshToken');
@@ -93,7 +93,7 @@ class _OrdersummeryState extends State<Ordersummery> {
   }
 
   Future<Map<String, dynamic>?> fetchClientData(String vendorId, String token) async {
-    final String apiUrl = "http://10.0.2.2:7500/api/client/get/$vendorId";
+    final String apiUrl = "http://127.0.0.1:7500/api/client/get/$vendorId";
     try {
       final response = await http.get(
         Uri.parse(apiUrl),
@@ -117,7 +117,7 @@ class _OrdersummeryState extends State<Ordersummery> {
   }
 
   Future<String?> submitOrder(String orderId) async {
-    final String apiUrl = "http://10.0.2.2:7500/api/order/add";
+    final String apiUrl = "http://127.0.0.1:7500/api/order/add";
     String? token = await getToken();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? vendorId = prefs.getString('vendorId');
@@ -246,7 +246,7 @@ class _OrdersummeryState extends State<Ordersummery> {
   }
 
   Future<bool> updateOrder(String orderId) async {
-    final String apiUrl = "http://10.0.2.2:7500/api/order/update/$orderId";
+    final String apiUrl = "http://127.0.0.1:7500/api/order/update/$orderId";
     String? token = await getToken();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? vendorId = prefs.getString('vendorId');

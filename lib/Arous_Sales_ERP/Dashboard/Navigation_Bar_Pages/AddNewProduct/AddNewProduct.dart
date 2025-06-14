@@ -63,7 +63,7 @@ class _AddnewproductState extends State<Addnewproduct> {
   }
 
   Future<String?> refreshToken() async {
-    final String refreshTokenApiUrl = "http://10.0.2.2:7500/api/auth/refreshToken";
+    final String refreshTokenApiUrl = "http://127.0.0.1:7500/api/auth/refreshToken";
     try {
       final prefs = await SharedPreferences.getInstance();
       final refreshToken = prefs.getString('refreshToken');
@@ -96,7 +96,7 @@ class _AddnewproductState extends State<Addnewproduct> {
   }
 
   Future<void> _getProducts() async {
-    final String apiUrl = "http://10.0.2.2:7500/api/product/getAll";
+    final String apiUrl = "http://127.0.0.1:7500/api/product/getAll";
     try {
       print('[_getProducts] Starting product fetch from $apiUrl');
       final token = await getToken();
@@ -205,7 +205,7 @@ class _AddnewproductState extends State<Addnewproduct> {
   }
 
   Future<void> _saveOrder() async {
-    final String apiUrl = "http://10.0.2.2:7500/api/order/add";
+    final String apiUrl = "http://127.0.0.1:7500/api/order/add";
     try {
       print('[_saveOrder] Starting order save to $apiUrl');
       final token = await getToken();

@@ -86,7 +86,7 @@ class _ClientState extends State<Client> {
 
     await prefs.setString('vendorId', vendorId);
 
-    final String apiUrl = "http://10.0.2.2:7500/api/client/get/$vendorId";
+    final String apiUrl = "http://127.0.0.1:7500/api/client/get/$vendorId";
     try {
       final response = await http.get(
         Uri.parse(apiUrl),
@@ -148,7 +148,7 @@ class _ClientState extends State<Client> {
   }
 
   Future<String?> refreshToken() async {
-    const String refreshTokenApiUrl = "http://10.0.2.2:7500/api/auth/refreshToken";
+    const String refreshTokenApiUrl = "http://127.0.0.1:7500/api/auth/refreshToken";
     try {
       final prefs = await SharedPreferences.getInstance();
       final refreshToken = prefs.getString('refreshToken');
@@ -193,7 +193,7 @@ class _ClientState extends State<Client> {
       return;
     }
 
-    final String apiUrl = "http://10.0.2.2:7500/api/user/$userId";
+    final String apiUrl = "http://127.0.0.1:7500/api/user/$userId";
     String? token = await getToken();
 
     if (token == null) {
@@ -250,7 +250,7 @@ class _ClientState extends State<Client> {
       errorMessage = null;
     });
 
-    const String apiUrl = "http://10.0.2.2:7500/api/client/getall";
+    const String apiUrl = "http://127.0.0.1:7500/api/client/getall";
     String? token = await getToken();
 
     if (token == null) {

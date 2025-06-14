@@ -5,15 +5,17 @@ import 'package:arouse_automotive_day1/designLayoutsPage/mobiledesign.dart';
 import 'package:arouse_automotive_day1/designLayoutsPage/webdesign.dart';
 import 'package:flutter/material.dart';
 import 'package:arouse_automotive_day1/login_button.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:webview_flutter/webview_flutter.dart';
 // import 'package:webview_flutter_android/webview_flutter_android.dart';
 // import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
-void main() {
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // _setupWebViewPlatform();
-  runApp(const MyApp());
+  await dotenv.load(fileName: ".env");
+  runApp(MyApp());
 }
 
 // void _setupWebViewPlatform() {

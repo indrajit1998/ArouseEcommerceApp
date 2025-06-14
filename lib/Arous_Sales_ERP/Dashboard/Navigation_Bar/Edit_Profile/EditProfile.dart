@@ -123,7 +123,7 @@ class _EditprofileState extends State<Editprofile> with WidgetsBindingObserver {
 
     try {
       final response = await http.get(
-        Uri.parse("http://10.0.2.2:7500/api/user/$userId"),
+        Uri.parse("http://127.0.0.1:7500/api/user/$userId"),
         headers: {
           "Authorization": "Bearer $token",
           "Content-Type": "application/json",
@@ -230,7 +230,7 @@ class _EditprofileState extends State<Editprofile> with WidgetsBindingObserver {
 
       var request = http.MultipartRequest(
         'PUT',
-        Uri.parse("http://10.0.2.2:7500/api/user/$userId"),
+        Uri.parse("http://127.0.0.1:7500/api/user/$userId"),
       );
 
       request.headers['Authorization'] = 'Bearer $token';

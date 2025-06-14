@@ -66,7 +66,7 @@ class _NeworderState extends State<Neworder> {
       return;
     }
 
-    final String apiUrl = "http://10.0.2.2:7500/api/client/get/$vendorId";
+    final String apiUrl = "http://127.0.0.1:7500/api/client/get/$vendorId";
     try {
       final response = await http.get(
         Uri.parse(apiUrl),

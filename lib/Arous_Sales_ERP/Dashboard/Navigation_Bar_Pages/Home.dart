@@ -84,7 +84,7 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> _loadClients() async {
-    final String baseUrl = Platform.isAndroid ? 'http://10.0.2.2:7500' : 'http://localhost:7500';
+    final String baseUrl = Platform.isAndroid ? 'http://127.0.0.1:7500' : 'http://localhost:7500';
     final String apiUrl = '$baseUrl/api/client/getall';
     try {
       final token = await getToken();

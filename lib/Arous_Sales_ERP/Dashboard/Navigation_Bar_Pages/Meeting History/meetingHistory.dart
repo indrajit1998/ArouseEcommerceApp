@@ -75,7 +75,7 @@ class _MeetinghistoryState extends State<Meetinghistory> {
   }
 
   Future<String?> refreshToken() async {
-    const String refreshTokenApiUrl = "http://10.0.2.2:7500/api/auth/refreshToken";
+    const String refreshTokenApiUrl = "http://127.0.0.1:7500/api/auth/refreshToken";
     try {
       final prefs = await SharedPreferences.getInstance();
       final refreshToken = prefs.getString('refreshToken');
@@ -115,7 +115,7 @@ class _MeetinghistoryState extends State<Meetinghistory> {
       return;
     }
 
-    final String apiUrl = "http://10.0.2.2:7500/api/user/$userId";
+    final String apiUrl = "http://127.0.0.1:7500/api/user/$userId";
     String? token = await getToken();
 
     if (token == null) {
@@ -172,7 +172,7 @@ class _MeetinghistoryState extends State<Meetinghistory> {
       errorMessage = null;
     });
 
-    const String apiUrl = "http://10.0.2.2:7500/api/client/getall";
+    const String apiUrl = "http://127.0.0.1:7500/api/client/getall";
     String? token = await getToken();
 
     if (token == null) {
@@ -263,7 +263,7 @@ class _MeetinghistoryState extends State<Meetinghistory> {
   }
 
   Future<void> updateMeeting(String meetingId) async {
-    final String apiUrl = "http://10.0.2.2:7500/api/meeting/$meetingId/updatemeeting";
+    final String apiUrl = "http://127.0.0.1:7500/api/meeting/$meetingId/updatemeeting";
     String? token = await getToken();
 
     if (token == null) {

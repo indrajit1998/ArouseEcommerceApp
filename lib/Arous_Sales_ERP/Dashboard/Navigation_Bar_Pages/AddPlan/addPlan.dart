@@ -67,7 +67,7 @@ class _AddplanState extends State<Addplan> {
     setState(() {
       isFetchingVendors = true;
     });
-    const String apiUrl = "http://10.0.2.2:7500/api/client/getall";
+    const String apiUrl = "http://127.0.0.1:7500/api/client/getall";
     try {
       final response = await http.get(
         Uri.parse(apiUrl),
@@ -246,7 +246,7 @@ class _AddplanState extends State<Addplan> {
   }
 
   Future<String?> refreshToken() async {
-    const String refreshTokenApiUrl = "http://10.0.2.2:7500/api/auth/refreshToken";
+    const String refreshTokenApiUrl = "http://127.0.0.1:7500/api/auth/refreshToken";
     try {
       final prefs = await SharedPreferences.getInstance();
       final refreshToken = prefs.getString('refreshToken');
@@ -282,7 +282,7 @@ class _AddplanState extends State<Addplan> {
   }
 
   Future<void> createMeeting() async {
-    const String apiUrl = "http://10.0.2.2:7500/api/meeting/addmeeting";
+    const String apiUrl = "http://127.0.0.1:7500/api/meeting/addmeeting";
     String? token = await getToken();
     String? userId = await getUserId();
 
@@ -380,7 +380,7 @@ class _AddplanState extends State<Addplan> {
   }
 
   Future<void> updateMeeting(String meetingId) async {
-    final String apiUrl = "http://10.0.2.2:7500/api/meeting/$meetingId/updatemeeting";
+    final String apiUrl = "http://127.0.0.1:7500/api/meeting/$meetingId/updatemeeting";
     String? token = await getToken();
     String? userId = await getUserId();
 
@@ -433,9 +433,7 @@ class _AddplanState extends State<Addplan> {
               meetingData['meetingPurpose'] = purposeController.text;
               meetingData['meetingImportantNotes'] = notesController.text;
               meetingData['resdulingPurpose'] = reasonController.text;
-              meetingData['resdulingNotes'] = additionalNotesController
-
-.text;
+              meetingData['resdulingNotes'] = additionalNotesController.text;
               meetingData['notesFile'] = selectedFileName;
             }
             return jsonEncode(meetingData);
@@ -479,7 +477,7 @@ class _AddplanState extends State<Addplan> {
       return;
     }
 
-    final String apiUrl = "http://10.0.2.2:7500/api/client/get/$vendorId";
+    final String apiUrl = "http://127.0.0.1:7500/api/client/get/$vendorId";
     try {
       final response = await http.get(
         Uri.parse(apiUrl),
