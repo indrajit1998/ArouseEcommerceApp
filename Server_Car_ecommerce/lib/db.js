@@ -6,7 +6,7 @@ dotenv.config();
 const ConnectToMongoDB = async () => {
     try{
         const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/CarEcommerce';
-        mongoose.connect(url);
+        await mongoose.connect(url);
         console.log("Successfully connected to the Database");
     }catch(error){
         console.log("Failed to connect to the Database.", error);
