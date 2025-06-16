@@ -46,6 +46,7 @@ class _WebdesignState extends State<Webdesign> {
     getReviews();
     fetchBlogs();
     fetchBrands();
+    _performBookings();
     filteredCars = carData;
   }
 

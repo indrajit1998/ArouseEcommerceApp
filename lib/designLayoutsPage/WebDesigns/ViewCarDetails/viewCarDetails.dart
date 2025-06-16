@@ -149,6 +149,7 @@ class _ViewcardetailsState extends State<Viewcardetails> {
       carouselCars = cars;
     }
     _calculatePrincipal();
+    _performBookings();
   }
 
   int? _hoveredIndex;

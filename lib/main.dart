@@ -12,9 +12,14 @@ import 'package:webview_flutter/webview_flutter.dart';
 // import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
 
+// Future<void> main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   await dotenv.load(fileName: ".env");
+//   runApp(MyApp());
+// }
+
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
+  await dotenv.load(fileName: "assets/.env");
   runApp(MyApp());
 }
 
