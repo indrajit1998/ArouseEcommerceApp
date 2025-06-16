@@ -2576,253 +2576,241 @@ void _calculatePrincipal() {
           child: Column(
             children: <Widget>[
               Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: MediaQuery.of(context).size.width * 0.0,
-                  vertical: MediaQuery.of(context).size.height * 0.0,
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(0),
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      double screenWidth = constraints.maxWidth;
-                      double imageHeight = screenWidth > 600
-                          ? MediaQuery.of(context).size.height * 0.9
-                          : MediaQuery.of(context).size.height * 0.35;
-      
-                      double textFontSize = screenWidth > 600 ? MediaQuery.of(context).size.width * 0.035 : screenWidth * 0.1;
-      
-                      return Stack(
-                        children: [
-                          SizedBox(
-                            height: imageHeight,
-                            width: double.infinity,
-                            child: Image.asset(
-                              "assets/carbackground.jpeg",
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-      
-                          Positioned(
-                            top: screenHeight * 0.3,
-                            left: screenWidth * 0.3,
-                            child: Align(
-                              alignment: Alignment.center,
-                              child: Positioned(
-                                left: screenWidth > 600
-                                    ? MediaQuery.of(context).size.width * 0.08
-                                    : MediaQuery.of(context).size.width * 0.05,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
+  padding: EdgeInsets.symmetric(
+    horizontal: MediaQuery.of(context).size.width * 0.0,
+    vertical: MediaQuery.of(context).size.height * 0.0,
+  ),
+  child: ClipRRect(
+    borderRadius: BorderRadius.circular(0),
+    child: LayoutBuilder(
+      builder: (context, constraints) {
+        double screenWidth = constraints.maxWidth;
+        double screenHeight = MediaQuery.of(context).size.height;
+        double imageHeight = screenWidth > 600
+            ? screenHeight * 0.9
+            : screenHeight * 0.35;
+
+        double textFontSize = screenWidth > 600 ? screenWidth * 0.035 : screenWidth * 0.1;
+
+        return Stack(
+          children: [
+            SizedBox(
+              height: imageHeight,
+              width: double.infinity,
+              child: Image.asset(
+                "assets/carbackground.jpeg",
+                fit: BoxFit.cover,
+              ),
+            ),
+            Positioned(
+              top: screenHeight * 0.2, // Adjusted for better spacing
+              left: 0,
+              right: 0,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    "Find Your Perfect Car",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: textFontSize,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: "DMSans",
+                    ),
+                  ),
+                  SizedBox(height: screenHeight * 0.04),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: screenWidth * 0.1, // Center the search bar
+                      vertical: 0,
+                    ),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        double searchBarHeight = screenWidth > 600
+                            ? screenHeight * 0.08
+                            : screenHeight * 0.06; // Simplified for web and mobile
+                        double searchBarWidth = screenWidth > 600
+                            ? screenWidth * 0.35
+                            : screenWidth * 0.8; // Wider for mobile
+
+                        double searchIconSize = searchBarHeight * 0.3;
+
+                        return SizedBox(
+                          height: searchBarHeight,
+                          width: searchBarWidth,
+                          child: SearchAnchor(
+                            builder: (context, controller) {
+                              return Container(
+                                height: searchBarHeight,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(screenWidth > 600 ? 50 : 20),
+                                  border: Border.all(
+                                    color: const Color.fromRGBO(233, 233, 233, 1),
+                                    width: 3,
+                                  ),
+                                ),
+                                padding: const EdgeInsets.only(left: 20),
+                                child: Row(
                                   children: [
-                                    Text(
-                                      "Find Your Perfect Car",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: textFontSize,
-                                        fontWeight: FontWeight.bold,
-                                        fontFamily: "DMSans",
+                                    Expanded(
+                                      child: TextField(
+                                        controller: controller,
+                                        onChanged: (query) {
+                                          if (query.isEmpty) {
+                                            setState(() {
+                                              filteredCars = List.from(carData);
+                                            });
+                                            controller.openView();
+                                            return;
+                                          }
+
+                                          setState(() {
+                                            if (RegExp(r'^\d+-\d+$').hasMatch(query)) {
+                                              List<String> range = query.split("-");
+                                              int minPrice = int.tryParse(range[0].replaceAll(RegExp(r'[^\d]'), '')) ?? 0;
+                                              int maxPrice = int.tryParse(range[1].replaceAll(RegExp(r'[^\d]'), '')) ?? 0;
+
+                                              filteredCars = carData.where((car) {
+                                                final int carPrice = int.tryParse(car['price'].toString().replaceAll(RegExp(r'[^\d]'), '')) ?? 0;
+                                                return carPrice >= minPrice && carPrice <= maxPrice;
+                                              }).toList();
+                                            } else {
+                                              filteredCars = carData.where((car) {
+                                                final make = car['make'].toString().toLowerCase();
+                                                final model = car['model'].toString().toLowerCase();
+                                                final price = car['price'].toString();
+                                                final specs = car['specifications'].toString().toLowerCase();
+
+                                                return make.contains(query.toLowerCase()) ||
+                                                    model.contains(query.toLowerCase()) ||
+                                                    price.contains(query) ||
+                                                    specs.contains(query.toLowerCase());
+                                              }).toList();
+                                            }
+                                          });
+                                          controller.openView();
+                                        },
+                                        decoration: InputDecoration(
+                                          hintText: "Type to select car name, eg. Jeep Meridian",
+                                          hintStyle: TextStyle(
+                                            color: const Color.fromRGBO(127, 127, 127, 1),
+                                            fontSize: screenWidth > 600 ? 14 : screenWidth * 0.04,
+                                            fontFamily: "DMSans",
+                                          ),
+                                          border: InputBorder.none,
+                                        ),
                                       ),
                                     ),
-                                    SizedBox(height: MediaQuery.of(context).size.height * 0.04),
-                              
                                     Padding(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: screenWidth * 0.0,
-                                        vertical: screenHeight * 0.0,
-                                      ),
-                                      child: LayoutBuilder(
-                                        builder: (context, constraints) {
-                                          double searchBarHeight = isWebOrDesktop
-                                              ? screenHeight * 0.08
-                                              : isTablet
-                                                  ? screenHeight * 0.07
-                                                  : screenHeight * 0.06;
-                                          double searchBarWidth = isWebOrDesktop
-                                              ? screenWidth * 0.35
-                                              : isTablet
-                                                  ? screenWidth * 0.35
-                                                  : screenWidth * 0.05;
-                              
-                                          double searchIconSize = searchBarHeight * 0.3;
-                              
-                                          return SizedBox(
-                                            height: searchBarHeight,
-                                            width: searchBarWidth,
-                                            child: SearchAnchor(
-                                              builder: (context, controller) {
-                                                return Container(
-                                                  height: searchBarHeight,
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.white,
-                                                    borderRadius: BorderRadius.circular(isWebOrDesktop ? 50 : 20),
-                                                    border: Border.all(
-                                                      color: const Color.fromRGBO(233, 233, 233, 1),
-                                                      width: 3,
-                                                    ),
-                                                  ),
-                                                  padding: const EdgeInsets.only(left: 20),
-                                                  child: Row(
-                                                    children: [
-                                                      Expanded(
-                                                        child: TextField(
-                                                          controller: controller,
-                                                          onChanged: (query) {
-                                                            if (query.isEmpty) {
-                                                              setState(() {
-                                                                filteredCars = List.from(carData);
-                                                              });
-                                                              controller.openView();
-                                                              return;
-                                                            }
-
-                                                            setState(() {
-                                                              if (RegExp(r'^\d+-\d+$').hasMatch(query)) {
-                                                                List<String> range = query.split("-");
-                                                                int minPrice = int.tryParse(range[0].replaceAll(RegExp(r'[^\d]'), '')) ?? 0;
-                                                                int maxPrice = int.tryParse(range[1].replaceAll(RegExp(r'[^\d]'), '')) ?? 0;
-
-                                                                filteredCars = carData.where((car) {
-                                                                  final int carPrice = int.tryParse(car['price'].toString().replaceAll(RegExp(r'[^\d]'), '')) ?? 0;
-                                                                  return carPrice >= minPrice && carPrice <= maxPrice;
-                                                                }).toList();
-                                                              } else {
-                                                                filteredCars = carData.where((car) {
-                                                                  final make = car['make'].toString().toLowerCase();
-                                                                  final model = car['model'].toString().toLowerCase();
-                                                                  final price = car['price'].toString();
-                                                                  final specs = car['specifications'].toString().toLowerCase();
-
-                                                                  return make.contains(query.toLowerCase()) ||
-                                                                      model.contains(query.toLowerCase()) ||
-                                                                      price.contains(query) ||
-                                                                      specs.contains(query.toLowerCase());
-                                                                }).toList();
-                                                              }
-                                                            });
-                                                            controller.openView();
-                                                          },
-                                                          decoration: InputDecoration(
-                                                            hintText: "Type to select car name, eg. Jeep Meridian",
-                                                            hintStyle: TextStyle(
-                                                              color: Color.fromRGBO(127, 127, 127, 1),
-                                                              fontSize: isWebOrDesktop ? 14 : isTablet ? 12 : screenWidth * 0.04,
-                                                              fontFamily: "DMSans",
-                                                            ),
-                                                            border: InputBorder.none,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      Padding(
-                                                        padding: const EdgeInsets.only(left: 0.0),
-                                                        child: Container(
-                                                          decoration: BoxDecoration(
-                                                            color: Color.fromRGBO(26, 76, 142, 1),
-                                                            borderRadius: BorderRadius.circular(50),
-                                                          ),
-                                                          child: Padding(
-                                                            padding: const EdgeInsets.symmetric(horizontal: 23.0, vertical: 10.0),
-                                                            child: Row(
-                                                              children: [
-                                                                Image.asset(
-                                                                  'assets/search.png',
-                                                                  height: searchIconSize,
-                                                                  color: Color.fromRGBO(255, 255, 255, 1),
-                                                                ),
-                                                                Text(
-                                                                  "Search",
-                                                                  style: TextStyle(
-                                                                    fontSize: 15,
-                                                                    fontFamily: "DMSans",
-                                                                    color: Color.fromRGBO(255, 255, 255, 1),
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                );
-                                              },
-                                              suggestionsBuilder: (context, controller) {
-                                                if (filteredCars.isEmpty) {
-                                                  return [
-                                                    const ListTile(
-                                                      title: Text(
-                                                        "No results found",
-                                                        style: TextStyle(color: Colors.grey),
-                                                      ),
-                                                    ),
-                                                  ];
-                                                }
-
-                                                return filteredCars.map((car) {
-                                                  return ListTile(
-                                                    title: Text(
-                                                      "${car["make"]} - ${car["model"]}",
-                                                      style: TextStyle(
-                                                        fontSize: isWebOrDesktop ? 18 : isTablet ? 16 : screenWidth * 0.04,
-                                                        fontFamily: "DMSans",
-                                                      ),
-                                                    ),
-                                                    subtitle: Text(
-                                                      "Price: ${car["price"]} | Specs: ${car["specifications"]}",
-                                                      style: const TextStyle(fontSize: 14, color: Colors.grey),
-                                                    ),
-                                                    onTap: () async {
-                                                      Map<String, dynamic> filteredCar = {
-                                                        "make": car["make"],
-                                                        "model": car["model"],
-                                                        "price": car["price"],
-                                                        "specifications": car["specifications"],
-                                                      };
-
-                                                      bool success = await apiService.saveSearchData(filteredCar);
-
-                                                      if (success) {
-                                                        ScaffoldMessenger.of(context).showSnackBar(
-                                                          SnackBar(
-                                                            content: Text(
-                                                              "Car data saved successfully: ${car["make"]} - ${car["model"]}",
-                                                            ),
-                                                            backgroundColor: Colors.green,
-                                                          ),
-                                                        );
-                                                      } else {
-                                                        ScaffoldMessenger.of(context).showSnackBar(
-                                                          const SnackBar(
-                                                            content: Text("Failed to save car data."),
-                                                            backgroundColor: Colors.red,
-                                                          ),
-                                                        );
-                                                      }
-
-                                                      controller.clear();
-
-                                                      setState(() {
-                                                        filteredCars = List.from(carData);
-                                                      });
-                                                    },
-                                                  );
-                                                }).toList();
-                                              },
-                                            ),
-                                          );
-                                        },
+                                      padding: const EdgeInsets.only(left: 0.0),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: const Color.fromRGBO(26, 76, 142, 1),
+                                          borderRadius: BorderRadius.circular(50),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 23.0, vertical: 10.0),
+                                          child: Row(
+                                            children: [
+                                              Image.asset(
+                                                'assets/search.png',
+                                                height: searchIconSize,
+                                                color: const Color.fromRGBO(255, 255, 255, 1),
+                                              ),
+                                              const Text(
+                                                "Search",
+                                                style: TextStyle(
+                                                  fontSize: 15,
+                                                  fontFamily: "DMSans",
+                                                  color: Color.fromRGBO(255, 255, 255, 1),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ],
                                 ),
-                              ),
-                            ),
+                              );
+                            },
+                            suggestionsBuilder: (context, controller) {
+                              if (filteredCars.isEmpty) {
+                                return [
+                                  const ListTile(
+                                    title: Text(
+                                      "No results found",
+                                      style: TextStyle(color: Colors.grey),
+                                    ),
+                                  ),
+                                ];
+                              }
+
+                              return filteredCars.map((car) {
+                                return ListTile(
+                                  title: Text(
+                                    "${car["make"]} - ${car["model"]}",
+                                    style: TextStyle(
+                                      fontSize: screenWidth > 600 ? 18 : screenWidth * 0.04,
+                                      fontFamily: "DMSans",
+                                    ),
+                                  ),
+                                  subtitle: Text(
+                                    "Price: ${car["price"]} | Specs: ${car["specifications"]}",
+                                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                                  ),
+                                  onTap: () async {
+                                    Map<String, dynamic> filteredCar = {
+                                      "make": car["make"],
+                                      "model": car["model"],
+                                      "price": car["price"],
+                                      "specifications": car["specifications"],
+                                    };
+
+                                    bool success = await apiService.saveSearchData(filteredCar);
+
+                                    if (success) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            "Car data saved successfully: ${car["make"]} - ${car["model"]}",
+                                          ),
+                                          backgroundColor: Colors.green,
+                                        ),
+                                      );
+                                    } else {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                          content: Text("Failed to save car data."),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                    }
+
+                                    controller.clear();
+
+                                    setState(() {
+                                      filteredCars = List.from(carData);
+                                    });
+                                  },
+                                );
+                              }).toList();
+                            },
                           ),
-                        ],
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
-                ),
+                ],
               ),
+            ),
+          ],
+        );
+      },
+    ),
+  ),
+),
       
               SizedBox(height: screenHeight * 0.03,),
               Align(
