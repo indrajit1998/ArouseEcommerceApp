@@ -9,6 +9,7 @@ const reviewRoutes = require('./routes/routes.reviews')
 const blogRoutes = require('./routes/routes.blogs');
 const brandRoutes = require('./routes/routes.brands');
 
+dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 7500;
 
