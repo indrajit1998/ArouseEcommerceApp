@@ -4,13 +4,15 @@ import 'package:arouse_automotive_day1/designLayoutsPage/WebDesigns/ViewCarDetai
 import 'package:arouse_automotive_day1/designLayoutsPage/WebDesigns/Web_WebViewWidgetPage/Web_WebView_Page.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'dart:math' as math;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../api/vechicleInfo_api.dart';
+
+final apiUrl = dotenv.env['API_URL'] ?? 'http://localhost:7500/api';
 
 class Webdesign extends StatefulWidget {
   const Webdesign({super.key});
@@ -109,7 +111,7 @@ class _WebdesignState extends State<Webdesign> {
   Future<void> fetchBrands() async {
     try{
       final response = await http.get(
-        Uri.parse("http://localhost:7500/api/brands/getAllBrands"),
+        Uri.parse("$apiUrl/brands/getAllBrands"),
         headers: {
           "Content-Type": "application/json"
         }
@@ -149,7 +151,7 @@ class _WebdesignState extends State<Webdesign> {
   Future<void> getReviews() async {
     try{
       final response = await http.get(
-        Uri.parse("http://localhost:7500/api/reviews/getHighRatedReviews"),
+        Uri.parse("$apiUrl/reviews/getHighRatedReviews"),
         headers: {
           "Content-Type": "application/json"
         }
@@ -220,7 +222,7 @@ class _WebdesignState extends State<Webdesign> {
   Future<void> fetchBlogs() async {
     try{
       final response = await http.get(
-        Uri.parse("http://localhost:7500/api/blogs/getAllBlogs"),
+        Uri.parse("$apiUrl/blogs/getAllBlogs"),
         headers: {
           "Content-Type": "application/json"
         }
@@ -291,7 +293,7 @@ class _WebdesignState extends State<Webdesign> {
   Future<void> fetchCars() async {
     try {
       final response = await http.get(
-        Uri.parse('http://localhost:7500/api/carData/getAll'),
+        Uri.parse('$apiUrl/carData/getAll'),
         headers: {
           'Content-Type': 'application/json',
           // Add authentication token if required by the backend
@@ -1236,7 +1238,7 @@ void _showVerificationSuccessDialog(BuildContext context) {
     if (_formKey.currentState!.validate()) {
       try {
         final response = await http.post(
-          Uri.parse('http://localhost:7500/api/book-test-drive'),
+          Uri.parse('$apiUrl/book-test-drive'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'state': _stateController.text,

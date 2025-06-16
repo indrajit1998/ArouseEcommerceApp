@@ -19,7 +19,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 // }
 
 Future<void> main() async {
-  await dotenv.load(fileName: "assets/.env");
+  await dotenv.load();
   runApp(MyApp());
 }
 
