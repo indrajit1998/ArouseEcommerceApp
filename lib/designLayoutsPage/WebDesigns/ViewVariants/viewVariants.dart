@@ -10,13 +10,36 @@ class Viewvariants extends StatelessWidget {
     return Scaffold(
       body: SingleChildScrollView(
         child: LayoutBuilder(
-          builder:(context, constraints) {
+          builder: (context, constraints) {
+            double screenWidth = constraints.maxWidth;
+            double screenHeight = constraints.maxHeight;
+
+            // Responsive padding
+            double horizontalPadding = screenWidth < 600
+                ? 12 // Mobile
+                : screenWidth < 1024
+                    ? 24 // Tablet
+                    : 45; // Desktop
+
+            // Responsive title font size
+            double titleFontSize = screenWidth < 600
+                ? 22 // Mobile
+                : screenWidth < 1024
+                    ? 32 // Tablet
+                    : 49; // Desktop
+
+            // Responsive image width
+            double imageWidth = screenWidth < 600
+                ? screenWidth * 1
+                : screenWidth < 1024
+                    ? screenWidth * 0.7
+                    : screenWidth * 0.8;
+
             return Padding(
-              padding: const EdgeInsets.all(45.0),
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-              
                   SizedBox(
                     width: 160,
                     child: TextButton(
@@ -32,24 +55,54 @@ class Viewvariants extends StatelessWidget {
                         ),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.only(top: 10, left: 15, bottom: 10, right: 15),
+                        padding: EdgeInsets.only(
+                          top: screenWidth < 600 ? 6 : 10,
+                          left: screenWidth < 600 ? 8 : 15,
+                          bottom: screenWidth < 600 ? 6 : 10,
+                          right: screenWidth < 600 ? 8 : 15,
+                        ),
                         child: Row(
                           children: [
-                            Icon(Icons.arrow_back_ios, size: 20),
-                            Icon(Icons.arrow_back_ios, size: 20),
-                            SizedBox(width: 5),
-                            Text('Back', style: TextStyle(fontSize: 15, fontFamily: "DMSans", fontWeight: FontWeight.w600, color: Color.fromRGBO(26, 76, 142, 1))),
+                            Icon(
+                              Icons.arrow_back_ios,
+                              size: screenWidth < 600
+                                  ? 16 // Mobile
+                                  : screenWidth < 1024
+                                      ? 18 // Tablet
+                                      : 20, // Desktop
+                            ),
+                            Icon(
+                              Icons.arrow_back_ios,
+                              size: screenWidth < 600
+                                  ? 16
+                                  : screenWidth < 1024
+                                      ? 18
+                                      : 20,
+                            ),
+                            SizedBox(width: screenWidth < 600 ? 3 : 5),
+                            Text(
+                              'Back',
+                              style: TextStyle(
+                                fontSize: screenWidth < 600
+                                    ? 13 // Mobile
+                                    : screenWidth < 1024
+                                        ? 14 // Tablet
+                                        : 15, // Desktop
+                                fontFamily: "DMSans",
+                                fontWeight: FontWeight.w600,
+                                color: Color.fromRGBO(26, 76, 142, 1),
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     ),
                   ),
                   const SizedBox(height: 20),
-              
                   Text(
                     "Hyundai i10 NIOS Variants (3)",
                     style: TextStyle(
-                      fontSize: 49,
+                      fontSize: titleFontSize,
                       fontWeight: FontWeight.w700,
                       color: Color.fromRGBO(0, 0, 0, 1),
                       fontFamily: 'Inter',
@@ -58,14 +111,15 @@ class Viewvariants extends StatelessWidget {
                   const SizedBox(height: 16),
                   Image.asset(
                     'assets/Web_Images/ViewVariants/variantDetails.png',
+                    width: imageWidth,
+                    fit: BoxFit.contain,
                   ),
-              
                   const SizedBox(height: 30),
                 ],
               ),
             );
           },
-        )
+        ),
       ),
     );
   }
