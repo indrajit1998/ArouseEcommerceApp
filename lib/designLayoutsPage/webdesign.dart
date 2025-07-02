@@ -32,10 +32,39 @@ class _WebdesignState extends State<Webdesign> {
 
   final List<Map<String, dynamic>> carData = [
     {"make": "Kia", "model": "Seltos", "price": 1500000, "specifications": "SUV"},
-    {"make": "Hyundai", "model": "Creta", "price": 37000000, "specifications": "SUV"},
+    {"make": "Hyundai Grand i10 NIOS", "model": "Creta", "price": 37000000, "specifications": "SUV"},
     {"make": "Ford", "model": "Ecosport", "price": 1400000, "specifications": "Compact SUV"},
+    {"make": "Porsche 718 Cayman", "model": "718 Spyder", "price": 40700000, "specifications": "Convertible, 4.0L Flat-6, Manual/PDK"},
+    {"make": "Audi TT RS", "model": "TT RS", "price": 7200000, "specifications": "Coupe, 2.5L Turbo, 7-Speed S tronic"},
+    {"make": "BMW 6 Series Gran Coupe", "model": "6 Series Gran Coupe", "price": 6900000, "specifications": "Sedan, Inline-6/V8, Auto/Manual"},
+    {"make": "Volkswagen Tiguan", "model": "Tiguan R-Line", "price": 3500000, "specifications": "SUV, 2.0L TSI, DSG/Manual"},
+    {"make": "Toyota Tacoma TRD", "model": "Tacoma TRD Off-Road", "price": 3800000, "specifications": "Pickup, Inline-4/V6, Auto/Manual"},
+    {"make": "Sedan Mercedes-Benz", "model": "Mercedes-Benz E-Class", "price": 3800000, "specifications": "Sedan, Inline-4/Inline-6, 9G-TRONIC 9-speed automatic"},
   ];
+
   List<Map<String, dynamic>> filteredCars= [];
+
+  final TextEditingController _controller = TextEditingController();
+  List<Map<String, dynamic>> _suggestions = [];
+
+  void _onChanged(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _suggestions = [];
+      } else {
+        _suggestions = carData.where((car) {
+          final make = car['make'].toString().toLowerCase();
+          final model = car['model'].toString().toLowerCase();
+          final price = car['price'].toString();
+          final specs = car['specifications'].toString().toLowerCase();
+          return make.contains(query.toLowerCase()) ||
+              model.contains(query.toLowerCase()) ||
+              price.contains(query) ||
+              specs.contains(query.toLowerCase());
+        }).toList();
+      }
+    });
+  }
 
   final ApiService apiService = ApiService();
 
@@ -2150,304 +2179,356 @@ void _calculatePrincipal() {
     required double screenHeight,
   }) {
     showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        double dialogWidth = screenWidth * 0.98;
-        double dialogHeight = screenHeight * 0.98;
-        return Center(
-          child: SingleChildScrollView(
-            child: Dialog(
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Container(
-                width: dialogWidth,
-                height: dialogHeight,
-                padding: EdgeInsets.all(12),
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Choose your EMI Options',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              color: Color.fromRGBO(74, 74, 74, 1),
-                              fontFamily: "DMSans",
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            icon: Icon(
-                              Icons.close,
-                              color: Color.fromRGBO(0, 0, 0, 1),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Standard EMI',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: "DMSans",
-                          color: Color.fromRGBO(109, 109, 109, 1),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Container(
-                            width: 60,
-                            height: 2,
-                            color: Color.fromRGBO(0, 76, 144, 1),
-                          ),
-                          Expanded(
-                            child: Container(
-                              height: 2,
-                              color: const Color.fromRGBO(189, 189, 189, 1),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Enter Estimated Price of the Car',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromRGBO(26, 76, 142, 1),
-                          fontFamily: "Inter",
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      TextField(
-                        controller: carPriceController,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          hintText: 'Rs. 18,79,000',
-                          prefixText: 'Rs. ',
-                        ),
-                        onChanged: (value) {
-                          calculatePrincipal();
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Enter Down Payment',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromRGBO(26, 76, 142, 1),
-                          fontFamily: "Inter",
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      TextField(
-                        controller: downPaymentController,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          hintText: 'Rs. 5,00,000',
-                          prefixText: 'Rs. ',
-                        ),
-                        onChanged: (value) {
-                          calculatePrincipal();
-                        },
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Your loan amount will be Rs. ${principal == 0 ? '13,79,000' : principal.toStringAsFixed(0)}',
-                        style: TextStyle(fontSize: 10),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Select Tenure',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromRGBO(26, 76, 142, 1),
-                          fontFamily: "Inter",
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      DropdownButton<String>(
-                        isExpanded: true,
-                        value: selectedTenure,
-                        items: tenureOptions.map((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                        onChanged: (newValue) {
-                          calculateEMI();
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Select Interest Rate',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromRGBO(26, 76, 142, 1),
-                          fontFamily: "Inter",
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      DropdownButton<String>(
-                        isExpanded: true,
-                        value: selectedInterestRate,
-                        items: interestRateOptions.map((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                        onChanged: (newValue) {
-                          calculateEMI();
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: calculateEMI,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color.fromRGBO(0, 76, 144, 1),
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(40),
-                            ),
-                          ),
-                          child: const Text('Calculate EMI'),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        'Rs. ${emi == 0 ? '60,000' : emi.toStringAsFixed(0)} EMI FOR ${selectedTenure.toLowerCase()}',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 11),
-                      Container(
-                        width: double.infinity,
-                        height: 2,
-                        color: Color.fromRGBO(189, 189, 189, 1),
-                      ),
-                      const SizedBox(height: 7),
-                      Container(
-                        color: Color.fromRGBO(248, 249, 251, 1),
-                        child: SizedBox(
-                          height: 120,
-                          child: Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: CustomPaint(
-                              painter: EMISemiCircleChart(
-                                principal: principal,
-                                totalInterest: totalInterest,
-                              ),
-                              child: const SizedBox.expand(),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Container(
-                            width: 10,
-                            height: 10,
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Color.fromRGBO(34, 53, 119, 1),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          const Text('Principal Loan Amount'),
-                          const Spacer(),
-                          Text('Rs. ${principal == 0 ? '18,79,000' : principal.toStringAsFixed(0)}'),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Container(
-                            width: 10,
-                            height: 10,
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Color.fromRGBO(39, 153, 227, 1),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          const Text('Total Interest Amount'),
-                          const Spacer(),
-                          Text('Rs. ${totalInterest == 0 ? '5,00,000' : totalInterest.toStringAsFixed(0)}'),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Container(
-                        color: Color.fromRGBO(248, 249, 251, 1),
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Row(
-                            children: [
-                              const Text(
-                                'Total Amount Payable',
-                                style: TextStyle(fontFamily: "DMSans", fontWeight: FontWeight.w400, color: Color.fromRGBO(0, 0, 0, 1)),
-                              ),
-                              const Spacer(),
-                              Text(
-                                'Rs. ${totalPayable == 0 ? '23,79,000' : totalPayable.toStringAsFixed(0)}',
-                                style: const TextStyle(fontFamily: "Poppins", fontWeight: FontWeight.w500, color: Color.fromRGBO(31, 31, 31, 1)),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton(
-                          onPressed: () {},
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(width: 2, color: Color.fromRGBO(0, 76, 144, 1)),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(40),
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: const Text(
-                              'Get EMI Offers',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontFamily: "DMSans",
-                                color: Color.fromRGBO(0, 76, 144, 1),
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
+                                                  context: context,
+                                                  builder: (BuildContext context) {
+                                                    return Center(
+                                                      child: SingleChildScrollView(
+                                                        child: Column(
+                                                          children: [
+                                                            SizedBox(
+                                                              width: screenHeight * 1.2,
+                                                              child: Dialog(
+                                                                backgroundColor: Colors.white,
+                                                                shape: RoundedRectangleBorder(
+                                                                  borderRadius: BorderRadius.circular(10),
+                                                                ),
+                                                                child: Padding(
+                                                                  padding: const EdgeInsets.all(16.0),
+                                                                  child: Column(
+                                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                                    children: [
+                                                                      Row(
+                                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                        children: [
+                                                                          const Text(
+                                                                            'Choose your EMI Options',
+                                                                            style: TextStyle(
+                                                                              fontSize: 26, 
+                                                                              fontWeight: FontWeight.w700,
+                                                                              color: Color.fromRGBO(74, 74, 74, 1),
+                                                                              fontFamily: "DMSans",
+                                                                            ),
+                                                                          ),
+                                                                          IconButton(
+                                                                            onPressed: (){
+                                                                              Navigator.pop(context);
+                                                                            },
+                                                                            icon: Icon(
+                                                                              Icons.close, 
+                                                                              color: Color.fromRGBO(0, 0, 0, 1),
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                      const SizedBox(height: 8),
+                                                                      const Text(
+                                                                        'Standard EMI',
+                                                                        style: TextStyle(
+                                                                          fontSize: 20, 
+                                                                          fontWeight: FontWeight.w600,
+                                                                          fontFamily: "DMSans",
+                                                                          color: Color.fromRGBO(109, 109, 109, 1),
+                                                                        ),
+                                                                      ),
+                                                                      const SizedBox(height: 8),
+                                                                      Row(
+                                                                        children: [
+                                                                          Container(
+                                                                            width: 100,
+                                                                            height: 2,
+                                                                            color: Color.fromRGBO(0, 76, 144, 1),
+                                                                          ),
+                                                                          Expanded(
+                                                                            child: Container(
+                                                                              height: 2,
+                                                                              color: const Color.fromRGBO(189, 189, 189, 1),
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                      const SizedBox(height: 16),
+                                                              
+                                                                      Row(
+                                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                                        children: [
+                                                                          
+                                                                          Expanded(
+                                                                            child: Column(
+                                                                              mainAxisSize: MainAxisSize.min,
+                                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                                              children: [
+                                                                                
+                                                                                const Text(
+                                                                                  'Enter Estimated Price of the Car', 
+                                                                                  style: TextStyle(
+                                                                                    fontSize: 14, 
+                                                                                    fontWeight: FontWeight.bold,
+                                                                                    color: Color.fromRGBO(26, 76, 142, 1),
+                                                                                    fontFamily: "Inter",
+                                                                                  ),
+                                                                                ),
+                                                                                const SizedBox(height: 8),
+                                                                                TextField(
+                                                                                  controller: _carPriceController,
+                                                                                  keyboardType: TextInputType.number,
+                                                                                  decoration: InputDecoration(
+                                                                                    border: OutlineInputBorder(),
+                                                                                    hintText: 'Rs. 18,79,000',
+                                                                                    prefixText: 'Rs. ',
+                                                                                  ),
+                                                                                  onChanged: (value) {
+                                                                                    _calculatePrincipal();
+                                                                                  },
+                                                                                ),
+                                                                                const SizedBox(height: 16),
+                                                                                const Text(
+                                                                                  'Enter Down Payement',
+                                                                                  style: TextStyle(
+                                                                                      fontSize: 14, 
+                                                                                      fontWeight: FontWeight.bold,
+                                                                                      color: Color.fromRGBO(26, 76, 142, 1),
+                                                                                      fontFamily: "Inter",
+                                                                                    ),
+                                                                                  ),
+                                                                                const SizedBox(height: 8),
+                                                                                TextField(
+                                                                                  controller: _downPaymentController,
+                                                                                  keyboardType: TextInputType.number,
+                                                                                  decoration: const InputDecoration(
+                                                                                    border: OutlineInputBorder(),
+                                                                                    hintText: 'Rs. 5,00,000',
+                                                                                    prefixText: 'Rs. ',
+                                                                                  ),
+                                                                                  onChanged: (value) {
+                                                                                    _calculatePrincipal();
+                                                                                  },
+                                                                                ),
+                                                                                const SizedBox(height: 8),
+                                                                                Text(
+                                                                                  'Your loan amount will be Rs. ${_principal == 0 ? '13,79,000' : _principal.toStringAsFixed(0)}',
+                                                                                  style: const TextStyle(fontSize: 12),
+                                                                                ),
+                                                                                const SizedBox(height: 16),
+                                                                                const Text(
+                                                                                  'Select Tenure',
+                                                                                  style: TextStyle(
+                                                                                    fontSize: 14, 
+                                                                                    fontWeight: FontWeight.bold,
+                                                                                    color: Color.fromRGBO(26, 76, 142, 1),
+                                                                                    fontFamily: "Inter",
+                                                                                  ),  
+                                                                                ),
+                                                                                const SizedBox(height: 8),
+                                                                                DropdownButton<String>(
+                                                                                  isExpanded: true,
+                                                                                  value: _selectedTenure,
+                                                                                  items: _tenureOptions.map((String value) {
+                                                                                    return DropdownMenuItem<String>(
+                                                                                      value: value,
+                                                                                      child: Text(value),
+                                                                                    );
+                                                                                  }).toList(),
+                                                                                  onChanged: (newValue) {
+                                                                                    setState(() {
+                                                                                      _selectedTenure = newValue!;
+                                                                                      _calculateEMI();
+                                                                                    });
+                                                                                  },
+                                                                                ),
+                                                                                const SizedBox(height: 16),
+                                                                                const Text(
+                                                                                  'Select Interest Rate',
+                                                                                  style: TextStyle(
+                                                                                    fontSize: 14, 
+                                                                                    fontWeight: FontWeight.bold,
+                                                                                    color: Color.fromRGBO(26, 76, 142, 1),
+                                                                                    fontFamily: "Inter",
+                                                                                  ),  
+                                                                                ),
+                                                                                const SizedBox(height: 8),
+                                                                                DropdownButton<String>(
+                                                                                  isExpanded: true,
+                                                                                  value: _selectedInterestRate,
+                                                                                  items: _interestRateOptions.map((String value) {
+                                                                                    return DropdownMenuItem<String>(
+                                                                                      value: value,
+                                                                                      child: Text(value),
+                                                                                    );
+                                                                                  }).toList(),
+                                                                                  onChanged: (newValue) {
+                                                                                    setState(() {
+                                                                                      _selectedInterestRate = newValue!;
+                                                                                      _calculateEMI();
+                                                                                    });
+                                                                                  },
+                                                                                ),
+                                                                                const SizedBox(height: 16),
+                                                                                SizedBox(
+                                                                                  width: double.infinity,
+                                                                                  child: ElevatedButton(
+                                                                                    onPressed: _calculateEMI,
+                                                                                    style: ElevatedButton.styleFrom(
+                                                                                      backgroundColor: Color.fromRGBO(0, 76, 144, 1),
+                                                                                      foregroundColor: Colors.white,
+                                                                                      shape: RoundedRectangleBorder(
+                                                                                        borderRadius: BorderRadius.circular(40),
+                                                                                      ),
+                                                                                    ),
+                                                                                    child: const Text('Calculate EMI'),
+                                                                                  ),
+                                                                                ),
+                                                                              ],
+                                                                            ),
+                                                                          ),
+                                                                          const SizedBox(width: 20),
+
+                                                                          Container(
+                                                                            width: 2,
+                                                                            height: 450,
+                                                                            color: Color.fromRGBO(189, 189, 189, 1),
+                                                                          ),
+
+                                                                          const SizedBox(width: 30,),
+                                                                          
+                                                                          // Right Section: EMI Results
+                                                                          Expanded(
+                                                                            child: Column(
+                                                                              mainAxisSize: MainAxisSize.min,
+                                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                                              children: [
+                                                                                Text(
+                                                                                  'Rs. ${_emi == 0 ? '60,000' : _emi.toStringAsFixed(0)} EMI FOR ${_selectedTenure.toLowerCase()}',
+                                                                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                                                                ),
+
+                                                                                const SizedBox(height: 11),
+                                                                                Padding(
+                                                                                  padding: EdgeInsets.zero,
+                                                                                  child: Container(
+                                                                                    width: 500,
+                                                                                    height: 2,
+                                                                                    color: Color.fromRGBO(189, 189, 189, 1),
+                                                                                  ),
+                                                                                ),
+                                                                                const SizedBox(height: 7),
+
+                                                                                Container(
+                                                                                  color: Color.fromRGBO(248, 249, 251, 1),
+                                                                                  child: SizedBox(
+                                                                                    height: MediaQuery.of(context).size.width < 600
+                                                                                      ? 70 // Mobile height
+                                                                                      : MediaQuery.of(context).size.width < 1024
+                                                                                          ? 120 // Tablet height
+                                                                                          : 180, // Desktop/Web height
+                                                                                    child: Padding(
+                                                                                      padding: const EdgeInsets.all(10),
+                                                                                      child: CustomPaint(
+                                                                                        painter: EMISemiCircleChart(
+                                                                                          principal: _principal,
+                                                                                          totalInterest: _totalInterest,
+                                                                                        ),
+                                                                                        child: const SizedBox.expand(),
+                                                                                      ),
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                                const SizedBox(height: 16),
+                                                                                
+                                                                                Row(
+                                                                                  children: [
+                                                                                    Container(
+                                                                                      width: 10,
+                                                                                      height: 10,
+                                                                                      decoration: const BoxDecoration(
+                                                                                        shape: BoxShape.circle,
+                                                                                        color: Color.fromRGBO(34, 53, 119, 1),
+                                                                                      ),
+                                                                                    ),
+                                                                                    const SizedBox(width: 8),
+                                                                                    const Text('Principal Loan Amount'),
+                                                                                    const Spacer(),
+                                                                                    Text('Rs. ${_principal == 0 ? '18,79,000' : _principal.toStringAsFixed(0)}'),
+                                                                                  ],
+                                                                                ),
+                                                                                const SizedBox(height: 8),
+                                                                                Row(
+                                                                                  children: [
+                                                                                    Container(
+                                                                                      width: 10,
+                                                                                      height: 10,
+                                                                                      decoration: const BoxDecoration(
+                                                                                        shape: BoxShape.circle,
+                                                                                        color: Color.fromRGBO(39, 153, 227, 1),
+                                                                                      ),
+                                                                                    ),
+                                                                                    const SizedBox(width: 8),
+                                                                                    const Text('Total Interest Amount'),
+                                                                                    const Spacer(),
+                                                                                    Text('Rs. ${_totalInterest == 0 ? '5,00,000' : _totalInterest.toStringAsFixed(0)}'),
+                                                                                  ],
+                                                                                ),
+                                                                                const SizedBox(height: 16),
+                                                                                Container(
+                                                                                  color: Color.fromRGBO(248, 249, 251, 1),
+                                                                                  child: Padding(
+                                                                                    padding: const EdgeInsets.all(10.0),
+                                                                                    child: Row(
+                                                                                      children: [
+                                                                                        const Text(
+                                                                                          'Total Amount Payable',
+                                                                                          style: TextStyle(fontFamily: "DMSans",fontWeight: FontWeight.w400, color: Color.fromRGBO(0, 0, 0, 1)),
+                                                                                        ),
+                                                                                        const Spacer(),
+                                                                                        Text(
+                                                                                          'Rs. ${_totalPayable == 0 ? '23,79,000' : _totalPayable.toStringAsFixed(0)}',
+                                                                                          style: const TextStyle(fontFamily: "Poppins",fontWeight: FontWeight.w500, color: Color.fromRGBO(31, 31, 31, 1)),
+                                                                                        ),
+                                                                                      ],
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                                const SizedBox(height: 16),
+                                                                                SizedBox(
+                                                                                  width: double.infinity,
+                                                                                  child: OutlinedButton(
+                                                                                    onPressed: () {},
+                                                                                    style: OutlinedButton.styleFrom(
+                                                                                      side: const BorderSide(width: 2, color: Color.fromRGBO(0, 76, 144, 1)),
+                                                                                      shape: RoundedRectangleBorder(
+                                                                                        borderRadius: BorderRadius.circular(40),
+                                                                                      ),
+                                                                                    ),
+                                                                                    child: Padding(
+                                                                                      padding: const EdgeInsets.all(5.0),
+                                                                                      child: const Text(
+                                                                                        'Get EMI Offers',
+                                                                                        style: TextStyle(
+                                                                                          fontSize: 16,
+                                                                                          fontFamily: "DMSans",
+                                                                                          color: Color.fromRGBO(0, 76, 144, 1),
+                                                                                          fontWeight: FontWeight.w600,
+                                                                                        ),
+                                                                                      ),
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                              ],
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    );
+                                                  }
+                                                );
+                                              
   }
 
 
@@ -2573,8 +2654,8 @@ Widget _drawerItem(String title, int idx) {
                     children: [
                       Image.asset(
                         'assets/image.png',
-                        height: isMobile ? 30 : imageHeight,
-                        width: isMobile ? 30 : imageWidth,
+                        height: isMobile ? 40 : imageHeight,
+                        width: isMobile ? 40 : imageWidth,
                         fit: BoxFit.contain,
                       ),
                       SizedBox(width: 8),
@@ -2582,7 +2663,7 @@ Widget _drawerItem(String title, int idx) {
                         'AROUSE',
                         style: TextStyle(
                           color: Color(0xFF004C90),
-                          fontSize: isMobile ? 12 : fontSize,
+                          fontSize: isMobile ? 15 : fontSize,
                           fontWeight: FontWeight.bold,
                           fontFamily: "DMSans",
                         ),
@@ -2590,7 +2671,7 @@ Widget _drawerItem(String title, int idx) {
                       Text(
                         'AUTOMOTIVE',
                         style: TextStyle(
-                          fontSize: isMobile ? 12 : fontSize,
+                          fontSize: isMobile ? 15 : fontSize,
                           fontWeight: FontWeight.bold,
                           fontFamily: "DMSans",
                         ),
@@ -3688,7 +3769,6 @@ Widget _drawerItem(String title, int idx) {
                             ),
                           ),
                         );
-                        Navigator.pop(context);
                       },
                     ),
                   ],
@@ -3713,6 +3793,10 @@ Widget _drawerItem(String title, int idx) {
                       double screenWidth = constraints.maxWidth;
                       double screenHeight = MediaQuery.of(context).size.height;
 
+                      final bool isMobile = screenWidth < 600;
+                      final bool isTablet = screenWidth >= 600 && screenWidth < 1024;
+                      final bool isWebOrDesktop = screenWidth >= 1024;
+
                       double heroImageHeight = isWebOrDesktop
                           ? screenHeight * 0.7
                           : isTablet
@@ -3720,6 +3804,22 @@ Widget _drawerItem(String title, int idx) {
                               : screenHeight * 0.3;
 
                       double heroFontSize = responsiveFont(48, 32, 22);
+
+                      double searchBarHeight = isWebOrDesktop
+                          ? screenHeight * 0.08
+                          : isTablet
+                              ? screenHeight * 0.07
+                              : 48; // Fixed height for mobile
+
+                      double searchBarWidth = isWebOrDesktop
+                          ? screenWidth * 0.35
+                          : isTablet
+                              ? screenWidth * 0.3
+                              : screenWidth; // Full width for mobile
+
+                      double searchIconSize = isMobile ? 18 : searchBarHeight * 0.3;
+                      double borderRadius = isMobile ? 16 : 32;
+                      double fontSize = isMobile ? 12 : 16;
 
                       return Stack(
                         children: [
@@ -3752,203 +3852,121 @@ Widget _drawerItem(String title, int idx) {
                                 SizedBox(height: screenHeight * 0.02),
 
 
-                                Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: isWebOrDesktop
-                                     ? screenWidth * 0.1
-                                     : isTablet
-                                        ? screenWidth * 0.05 
-                                        : 0.03, // Center the search bar
-                                    vertical: 0,
-                                  ),
-                                  child: LayoutBuilder(
-                                    builder: (context, constraints) {
-                                      double searchBarHeight = isWebOrDesktop
-                                          ? screenHeight * 0.08
+                                Center(
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: isWebOrDesktop
+                                          ? screenWidth * 0.1
                                           : isTablet
-                                              ? screenHeight * 0.07
-                                              : 48; // Fixed height for mobile
-
-                                      double searchBarWidth = isWebOrDesktop
-                                          ? screenWidth * 0.35
-                                          : isTablet
-                                              ? screenWidth * 0.3
-                                              : constraints.maxWidth; // Full width minus padding for mobile
-
-                                      double searchIconSize = isMobile ? 18 : searchBarHeight * 0.3;
-                                      double borderRadius = isMobile ? 16 : 32;
-                                      double fontSize = isMobile ? 12 : 16;
-
-                                      return SizedBox(
-                                        height: searchBarHeight,
-                                        width: searchBarWidth,
-                                        child: SearchAnchor(
-                                          builder: (context, controller) {
-                                            return Container(
-                                              height: searchBarHeight,
+                                              ? screenWidth * 0.05
+                                              : 0.03,
+                                      vertical: 0,
+                                    ),
+                                    child: SizedBox(
+                                      width: searchBarWidth,
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            height: searchBarHeight,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius: BorderRadius.circular(screenWidth > 600 ? 50 : 20),
+                                              border: Border.all(
+                                                color: const Color.fromRGBO(233, 233, 233, 1),
+                                                width: 3,
+                                              ),
+                                            ),
+                                            padding: const EdgeInsets.only(left: 20),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: TextField(
+                                                    controller: _controller,
+                                                    onChanged: _onChanged,
+                                                    decoration: InputDecoration(
+                                                      hintText: "Search car by name, model, price, or specs",
+                                                      hintStyle: TextStyle(
+                                                        color: const Color.fromRGBO(127, 127, 127, 1),
+                                                        fontSize: fontSize,
+                                                        fontFamily: "DMSans",
+                                                      ),
+                                                      border: InputBorder.none,
+                                                    ),
+                                                    style: TextStyle(fontSize: fontSize),
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding: const EdgeInsets.only(left: 0.0, right: 8),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: const Color.fromRGBO(26, 76, 142, 1),
+                                                      borderRadius: BorderRadius.circular(50),
+                                                    ),
+                                                    child: Padding(
+                                                      padding: EdgeInsets.symmetric(
+                                                        horizontal: isMobile ? 10 : 23.0,
+                                                        vertical: isMobile ? 6 : 10.0,
+                                                      ),
+                                                      child: Row(
+                                                        children: [
+                                                          Icon(Icons.search,
+                                                              color: Colors.white, size: searchIconSize),
+                                                          if (!isMobile)
+                                                            Text(
+                                                              "Search",
+                                                              style: TextStyle(
+                                                                fontSize: fontSize,
+                                                                fontFamily: "DMSans",
+                                                                color: Colors.white,
+                                                              ),
+                                                            ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          if (_suggestions.isNotEmpty)
+                                            Container(
+                                              margin: const EdgeInsets.only(top: 4),
                                               decoration: BoxDecoration(
                                                 color: Colors.white,
-                                                borderRadius: BorderRadius.circular(screenWidth > 600 ? 50 : 20),
-                                                border: Border.all(
-                                                  color: const Color.fromRGBO(233, 233, 233, 1),
-                                                  width: 3,
-                                                ),
+                                                border: Border.all(color: Colors.grey.shade300),
+                                                borderRadius: BorderRadius.circular(12),
+                                                boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
                                               ),
-                                              padding: const EdgeInsets.only(left: 20),
-                                              child: Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: TextField(
-                                                      controller: controller,
-                                                      onChanged: (query) {
-                                                        
-                                                        if (query.isEmpty) {
-                                                          setState(() {
-                                                            filteredCars = List.from(carData);
-                                                          });
-                                                          controller.openView();
-                                                          return;
-                                                        }
-
-                                                        setState(() {
-                                                          if (RegExp(r'^\d+-\d+$').hasMatch(query)) {
-                                                            List<String> range = query.split("-");
-                                                            int minPrice = int.tryParse(range[0].replaceAll(RegExp(r'[^\d]'), '')) ?? 0;
-                                                            int maxPrice = int.tryParse(range[1].replaceAll(RegExp(r'[^\d]'), '')) ?? 0;
-
-                                                            filteredCars = carData.where((car) {
-                                                              final int carPrice = int.tryParse(car['price'].toString().replaceAll(RegExp(r'[^\d]'), '')) ?? 0;
-                                                              return carPrice >= minPrice && carPrice <= maxPrice;
-                                                            }).toList();
-                                                          } else {
-                                                            filteredCars = carData.where((car) {
-                                                              final make = car['make'].toString().toLowerCase();
-                                                              final model = car['model'].toString().toLowerCase();
-                                                              final price = car['price'].toString();
-                                                              final specs = car['specifications'].toString().toLowerCase();
-
-                                                              return make.contains(query.toLowerCase()) ||
-                                                                  model.contains(query.toLowerCase()) ||
-                                                                  price.contains(query) ||
-                                                                  specs.contains(query.toLowerCase());
-                                                            }).toList();
-                                                          }
-                                                        });
-                                                        controller.openView();
-                                                      },
-                                                      decoration: InputDecoration(
-                                                        hintText: "Type to select car name, eg. Jeep Meridian",
-                                                        hintStyle: TextStyle(
-                                                          color: const Color.fromRGBO(127, 127, 127, 1),
-                                                          fontSize: fontSize,
-                                                          fontFamily: "DMSans",
-                                                        ),
-                                                        border: InputBorder.none,
-                                                      ),
+                                              child: ListView.builder(
+                                                shrinkWrap: true,
+                                                itemCount: _suggestions.length,
+                                                itemBuilder: (context, index) {
+                                                  final car = _suggestions[index];
+                                                  return ListTile(
+                                                    title: Text(
+                                                      "${car['make']} - ${car['model']}",
+                                                      style: TextStyle(
+                                                          fontWeight: FontWeight.bold, fontSize: fontSize),
                                                     ),
-                                                  ),
-                                                  Padding(
-                                                    padding: const EdgeInsets.only(left: 0.0, right: 8),
-                                                    child: Container(
-                                                      decoration: BoxDecoration(
-                                                        color: const Color.fromRGBO(26, 76, 142, 1),
-                                                        borderRadius: BorderRadius.circular(50),
-                                                      ),
-                                                      child: Padding(
-                                                        padding: EdgeInsets.symmetric(
-                                                          horizontal: isMobile ? 10 : 23.0,
-                                                          vertical: isMobile ? 6 : 10.0,
-                                                        ),
-                                                        child: Row(
-                                                          children: [
-                                                            Image.asset(
-                                                              'assets/search.png',
-                                                              height: searchIconSize,
-                                                              color: const Color.fromRGBO(255, 255, 255, 1),
-                                                            ),
-                                                            if (!isMobile)
-                                                              Text(
-                                                                "Search",
-                                                                style: TextStyle(
-                                                                  fontSize: fontSize,
-                                                                  fontFamily: "DMSans",
-                                                                  color: const Color.fromRGBO(255, 255, 255, 1),
-                                                                ),
-                                                              ),
-                                                          ],
-                                                        ),
-                                                      ),
+                                                    subtitle: Text(
+                                                      "Price: ${car['price']} | Specs: ${car['specifications']}",
+                                                      style: TextStyle(fontSize: fontSize - 2),
                                                     ),
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          },
-                                          suggestionsBuilder: (context, controller) {
-                                            if (filteredCars.isEmpty) {
-                                              return [
-                                                const ListTile(
-                                                  title: Text(
-                                                    "No results found",
-                                                    style: TextStyle(color: Colors.grey),
-                                                  ),
-                                                ),
-                                              ];
-                                            }
-
-                                            return filteredCars.map((car) {
-                                              return ListTile(
-                                                title: Text(
-                                                  "${car["make"]} - ${car["model"]}",
-                                                  style: TextStyle(
-                                                    fontSize: screenWidth > 600 ? 18 : screenWidth * 0.04,
-                                                    fontFamily: "DMSans",
-                                                  ),
-                                                ),
-                                                subtitle: Text(
-                                                  "Price: ${car["price"]} | Specs: ${car["specifications"]}",
-                                                  style: const TextStyle(fontSize: 14, color: Colors.grey),
-                                                ),
-                                                onTap: () async {
-                                                  Map<String, dynamic> filteredCar = {
-                                                    "make": car["make"],
-                                                    "model": car["model"],
-                                                    "price": car["price"],
-                                                    "specifications": car["specifications"],
-                                                  };
-
-                                                  bool success = await apiService.saveSearchData(filteredCar);
-
-                                                  if (success) {
-                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                      SnackBar(
-                                                        content: Text(
-                                                          "Car data saved successfully: ${car["make"]} - ${car["model"]}",
-                                                        ),
-                                                        backgroundColor: Colors.green,
-                                                      ),
-                                                    );
-                                                  } else {
-                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                      const SnackBar(
-                                                        content: Text("Failed to save car data."),
-                                                        backgroundColor: Colors.red,
-                                                      ),
-                                                    );
-                                                  }
-
-                                                  controller.clear();
-
-                                                  setState(() {
-                                                    filteredCars = List.from(carData);
-                                                  });
+                                                    onTap: () {
+                                                      FocusScope.of(context).unfocus();
+                                                      setState(() {
+                                                        _controller.text = "${car['make']} - ${car['model']}";
+                                                        _suggestions = [];
+                                                      });
+                                                    },
+                                                  );
                                                 },
-                                              );
-                                            }).toList();
-                                          },
-                                        ),
-                                      );
-                                    },
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],
@@ -4044,6 +4062,7 @@ Widget _drawerItem(String title, int idx) {
                           ),
                         ),
 
+
                         Container(
                           decoration: BoxDecoration(
                             color: Color.fromRGBO(255, 255, 255, 1),
@@ -4075,8 +4094,8 @@ Widget _drawerItem(String title, int idx) {
                               height: screenWidth >= 1024
                                 ? screenHeight * 5.2 // Web/Desktop
                                 : screenWidth >= 600
-                                    ? screenHeight * 5.2 // Tablet
-                                    : screenHeight * 6, // Mobile
+                                    ? screenHeight * 5.4 // Tablet
+                                    : screenHeight * 5.6, // Mobile
                               child: TabBarView(
                                 children: [
                                   All(),
@@ -4089,13 +4108,14 @@ Widget _drawerItem(String title, int idx) {
                             ),
                           ),
                         ),
+                        buildResponsiveFooter(context),
                       ]
                     ),
                   ),
                 ),
               ),
 
-              buildResponsiveFooter(context),
+              
 
             ],
           ),
@@ -5313,1334 +5333,827 @@ Widget buildBrandCards(BuildContext context) {
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             SizedBox(height: sectionSpacing),
-                                        //     Row(
-                                        //       children: [
-                                        //         Stack(
-                                        //           alignment: Alignment.center,
-                                        //           children: [
-                                        //             ClipRRect(
-                                        //               borderRadius: BorderRadius.only(
-                                        //                 topLeft: Radius.circular(10),
-                                        //                 bottomLeft: Radius.circular(10),
-                                        //                 topRight: Radius.circular(0),
-                                        //                 bottomRight: Radius.circular(0),
-                                        //               ),
-                                        //               child: Image.asset(
-                                        //                 "assets/videoImage.jpeg",
-                                        //                 width: imageWidth,
-                                        //                 height: imageHeight,
-                                        //                 fit: BoxFit.cover,
-                                        //               ),
-                                        //             ),
-                                        //             CircleAvatar(
-                                        //               radius: playButtonSize / 2,
-                                        //               backgroundColor: Colors.white,
-                                        //               child: Icon(
-                                        //                 Icons.play_arrow,
-                                        //                 size: playButtonSize * 0.5,
-                                        //                 color: Colors.black,
-                                        //               ),
-                                        //             ),
-                                        //           ],
-                                        //         ),
-                                              
-                                        //     Container(
-                                        //       width: screenWidth * 0.50,
-                                        //       decoration: BoxDecoration(
-                                        //         color: Color.fromRGBO(238, 241, 251, 1),
-                                        //       ),
-                                        //       child: Padding(
-                                        //         padding: const EdgeInsets.all(70.0),
-                                        //         child: Column(
-                                        //           crossAxisAlignment: CrossAxisAlignment.start,
-                                        //           children: [
-                                        //             Text(
-                                        //               "Buying a car has never been this easy.",
-                                        //               style: TextStyle(
-                                        //                 fontSize: titleFontSize,
-                                        //                 fontWeight: FontWeight.bold,
-                                        //                 color: Colors.black,
-                                        //                 fontFamily: "DMSans",
-                                        //               ),
-                                        //             ),
-                                        //             SizedBox(height: sectionSpacing),
-                                        //             Text(
-                                        //               "We are committed to providing our customers with exceptional service, competitive pricing, and a wide range of options.",
-                                        //               style: TextStyle(
-                                        //                 fontSize: screenWidth * 0.008,
-                                        //                 color: Color.fromRGBO(5, 11, 32, 1),
-                                        //                 fontFamily: "DMSans",
-                                        //               ),
-                                        //             ),
-                                        //             SizedBox(height: sectionSpacing),
-                                        //             Column(
-                                        //               children: [
-                                        //                 buildBulletPoint(
-                                        //                     "We are the UK's largest provider, with more patrols in more places"),
-                                        //                 buildBulletPoint("You get 24/7 roadside assistance"),
-                                        //                 buildBulletPoint("We fix 4 out of 5 cars at the roadside"),
-                                        //               ],
-                                        //             ),
-                                        //             SizedBox(height: sectionSpacing),
-                                        //             ElevatedButton(
-                                        //               onPressed: () {
-                                        //                       showDialog(
-                                        //                         context: context,
-                                        //                         builder: (BuildContext context) {
-                                        //                           return Center(
-                                        //                             child: SingleChildScrollView(
-                                        //                               child: Column(
-                                        //                                 mainAxisAlignment: MainAxisAlignment.end,
-                                        //                                 children: [
-                                        //                                   Container(
-                                        //                                     width: MediaQuery.of(context).size.width * 0.9,
-                                        //                                     height: MediaQuery.of(context).size.height * 0.9,
-                                        //                                     decoration: BoxDecoration(
-                                        //                                       image: DecorationImage(
-                                        //                                         image: AssetImage(
-                                        //                                           "assets/Web_Images/BookAtestDriveDialogue/dialogue_background.jpeg",
-                                        //                                         ),
-                                        //                                         fit: BoxFit.cover,
-                                        //                                       ),
-                                        //                                     ),
-                                        //                                     child: Row(
-                                        //                                       mainAxisAlignment: MainAxisAlignment.end,
-                                        //                                       children: [
-                                        //                                         AlertDialog(
-                                        //                                           contentPadding: const EdgeInsets.all(16),
-                                        //                                           insetPadding: const EdgeInsets.symmetric(horizontal: 0),
-                                        //                                           shape: RoundedRectangleBorder(
-                                        //                                             borderRadius: BorderRadius.circular(0),
-                                        //                                           ),
-                                        //                                           title: SizedBox(
-                                        //                                             width: MediaQuery.of(context).size.width * 0.5,
-                                        //                                             child: Stack(
-                                        //                                               children: [
-                                        //                                                 Column(
-                                        //                                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                        //                                                   children: [
-                                        //                                                     Text(
-                                        //                                                       "Test Drive",
-                                        //                                                       style: TextStyle(
-                                        //                                                         color: Color.fromRGBO(0, 76, 144, 1),
-                                        //                                                         fontWeight: FontWeight.w600,
-                                        //                                                         fontSize: 20,
-                                        //                                                         fontFamily: "DMSans",
-                                        //                                                       ),
-                                        //                                                     ),
-                                        //                                                     Padding(
-                                        //                                                       padding: EdgeInsets.zero,
-                                        //                                                       child: Container(
-                                        //                                                         height: 2,
-                                        //                                                         margin: const EdgeInsets.only(top: 4),
-                                        //                                                         child: Row(
-                                        //                                                           children: [
-                                        //                                                             Container(
-                                        //                                                               width: 100,
-                                        //                                                               color: const Color.fromRGBO(0, 76, 144, 1),
-                                        //                                                             ),
-                                        //                                                             Expanded(
-                                        //                                                               child: Container(
-                                        //                                                                 color: Color.fromRGBO(189, 189, 189, 1),
-                                        //                                                               ),
-                                        //                                                             ),
-                                        //                                                           ],
-                                        //                                                         ),
-                                        //                                                       ),
-                                        //                                                     ),
-                                        //                                                     SizedBox(height: MediaQuery.of(context).size.height * 0.015),
-                                        //                                                     Text(
-                                        //                                                       "Book a Test Drive",
-                                        //                                                       style: TextStyle(
-                                        //                                                         fontSize: 26,
-                                        //                                                         fontWeight: FontWeight.w700,
-                                        //                                                         fontFamily: "DMSans",
-                                        //                                                       color: Color.fromRGBO(74, 74, 74, 1),
-                                        //                                                       ),
-                                        //                                                     ),
-                                        //                                                     Text(
-                                        //                                                       "Please enter your details too schedule a test drive",
-                                        //                                                       style: TextStyle(
-                                        //                                                         fontSize: 14,
-                                        //                                                         color: Color.fromRGBO(81, 81, 81, 1),
-                                        //                                                       ),
-                                        //                                                     ),
-                                        //                                                   ],
-                                        //                                                 ),
-                                        //                                                 Positioned(
-                                        //                                                   right: 10,
-                                        //                                                   top: 0,
-                                        //                                                   child: GestureDetector(
-                                        //                                                     onTap: () {
-                                        //                                                       Navigator.of(context).pop();
-                                        //                                                     },
-                                        //                                                     child: Icon(
-                                        //                                                       Icons.close,
-                                        //                                                       color: Color.fromRGBO(0, 76, 144, 1), 
-                                        //                                                       size: 20,
-                                        //                                                     ),
-                                        //                                                   ),
-                                        //                                                 ),
-                                        //                                               ],
-                                        //                                             ),
-                                        //                                           ),
-                                        //                                           content: SingleChildScrollView(
-                                        //                                             child: Column(
-                                        //                                               mainAxisSize: MainAxisSize.min,
-                                        //                                               children: [
-                                        //                                                 Row(
-                                        //                                                   children: [
-                                        //                                                     Expanded(
-                                        //                                                       child: _buildDropdownField(
-                                        //                                                         label: "State",
-                                        //                                                         hint: "Select your State",
-                                        //                                                         items: ["Andhra Pradesh", "Telangana", "Delhi", "Maharashtra", "Uttar Pradesh", "Punjab", "Rajasthan", "Kerala", "Tamil Nadu", "Karnataka"],
-                                        //                                                         controller: _stateController,
-                                        //                                                       ),
-                                        //                                                     ),
-                                        //                                                     SizedBox(width: 16),
-                                        //                                                     Expanded(
-                                        //                                                       child: _buildDropdownField(
-                                        //                                                         label: "City",
-                                        //                                                         hint: "Select your city",
-                                        //                                                         items: ["Tirupati", "Hyderabad", "Bangalore", "Delhi", "Mumbai", "Lucknow", "Chandigarh", "Jaipur", "Kochi", "Chennai"],
-                                        //                                                         controller: _cityController,
-                                        //                                                       ),
-                                        //                                                     ),
-                                        //                                                   ],
-                                        //                                                 ),
-                                        //                                                 _buildTextField(label: "Address", hint: "Enter the full Address", controller: _addressController),
-                                        //                                                 Row(
-                                        //                                                   children: [
-                                        //                                                     Expanded(
-                                        //                                                       child: _buildDropdownField(
-                                        //                                                         label: "Brand",
-                                        //                                                         hint: "Select your Brand",
-                                        //                                                         items: ["Tata", "Mahindra", "Honda", "Toyota", "Hyundai", "Nissan", "Kia", "Ford", "Volkswagen", "Skoda"],
-                                        //                                                         controller: _brandController,
-                                        //                                                       ),
-                                        //                                                     ),
-                                        //                                                     SizedBox(width: 16),
-                                        //                                                     Expanded(
-                                        //                                                       child: _buildDropdownField(
-                                        //                                                         label: "Model",
-                                        //                                                         hint: "Select your Model",
-                                        //                                                         items: ["Tata Curvv", "Tata Zest", "Hyundai Creta", "Honda City", "Toyota Innova", "Mahindra Thar", "Kia Seltos", "Nissan Magnite", "Ford EcoSport", "Volkswagen Taigun"],
-                                        //                                                         controller: _modelController,
-                                        //                                                       ),
-                                        //                                                     ),
-                                        //                                                   ],
-                                        //                                                 ),
-                                        //                                                 Row(
-                                        //                                                   children: [
-                                        //                                                     Expanded(
-                                        //                                                       child: _buildDateField(
-                                        //                                                         label: "Test Drive Date Selection",
-                                        //                                                         hint: "Select your Date",
-                                        //                                                         controller: _dateController,
-                                        //                                                         suffixIcon: const Icon(
-                                        //                                                           Icons.calendar_month,
-                                        //                                                           color: Color.fromRGBO(0, 76, 144, 1),
-                                        //                                                         ),
-                                        //                                                       ),
-                                        //                                                     ),
-                                        //                                                     SizedBox(width: 16),
-                                        //                                                     Expanded(
-                                        //                                                       child: _buildDropdownField(
-                                        //                                                         label: "Select Time Slot",
-                                        //                                                         hint: "Select your time slot",
-                                        //                                                         items: ["10AM - 11Am", "11AM - 12AM", "12AM - 1PM", "1PM - 2PM", "2PM - 3PM", "3PM - 4PM", "4PM - 5PM"],
-                                        //                                                         controller: _testDriveTimeController,
-                                        //                                                       ),
-                                        //                                                     ),
-                                        //                                                   ],
-                                        //                                                 ),
-                                        //                                                 Row(
-                                        //                                                   children: [
-                                        //                                                     Expanded(
-                                        //                                                       child: _buildTextField(label: "Name", hint: "Enter your Name", controller: _nameController),
-                                        //                                                     ),
-                                        //                                                     SizedBox(width: 16),
-                                        //                                                     Expanded(
-                                        //                                                       child: _buildPhoneField(
-                                        //                                                         label: "Phone Number*",
-                                        //                                                         hint: "Enter your Phone Number",
-                                        //                                                         controller: _phoneNumberController,
-                                        //                                                       ),
-                                        //                                                     ),
-                                        //                                                   ],
-                                        //                                                 ),
-                                        //                                                 _buildPhoneField(
-                                        //                                                   label: "Alternate Phone Number",
-                                        //                                                   hint: "Enter your Phone Number",
-                                        //                                                   controller: _phoneNumberController,
-                                        //                                                 ),
-                                        //                                                 _buildTextField(label: "Email Address", hint: "Enter your email address", controller: _emailController),
-                                        //                                                 _buildDropdownField(
-                                        //                                                   label: "Do you have a driving License?",
-                                        //                                                   hint: "Yes or No",
-                                        //                                                   items: ["Yes", "No"],
-                                        //                                                   controller: _drivingLicenseController,
-                                        //                                                 ),
-                                        //                                               ],
-                                        //                                             ),
-                                        //                                           ),
-                                        //                                           actions: [
-                                        //                                             SizedBox(
-                                        //                                               width: double.infinity,
-                                        //                                               height: 40,
-                                        //                                               child: ElevatedButton(
-                                        //                                                 style: ElevatedButton.styleFrom(
-                                        //                                                   backgroundColor: Color(0xFF004C90),
-                                        //                                                   padding: EdgeInsets.symmetric(vertical: 12),
-                                        //                                                 ),
-                                        //                                                 onPressed: () async {
-                                        //                                                   bool isBookingSuccessful = await _performBookings();
 
-                                        //                                                   Navigator.of(context).pop();
+                                          // Responsive "video + info" section
+                                          Builder(
+                                            builder: (context) {
+                                              final screenWidth = MediaQuery.of(context).size.width;
+                                              final isMobile = screenWidth < 800;
+                                              final isTablet = screenWidth >= 800 && screenWidth < 1024;
+                                              final isDesktop = screenWidth >= 1024;
 
-                                        //                                                   if (isBookingSuccessful) {
-                                        //                                                     showDialog(
-                                        //                                                       context: context,
-                                        //                                                       builder: (BuildContext context) {
-                                        //                                                         return AlertDialog(
-                                        //                                                           shape: RoundedRectangleBorder(
-                                        //                                                             borderRadius: BorderRadius.circular(10),
-                                        //                                                           ),
-                                        //                                                           content: Column(
-                                        //                                                             mainAxisSize: MainAxisSize.min,
-                                        //                                                             children: [
-                                        //                                                               Align(
-                                        //                                                                 alignment: Alignment.topRight,
-                                        //                                                                 child: IconButton(
-                                        //                                                                   icon: Icon(Icons.close, color: Colors.grey),
-                                        //                                                                   onPressed: () {
-                                        //                                                                     Navigator.of(context).pop();
-                                        //                                                                   },
-                                        //                                                                 ),
-                                        //                                                               ),
-                                        //                                                               SizedBox(height: 10),
-                                        //                                                               Stack(
-                                        //                                                                 alignment: Alignment.center,
-                                        //                                                                 children: [
-                                        //                                                                   Container(
-                                        //                                                                     width: 60,
-                                        //                                                                     height: 60,
-                                        //                                                                     decoration: BoxDecoration(
-                                        //                                                                       shape: BoxShape.circle,
-                                        //                                                                       color: Color(0xFF004C90),
-                                        //                                                                     ),
-                                        //                                                                     child: Icon(
-                                        //                                                                       Icons.check,
-                                        //                                                                       color: Colors.white,
-                                        //                                                                       size: 40,
-                                        //                                                                     ),
-                                        //                                                                   ),
-                                        //                                                                   Positioned(
-                                        //                                                                     top: 0,
-                                        //                                                                     left: 20,
-                                        //                                                                     child: Icon(Icons.star, size: 10, color: Color(0xFF004C90)),
-                                        //                                                                   ),
-                                        //                                                                   Positioned(
-                                        //                                                                     top: 10,
-                                        //                                                                     right: 10,
-                                        //                                                                     child: Icon(Icons.star, size: 8, color: Color(0xFF004C90)),
-                                        //                                                                   ),
-                                        //                                                                   Positioned(
-                                        //                                                                     bottom: 10,
-                                        //                                                                     left: 10,
-                                        //                                                                     child: Icon(Icons.star, size: 8, color: Color(0xFF004C90)),
-                                        //                                                                   ),
-                                        //                                                                   Positioned(
-                                        //                                                                     bottom: 0,
-                                        //                                                                     right: 20,
-                                        //                                                                     child: Icon(Icons.star, size: 10, color: Color(0xFF004C90)),
-                                        //                                                                   ),
-                                        //                                                                 ],
-                                        //                                                               ),
-                                        //                                                               SizedBox(height: 20),
-                                        //                                                               Text(
-                                        //                                                                 "Thank you for booking your test\ndrive with Arouse Automotive",
-                                        //                                                                 textAlign: TextAlign.center,
-                                        //                                                                 style: TextStyle(
-                                        //                                                                   fontSize: 18,
-                                        //                                                                   fontWeight: FontWeight.bold,
-                                        //                                                                   color: Colors.black,
-                                        //                                                                 ),
-                                        //                                                               ),
-                                        //                                                               SizedBox(height: 10),
-                                        //                                                               Text(
-                                        //                                                                 "Our Executive will call you for the confirmation",
-                                        //                                                                 textAlign: TextAlign.center,
-                                        //                                                                 style: TextStyle(
-                                        //                                                                   fontSize: 14,
-                                        //                                                                   color: Color.fromRGBO(143, 143, 143, 1),
-                                        //                                                                 ),
-                                        //                                                               ),
-                                        //                                                             ],
-                                        //                                                           ),
-                                        //                                                         );
-                                        //                                                       },
-                                        //                                                     );
-                                        //                                                   } else {
-                                        //                                                     // Show failure dialog
-                                        //                                                     showDialog(
-                                        //                                                       context: context,
-                                        //                                                       builder: (BuildContext context) {
-                                        //                                                         return AlertDialog(
-                                        //                                                           shape: RoundedRectangleBorder(
-                                        //                                                             borderRadius: BorderRadius.circular(10),
-                                        //                                                           ),
-                                        //                                                           content: Column(
-                                        //                                                             mainAxisSize: MainAxisSize.min,
-                                        //                                                             children: [
-                                        //                                                               Align(
-                                        //                                                                 alignment: Alignment.topRight,
-                                        //                                                                 child: IconButton(
-                                        //                                                                   icon: Icon(Icons.close, color: Color.fromRGBO(158, 158, 158, 1)),
-                                        //                                                                   onPressed: () {
-                                        //                                                                     Navigator.of(context).pop();
-                                        //                                                                   },
-                                        //                                                                 ),
-                                        //                                                               ),
-                                        //                                                               SizedBox(height: 10),
-                                        //                                                               Stack(
-                                        //                                                                 alignment: Alignment.center,
-                                        //                                                                 children: [
-                                        //                                                                   Container(
-                                        //                                                                     width: 60,
-                                        //                                                                     height: 60,
-                                        //                                                                     decoration: BoxDecoration(
-                                        //                                                                       shape: BoxShape.circle,
-                                        //                                                                       color: Color.fromRGBO(177, 25, 0, 1),
-                                        //                                                                     ),
-                                        //                                                                     child: Icon(
-                                        //                                                                       Icons.priority_high,
-                                        //                                                                       color: Colors.white,
-                                        //                                                                       size: 40,
-                                        //                                                                     ),
-                                        //                                                                   ),
-                                        //                                                                   Positioned(
-                                        //                                                                     top: 0,
-                                        //                                                                     left: 20,
-                                        //                                                                     child: Icon(Icons.star, size: 10, color: Color.fromRGBO(177, 25, 0, 1)),
-                                        //                                                                   ),
-                                        //                                                                   Positioned(
-                                        //                                                                     top: 10,
-                                        //                                                                     right: 10,
-                                        //                                                                     child: Icon(Icons.star, size: 8, color: Color.fromRGBO(177, 25, 0, 1)),
-                                        //                                                                   ),
-                                        //                                                                   Positioned(
-                                        //                                                                     bottom: 10,
-                                        //                                                                     left: 10,
-                                        //                                                                     child: Icon(Icons.star, size: 8, color: Color.fromRGBO(177, 25, 0, 1)),
-                                        //                                                                   ),
-                                        //                                                                   Positioned(
-                                        //                                                                     bottom: 0,
-                                        //                                                                     right: 20,
-                                        //                                                                     child: Icon(Icons.star, size: 10, color: Color.fromRGBO(177, 25, 0, 1)),
-                                        //                                                                   ),
-                                        //                                                                 ],
-                                        //                                                               ),
-                                        //                                                               SizedBox(height: 20),
-                                        //                                                               Text(
-                                        //                                                                 "Oops! This vehicle is not available \nwith us for the test Drive",
-                                        //                                                                 textAlign: TextAlign.center,
-                                        //                                                                 style: TextStyle(
-                                        //                                                                   fontSize: 18,
-                                        //                                                                   fontWeight: FontWeight.bold,
-                                        //                                                                   color: Colors.black,
-                                        //                                                                 ),
-                                        //                                                               ),
-                                        //                                                               SizedBox(height: 10),
-                                        //                                                               Text(
-                                        //                                                                 "Please try another vehicle, we will reach out to you if this \nvehicle is available with us in future.",
-                                        //                                                                 textAlign: TextAlign.center,
-                                        //                                                                 style: TextStyle(
-                                        //                                                                   fontSize: 14,
-                                        //                                                                   color: Color.fromRGBO(143, 143, 143, 1),
-                                        //                                                                 ),
-                                        //                                                               ),
-                                        //                                                             ],
-                                        //                                                           ),
-                                        //                                                         );
-                                        //                                                       },
-                                        //                                                     );
-                                        //                                                   }
-                                        //                                                 },
-                                        //                                                 child: Text(
-                                        //                                                   "Book Now",
-                                        //                                                   style: TextStyle(
-                                        //                                                     color: Color.fromRGBO(255, 249, 255, 1),
-                                        //                                                     fontSize: 18,
-                                        //                                                     fontWeight: FontWeight.bold,
-                                        //                                                   ),
-                                        //                                                 ),
-                                        //                                               ),
-                                        //                                             ),
-                                        //                                           ],
-                                        //                                         ),
-                                        //                                       ],
-                                        //                                     ),
-                                        //                                   ),
-                                        //                                 ],
-                                        //                               ),
-                                        //                             ),
-                                        //                           );
-                                        //                         },
-                                        //                       );
-                                        //                     },
-                                        //               style: ElevatedButton.styleFrom(
-                                        //                 backgroundColor: Color(0xFF004C90),
-                                        //                 padding: EdgeInsets.symmetric(
-                                        //                   horizontal: screenWidth * 0.01,
-                                        //                   vertical: screenWidth * 0.01,
-                                        //                 ),
-                                        //                 shape: RoundedRectangleBorder(
-                                        //                   borderRadius: BorderRadius.circular(8),
-                                        //                 ),
-                                        //               ),
-                                        //               child: Row(
-                                        //                 mainAxisSize: MainAxisSize.min,
-                                        //                 children: [
-                                        //                   Text("Book a test drive",
-                                        //                       style: TextStyle(
-                                        //                         color: Colors.white,
-                                        //                         fontSize: screenWidth * 0.01,
-                                        //                         fontFamily: "DMSans",
-                                        //                       )),
-                                        //                   SizedBox(width: sectionSpacing),
-                                        //                   Icon(Icons.arrow_outward, color: Colors.white),
-                                        //                 ],
-                                        //               ),
-                                        //             ),
-                                        //           ],
-                                        //         ),
-                                        //       ),
-                                        //     ),
-                                        //   ],
-                                        // ),
+                                              // Responsive sizes
+                                              double imageWidth, imageHeight, playButtonSize, infoPadding, titleFontSize, descFontSize, bulletFontSize, buttonFontSize, sectionSpacing;
+                                              if (isMobile) {
+                                                imageWidth = screenWidth * 0.9;
+                                                imageHeight = screenWidth * 0.5;
+                                                playButtonSize = 40;
+                                                infoPadding = 16;
+                                                titleFontSize = 18;
+                                                descFontSize = 12;
+                                                bulletFontSize = 12;
+                                                buttonFontSize = 14;
+                                                sectionSpacing = 10;
+                                              } else if (isTablet) {
+                                                imageWidth = screenWidth * 0.4;
+                                                imageHeight = screenWidth * 0.5;
+                                                playButtonSize = 50;
+                                                infoPadding = 32;
+                                                titleFontSize = 24;
+                                                descFontSize = 14;
+                                                bulletFontSize = 14;
+                                                buttonFontSize = 16;
+                                                sectionSpacing = 16;
+                                              } else {
+                                                imageWidth = screenWidth * 0.35;
+                                                imageHeight = screenWidth * 0.33;
+                                                playButtonSize = 60;
+                                                infoPadding = 70;
+                                                titleFontSize = 32;
+                                                descFontSize = 16;
+                                                bulletFontSize = 16;
+                                                buttonFontSize = 18;
+                                                sectionSpacing = 24;
+                                              }
 
+                                              Widget imageStack = Stack(
+                                                alignment: Alignment.center,
+                                                children: [
+                                                  ClipRRect(
+                                                    borderRadius: BorderRadius.only(
+                                                      topLeft: Radius.circular(10),
+                                                      bottomLeft: isMobile ? Radius.circular(10) : Radius.circular(0),
+                                                      topRight: isMobile ? Radius.circular(10) : Radius.circular(0),
+                                                      bottomRight: Radius.circular(0),
+                                                    ),
+                                                    child: Image.asset(
+                                                      "assets/videoImage.jpeg",
+                                                      width: imageWidth,
+                                                      height: imageHeight,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
+                                                  CircleAvatar(
+                                                    radius: playButtonSize / 2,
+                                                    backgroundColor: Colors.white,
+                                                    child: Icon(
+                                                      Icons.play_arrow,
+                                                      size: playButtonSize * 0.5,
+                                                      color: Colors.black,
+                                                    ),
+                                                  ),
+                                                ],
+                                              );
 
-                                        // Responsive "video + info" section
-                                        Builder(
-                                          builder: (context) {
-                                            final screenWidth = MediaQuery.of(context).size.width;
-                                            final isMobile = screenWidth < 600;
-                                            final isTablet = screenWidth >= 600 && screenWidth < 1024;
-                                            final isDesktop = screenWidth >= 1024;
+                                              Widget infoSection = Container(
+                                                width: isMobile ? double.infinity : screenWidth * 0.48,
+                                                decoration: BoxDecoration(
+                                                  color: Color.fromRGBO(238, 241, 251, 1),
+                                                  borderRadius: isMobile
+                                                      ? BorderRadius.only(
+                                                          bottomLeft: Radius.circular(10),
+                                                          bottomRight: Radius.circular(10),
+                                                        )
+                                                      : null,
+                                                ),
+                                                child: Padding(
+                                                  padding: EdgeInsets.all(infoPadding),
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        "Buying a car has never been this easy.",
+                                                        style: TextStyle(
+                                                          fontSize: titleFontSize,
+                                                          fontWeight: FontWeight.bold,
+                                                          color: Colors.black,
+                                                          fontFamily: "DMSans",
+                                                        ),
+                                                      ),
+                                                      SizedBox(height: sectionSpacing),
+                                                      Text(
+                                                        "We are committed to providing our customers with exceptional service, competitive pricing, and a wide range of options.",
+                                                        style: TextStyle(
+                                                          fontSize: descFontSize,
+                                                          color: Color.fromRGBO(5, 11, 32, 1),
+                                                          fontFamily: "DMSans",
+                                                        ),
+                                                      ),
+                                                      SizedBox(height: sectionSpacing),
+                                                      Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          buildBulletPoint(
+                                                            "We are the UK's largest provider, with more patrols in more places",
+                                                            fontSize: bulletFontSize,
+                                                          ),
+                                                          buildBulletPoint(
+                                                            "You get 24/7 roadside assistance",
+                                                            fontSize: bulletFontSize,
+                                                          ),
+                                                          buildBulletPoint(
+                                                            "We fix 4 out of 5 cars at the roadside",
+                                                            fontSize: bulletFontSize,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      SizedBox(height: sectionSpacing),
+                                                      ElevatedButton(
+                                                        onPressed: () {
+                                                          _bookTestDrive();
+                                                        },
+                                                        style: ElevatedButton.styleFrom(
+                                                          backgroundColor: Color(0xFF004C90),
+                                                          padding: EdgeInsets.symmetric(
+                                                            horizontal: infoPadding,
+                                                            vertical: infoPadding / 2.5,
+                                                          ),
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.circular(8),
+                                                          ),
+                                                        ),
+                                                        child: Row(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          children: [
+                                                            Text(
+                                                              "Book a test drive",
+                                                              style: TextStyle(
+                                                                color: Colors.white,
+                                                                fontSize: buttonFontSize,
+                                                                fontFamily: "DMSans",
+                                                              ),
+                                                            ),
+                                                            SizedBox(width: sectionSpacing / 2),
+                                                            Icon(Icons.arrow_outward, color: Colors.white, size: buttonFontSize + 2),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              );
 
-                                            // Responsive sizes
-                                            double imageWidth, imageHeight, playButtonSize, infoPadding, titleFontSize, descFontSize, bulletFontSize, buttonFontSize, sectionSpacing;
-                                            if (isMobile) {
-                                              imageWidth = screenWidth * 0.9;
-                                              imageHeight = screenWidth * 0.5;
-                                              playButtonSize = 40;
-                                              infoPadding = 16;
-                                              titleFontSize = 18;
-                                              descFontSize = 12;
-                                              bulletFontSize = 12;
-                                              buttonFontSize = 14;
-                                              sectionSpacing = 10;
-                                            } else if (isTablet) {
-                                              imageWidth = screenWidth * 0.4;
-                                              imageHeight = screenWidth * 0.3;
-                                              playButtonSize = 50;
-                                              infoPadding = 32;
-                                              titleFontSize = 24;
-                                              descFontSize = 14;
-                                              bulletFontSize = 14;
-                                              buttonFontSize = 16;
-                                              sectionSpacing = 16;
-                                            } else {
-                                              imageWidth = screenWidth * 0.35;
-                                              imageHeight = screenWidth * 0.33;
-                                              playButtonSize = 60;
-                                              infoPadding = 70;
-                                              titleFontSize = 32;
-                                              descFontSize = 16;
-                                              bulletFontSize = 16;
-                                              buttonFontSize = 18;
-                                              sectionSpacing = 24;
-                                            }
+                                              if (isMobile) {
+                                                return Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                  children: [
+                                                    imageStack,
+                                                    infoSection,
+                                                  ],
+                                                );
+                                              } else {
+                                                return Row(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    imageStack,
+                                                    infoSection,
+                                                  ],
+                                                );
+                                              }
+                                            },
+                                          ),
 
-                                            Widget imageStack = Stack(
-                                              alignment: Alignment.center,
+                                          SizedBox(height: sectionSpacing),
+                                          Builder(
+                                            builder: (context) {
+                                              double screenWidth = MediaQuery.of(context).size.width;
+                                              int crossAxisCount;
+                                              if (screenWidth < 600) {
+                                                crossAxisCount = 2;
+                                              } else if (screenWidth < 1024) {
+                                                crossAxisCount = 4;
+                                              } else {
+                                                crossAxisCount = 4;
+                                              }
+                                              return Wrap(
+                                                alignment: WrapAlignment.center,
+                                                spacing: 8,
+                                                runSpacing: 8,
+                                                children: [
+                                                  buildStatBox("836M", "CARS FOR SALE", context),
+                                                  buildStatBox("738M", "DEALER REVIEWS", context),
+                                                  buildStatBox("100M", "VISITORS PER DAY", context),
+                                                  buildStatBox("238M", "VERIFIED DEALERS", context),
+                                                ],
+                                              );
+                                            },
+                                          ),
+
+                                          Divider(
+                                            thickness: 1,
+                                            color: Color.fromRGBO(223, 223, 223, 1),
+                                          ),
+                                          SizedBox(height: sectionSpacing),
+
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                              left: screenWidth >= 1024
+                                                  ? 100
+                                                  : screenWidth >= 600
+                                                      ? 40
+                                                      : 10,
+                                              right: screenWidth >= 1024
+                                                  ? 50
+                                                  : screenWidth >= 600
+                                                      ? 24
+                                                      : 10,
+                                              top: screenWidth >= 1024
+                                                  ? 50
+                                                  : screenWidth >= 600
+                                                      ? 30
+                                                      : 16,
+                                              bottom: screenWidth >= 1024
+                                                  ? 20
+                                                  : screenWidth >= 600
+                                                      ? 16
+                                                      : 8,
+                                            ),
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
-                                                ClipRRect(
-                                                  borderRadius: BorderRadius.only(
-                                                    topLeft: Radius.circular(10),
-                                                    bottomLeft: isMobile ? Radius.circular(10) : Radius.circular(0),
-                                                    topRight: isMobile ? Radius.circular(10) : Radius.circular(0),
-                                                    bottomRight: Radius.circular(0),
-                                                  ),
-                                                  child: Image.asset(
-                                                    "assets/videoImage.jpeg",
-                                                    width: imageWidth,
-                                                    height: imageHeight,
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                                CircleAvatar(
-                                                  radius: playButtonSize / 2,
-                                                  backgroundColor: Colors.white,
-                                                  child: Icon(
-                                                    Icons.play_arrow,
-                                                    size: playButtonSize * 0.5,
-                                                    color: Colors.black,
-                                                  ),
-                                                ),
+                                                Text("Why Choose Us?", style: TextStyle(fontWeight: FontWeight.bold,fontSize: screenHeight * 0.038, fontFamily: "DMSans",),),
                                               ],
-                                            );
+                                            ),
+                                          ),
+                                          SizedBox(height: sectionSpacing),
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                              left: screenWidth >= 1024
+                                                  ? 100
+                                                  : screenWidth >= 600
+                                                      ? 40
+                                                      : 10,
+                                              right: screenWidth >= 1024
+                                                  ? 50
+                                                  : screenWidth >= 600
+                                                      ? 24
+                                                      : 10,
+                                              top: screenWidth >= 1024
+                                                  ? 50
+                                                  : screenWidth >= 600
+                                                      ? 30
+                                                      : 16,
+                                              bottom: screenWidth >= 1024
+                                                  ? 20
+                                                  : screenWidth >= 600
+                                                      ? 16
+                                                      : 8,
+                                            ),
+                                            child: LayoutBuilder(
+                                              builder: (context, constraints) {
+                                                double screenWidth = MediaQuery.of(context).size.width;
+                                                bool isMobile = screenWidth < 600;
 
-                                            Widget infoSection = Container(
-                                              width: isMobile ? double.infinity : screenWidth * 0.48,
+                                                double imageSize;
+                                                double titleFontSize;
+                                                double descFontSize;
+                                                if (screenWidth >= 1024) {
+                                                  // Desktop
+                                                  imageSize = 52;
+                                                  titleFontSize = 22;
+                                                  descFontSize = 15;
+                                                } else if (screenWidth >= 600) {
+                                                  // Tablet
+                                                  imageSize = 40;
+                                                  titleFontSize = 19;
+                                                  descFontSize = 15;
+                                                } else {
+                                                  // Mobile
+                                                  imageSize = 33;
+                                                  titleFontSize = 15;
+                                                  descFontSize = 13;
+                                                }
+
+                                                List<Widget> infoBlocks = [
+                                                  Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Image.asset("assets/financialOffer.png", height: imageSize),
+                                                      SizedBox(height: screenWidth * 0.02),
+                                                      Text("Special Financing Offers", style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold, fontFamily: "DMSans",),),
+                                                      SizedBox(height: screenWidth * 0.01),
+                                                      Text("Our stress-free finance department that can \nfind financial solutions to save you money.",
+                                                        style: TextStyle(fontFamily: "DMSans", fontSize: descFontSize),),
+                                                    ],
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Image.asset("assets/dealership.png", height: imageSize),
+                                                      SizedBox(height: screenWidth * 0.02),
+                                                      Text("Trusted Car Dealership", style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold, fontFamily: "DMSans",),),
+                                                      SizedBox(height: screenWidth * 0.01),
+                                                      Text("Our stress-free finance department that can \nfind financial solutions to save you money.",
+                                                        style: TextStyle(fontFamily: "DMSans", fontSize: descFontSize),),
+                                                    ],
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Image.asset("assets/transparent.png", height: imageSize),
+                                                      SizedBox(height: screenWidth*0.02),
+                                                      Text("Transparent Pricing", style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold, fontFamily: "DMSans",),),
+                                                      SizedBox(height: screenWidth * 0.01),
+                                                      Text("Our stress-free finance department that can \nfind financial solutions to save you money.",
+                                                        style: TextStyle(fontFamily: "DMSans", fontSize: descFontSize),),
+                                                    ],
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Image.asset("assets/expertCar.png", height: imageSize),
+                                                      SizedBox(height: screenWidth * 0.02),
+                                                      Text("Expert Car Service", style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold),),
+                                                      SizedBox(height: screenWidth * 0.01),
+                                                      Text("Our stress-free finance department that can \nfind financial solutions to save you money.",
+                                                        style: TextStyle(fontFamily: "DMSans", fontSize: descFontSize),),
+                                                    ],
+                                                  ),
+                                                ];
+
+                                                if (isMobile) {
+                                                  // Display vertically for mobile
+                                                  return Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: infoBlocks
+                                                        .map((block) => Padding(
+                                                              padding: EdgeInsets.only(bottom: screenWidth * 0.04),
+                                                              child: block,
+                                                            ))
+                                                        .toList(),
+                                                  );
+                                                } else {
+                                                  // Display horizontally for tablet/desktop
+                                                  return Row(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: infoBlocks
+                                                        .map((block) => Padding(
+                                                              padding: EdgeInsets.only(right: screenWidth * 0.02),
+                                                              child: block,
+                                                            ))
+                                                        .toList(),
+                                                  );
+                                                }
+                                              }
+                                            ),
+                                          ),
+                                          SizedBox(height: screenHeight * 0.1),
+                                          
+                                          Stack(
+                                          children: [
+                                            Container(
                                               decoration: BoxDecoration(
-                                                color: Color.fromRGBO(238, 241, 251, 1),
-                                                borderRadius: isMobile
-                                                    ? BorderRadius.only(
-                                                        bottomLeft: Radius.circular(10),
-                                                        bottomRight: Radius.circular(10),
-                                                      )
-                                                    : null,
+                                                color: Color.fromRGBO(249, 251, 252, 1),
                                               ),
                                               child: Padding(
-                                                padding: EdgeInsets.all(infoPadding),
+                                                padding: EdgeInsets.only(
+                                                  left: screenWidth >= 1024
+                                                      ? screenWidth * 0.15
+                                                      : screenWidth >= 600
+                                                          ? screenWidth * 0.08
+                                                          : 16,
+                                                  right: screenWidth >= 1024
+                                                      ? screenWidth * 0.15
+                                                      : screenWidth >= 600
+                                                          ? screenWidth * 0.08
+                                                          : 16,
+                                                  top: screenWidth >= 1024
+                                                      ? screenHeight * 0.10
+                                                      : screenWidth >= 600
+                                                          ? screenHeight * 0.06
+                                                          : 16,
+                                                ),
                                                 child: Column(
                                                   crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
-                                                    Text(
-                                                      "Buying a car has never been this easy.",
-                                                      style: TextStyle(
-                                                        fontSize: titleFontSize,
-                                                        fontWeight: FontWeight.bold,
-                                                        color: Colors.black,
-                                                        fontFamily: "DMSans",
+                                                    Padding(
+                                                      padding: EdgeInsets.symmetric(
+                                                        horizontal: screenWidth >= 1024
+                                                            ? 0
+                                                            : screenWidth >= 600
+                                                                ? 0
+                                                                : 0, // You can adjust if you want more padding on mobile
+                                                      ),
+                                                      child: LayoutBuilder(
+                                                        builder: (context, constraints) {
+                                                          double textSize;
+                                                          double subTextSize;
+                                                          if (constraints.maxWidth >= 1024) {
+                                                            textSize = 28;
+                                                            subTextSize = 14;
+                                                          } else if (constraints.maxWidth >= 600) {
+                                                            textSize = 24;
+                                                            subTextSize = 12;
+                                                          } else {
+                                                            textSize = 18;
+                                                            subTextSize = 10;
+                                                          }
+
+                                                          bool isMobile = constraints.maxWidth < 600;
+
+                                                          return Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: [
+                                                              isMobile
+                                                                  ? Column(
+                                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                                      children: [
+                                                                        Text(
+                                                                          "What our customers say",
+                                                                          style: TextStyle(
+                                                                            fontWeight: FontWeight.w700,
+                                                                            fontSize: textSize,
+                                                                            fontFamily: "DMSans",
+                                                                          ),
+                                                                        ),
+                                                                        SizedBox(height: 8),
+                                                                        Text(
+                                                                          "Rated ${calculateAverageRating().toStringAsFixed(1)} / 5 based on $totalReviews reviews Showing our 4 & 5 star reviews",
+                                                                          style: TextStyle(
+                                                                            fontWeight: FontWeight.w400,
+                                                                            fontSize: subTextSize,
+                                                                            fontFamily: "DMSans",
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    )
+                                                                  : Row(
+                                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                      children: [
+                                                                        Text(
+                                                                          "What our customers say",
+                                                                          style: TextStyle(
+                                                                            fontWeight: FontWeight.w700,
+                                                                            fontSize: textSize,
+                                                                            fontFamily: "DMSans",
+                                                                          ),
+                                                                        ),
+                                                                        Text(
+                                                                          "Rated ${calculateAverageRating().toStringAsFixed(1)} / 5 based on $totalReviews reviews Showing our 4 & 5 star reviews",
+                                                                          style: TextStyle(
+                                                                            fontWeight: FontWeight.w400,
+                                                                            fontSize: subTextSize,
+                                                                            fontFamily: "DMSans",
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                            ],
+                                                          );
+                                                        },
                                                       ),
                                                     ),
-                                                    SizedBox(height: sectionSpacing),
-                                                    Text(
-                                                      "We are committed to providing our customers with exceptional service, competitive pricing, and a wide range of options.",
-                                                      style: TextStyle(
-                                                        fontSize: descFontSize,
-                                                        color: Color.fromRGBO(5, 11, 32, 1),
-                                                        fontFamily: "DMSans",
+                                                    const SizedBox(height: 20),
+                                                    Padding(
+                                                      padding: EdgeInsets.symmetric(
+                                                        horizontal: screenWidth >= 1024
+                                                            ? 0
+                                                            : screenWidth >= 600
+                                                                ? 0
+                                                                : 0, // Adjust if you want more padding on mobile
                                                       ),
-                                                    ),
-                                                    SizedBox(height: sectionSpacing),
-                                                    Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      children: [
-                                                        buildBulletPoint(
-                                                          "We are the UK's largest provider, with more patrols in more places",
-                                                          fontSize: bulletFontSize,
-                                                        ),
-                                                        buildBulletPoint(
-                                                          "You get 24/7 roadside assistance",
-                                                          fontSize: bulletFontSize,
-                                                        ),
-                                                        buildBulletPoint(
-                                                          "We fix 4 out of 5 cars at the roadside",
-                                                          fontSize: bulletFontSize,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    SizedBox(height: sectionSpacing),
-                                                    ElevatedButton(
-                                                      onPressed: () {
-                                                        _bookTestDrive();
-                                                      },
-                                                      style: ElevatedButton.styleFrom(
-                                                        backgroundColor: Color(0xFF004C90),
-                                                        padding: EdgeInsets.symmetric(
-                                                          horizontal: infoPadding,
-                                                          vertical: infoPadding / 2.5,
-                                                        ),
-                                                        shape: RoundedRectangleBorder(
-                                                          borderRadius: BorderRadius.circular(8),
-                                                        ),
-                                                      ),
-                                                      child: Row(
-                                                        mainAxisSize: MainAxisSize.min,
-                                                        children: [
-                                                          Text(
-                                                            "Book a test drive",
-                                                            style: TextStyle(
-                                                              color: Colors.white,
-                                                              fontSize: buttonFontSize,
-                                                              fontFamily: "DMSans",
-                                                            ),
-                                                          ),
-                                                          SizedBox(width: sectionSpacing / 2),
-                                                          Icon(Icons.arrow_outward, color: Colors.white, size: buttonFontSize + 2),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            );
+                                                      child: LayoutBuilder(
+                                                        builder: (context, constraints) {
+                                                          bool isDesktop = constraints.maxWidth >= 1024;
+                                                          bool isTablet = constraints.maxWidth >= 600 && constraints.maxWidth < 1024;
+                                                          bool isMobile = constraints.maxWidth < 600;
 
-                                            if (isMobile) {
-                                              return Column(
-                                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                                children: [
-                                                  imageStack,
-                                                  infoSection,
-                                                ],
-                                              );
-                                            } else {
-                                              return Row(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  imageStack,
-                                                  infoSection,
-                                                ],
-                                              );
-                                            }
-                                          },
-                                        ),
+                                                          double containerHeight = isDesktop
+                                                              ? 490
+                                                              : isTablet
+                                                                  ? 420
+                                                                  : 320;
+                                                          double containerWidth = isDesktop
+                                                              ? screenWidth * 0.9
+                                                              : isTablet
+                                                                  ? screenWidth * 0.95
+                                                                  : screenWidth * 0.98;
+                                                          double imageWidth = isDesktop
+                                                              ? 480
+                                                              : isTablet
+                                                                  ? 300
+                                                                  : containerWidth;
+                                                          double imageHeight = isDesktop
+                                                              ? 550
+                                                              : isTablet
+                                                                  ? 380
+                                                                  : 180;
+                                                          double nameSize = isDesktop
+                                                              ? 18
+                                                              : isTablet
+                                                                  ? 16
+                                                                  : 14;
+                                                          double designationSize = isDesktop
+                                                              ? 15
+                                                              : isTablet
+                                                                  ? 13
+                                                                  : 11;
+                                                          double reviewTextSize = isDesktop
+                                                              ? 22
+                                                              : isTablet
+                                                                  ? 16
+                                                                  : 12;
+                                                          double starSize = isDesktop
+                                                              ? 16
+                                                              : isTablet
+                                                                  ? 13
+                                                                  : 11;
 
-                                        SizedBox(height: sectionSpacing),
-                                         Builder(
-                                          builder: (context) {
-                                            double screenWidth = MediaQuery.of(context).size.width;
-                                            int crossAxisCount;
-                                            if (screenWidth < 600) {
-                                              crossAxisCount = 2;
-                                            } else if (screenWidth < 1024) {
-                                              crossAxisCount = 4;
-                                            } else {
-                                              crossAxisCount = 4;
-                                            }
-                                            return Wrap(
-                                              alignment: WrapAlignment.center,
-                                              spacing: 8,
-                                              runSpacing: 8,
-                                              children: [
-                                                buildStatBox("836M", "CARS FOR SALE", context),
-                                                buildStatBox("738M", "DEALER REVIEWS", context),
-                                                buildStatBox("100M", "VISITORS PER DAY", context),
-                                                buildStatBox("238M", "VERIFIED DEALERS", context),
-                                              ],
-                                            );
-                                          },
-                                        ),
-
-                                        Divider(
-                                          thickness: 1,
-                                          color: Color.fromRGBO(223, 223, 223, 1),
-                                        ),
-                                        SizedBox(height: sectionSpacing),
-
-                                        Padding(
-                                          padding: EdgeInsets.only(
-                                            left: screenWidth >= 1024
-                                                ? 100
-                                                : screenWidth >= 600
-                                                    ? 40
-                                                    : 10,
-                                            right: screenWidth >= 1024
-                                                ? 50
-                                                : screenWidth >= 600
-                                                    ? 24
-                                                    : 10,
-                                            top: screenWidth >= 1024
-                                                ? 50
-                                                : screenWidth >= 600
-                                                    ? 30
-                                                    : 16,
-                                            bottom: screenWidth >= 1024
-                                                ? 20
-                                                : screenWidth >= 600
-                                                    ? 16
-                                                    : 8,
-                                          ),
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text("Why Choose Us?", style: TextStyle(fontWeight: FontWeight.bold,fontSize: screenHeight * 0.038, fontFamily: "DMSans",),),
-                                            ],
-                                          ),
-                                        ),
-                                        SizedBox(height: sectionSpacing),
-                                        Padding(
-                                          padding: EdgeInsets.only(
-                                            left: screenWidth >= 1024
-                                                ? 100
-                                                : screenWidth >= 600
-                                                    ? 40
-                                                    : 10,
-                                            right: screenWidth >= 1024
-                                                ? 50
-                                                : screenWidth >= 600
-                                                    ? 24
-                                                    : 10,
-                                            top: screenWidth >= 1024
-                                                ? 50
-                                                : screenWidth >= 600
-                                                    ? 30
-                                                    : 16,
-                                            bottom: screenWidth >= 1024
-                                                ? 20
-                                                : screenWidth >= 600
-                                                    ? 16
-                                                    : 8,
-                                          ),
-                                          child: LayoutBuilder(
-                                            builder: (context, constraints) {
-                                              double screenWidth = MediaQuery.of(context).size.width;
-                                              bool isMobile = screenWidth < 600;
-
-                                              double imageSize;
-                                              double titleFontSize;
-                                              double descFontSize;
-                                              if (screenWidth >= 1024) {
-                                                // Desktop
-                                                imageSize = 52;
-                                                titleFontSize = 22;
-                                                descFontSize = 15;
-                                              } else if (screenWidth >= 600) {
-                                                // Tablet
-                                                imageSize = 40;
-                                                titleFontSize = 19;
-                                                descFontSize = 15;
-                                              } else {
-                                                // Mobile
-                                                imageSize = 33;
-                                                titleFontSize = 15;
-                                                descFontSize = 13;
-                                              }
-
-                                              List<Widget> infoBlocks = [
-                                                Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Image.asset("assets/financialOffer.png", height: imageSize),
-                                                    SizedBox(height: screenWidth * 0.02),
-                                                    Text("Special Financing Offers", style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold, fontFamily: "DMSans",),),
-                                                    SizedBox(height: screenWidth * 0.01),
-                                                    Text("Our stress-free finance department that can \nfind financial solutions to save you money.",
-                                                      style: TextStyle(fontFamily: "DMSans", fontSize: descFontSize),),
-                                                  ],
-                                                ),
-                                                Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Image.asset("assets/dealership.png", height: imageSize),
-                                                    SizedBox(height: screenWidth * 0.02),
-                                                    Text("Trusted Car Dealership", style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold, fontFamily: "DMSans",),),
-                                                    SizedBox(height: screenWidth * 0.01),
-                                                    Text("Our stress-free finance department that can \nfind financial solutions to save you money.",
-                                                      style: TextStyle(fontFamily: "DMSans", fontSize: descFontSize),),
-                                                  ],
-                                                ),
-                                                Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Image.asset("assets/transparent.png", height: imageSize),
-                                                    SizedBox(height: screenWidth*0.02),
-                                                    Text("Transparent Pricing", style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold, fontFamily: "DMSans",),),
-                                                    SizedBox(height: screenWidth * 0.01),
-                                                    Text("Our stress-free finance department that can \nfind financial solutions to save you money.",
-                                                      style: TextStyle(fontFamily: "DMSans", fontSize: descFontSize),),
-                                                  ],
-                                                ),
-                                                Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Image.asset("assets/expertCar.png", height: imageSize),
-                                                    SizedBox(height: screenWidth * 0.02),
-                                                    Text("Expert Car Service", style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold),),
-                                                    SizedBox(height: screenWidth * 0.01),
-                                                    Text("Our stress-free finance department that can \nfind financial solutions to save you money.",
-                                                      style: TextStyle(fontFamily: "DMSans", fontSize: descFontSize),),
-                                                  ],
-                                                ),
-                                              ];
-
-                                              if (isMobile) {
-                                                // Display vertically for mobile
-                                                return Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: infoBlocks
-                                                      .map((block) => Padding(
-                                                            padding: EdgeInsets.only(bottom: screenWidth * 0.04),
-                                                            child: block,
-                                                          ))
-                                                      .toList(),
-                                                );
-                                              } else {
-                                                // Display horizontally for tablet/desktop
-                                                return Row(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: infoBlocks
-                                                      .map((block) => Padding(
-                                                            padding: EdgeInsets.only(right: screenWidth * 0.02),
-                                                            child: block,
-                                                          ))
-                                                      .toList(),
-                                                );
-                                              }
-                                            }
-                                          ),
-                                        ),
-                                        SizedBox(height: screenHeight * 0.1),
-                                        
-                                        Stack(
-                                        children: [
-                                          Container(
-                                            decoration: BoxDecoration(
-                                              color: Color.fromRGBO(249, 251, 252, 1),
-                                            ),
-                                            child: Padding(
-                                              padding: EdgeInsets.only(
-                                                left: screenWidth >= 1024
-                                                    ? screenWidth * 0.15
-                                                    : screenWidth >= 600
-                                                        ? screenWidth * 0.08
-                                                        : 16,
-                                                right: screenWidth >= 1024
-                                                    ? screenWidth * 0.15
-                                                    : screenWidth >= 600
-                                                        ? screenWidth * 0.08
-                                                        : 16,
-                                                top: screenWidth >= 1024
-                                                    ? screenHeight * 0.10
-                                                    : screenWidth >= 600
-                                                        ? screenHeight * 0.06
-                                                        : 16,
-                                              ),
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Padding(
-                                                    padding: EdgeInsets.symmetric(
-                                                      horizontal: screenWidth >= 1024
-                                                          ? 0
-                                                          : screenWidth >= 600
-                                                              ? 0
-                                                              : 0, // You can adjust if you want more padding on mobile
-                                                    ),
-                                                    child: LayoutBuilder(
-                                                      builder: (context, constraints) {
-                                                        double textSize;
-                                                        double subTextSize;
-                                                        if (constraints.maxWidth >= 1024) {
-                                                          textSize = 28;
-                                                          subTextSize = 14;
-                                                        } else if (constraints.maxWidth >= 600) {
-                                                          textSize = 24;
-                                                          subTextSize = 12;
-                                                        } else {
-                                                          textSize = 18;
-                                                          subTextSize = 10;
-                                                        }
-
-                                                        bool isMobile = constraints.maxWidth < 600;
-
-                                                        return Column(
-                                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                                          children: [
-                                                            isMobile
-                                                                ? Column(
-                                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                                    children: [
-                                                                      Text(
-                                                                        "What our customers say",
-                                                                        style: TextStyle(
-                                                                          fontWeight: FontWeight.w700,
-                                                                          fontSize: textSize,
-                                                                          fontFamily: "DMSans",
-                                                                        ),
-                                                                      ),
-                                                                      SizedBox(height: 8),
-                                                                      Text(
-                                                                        "Rated ${calculateAverageRating().toStringAsFixed(1)} / 5 based on $totalReviews reviews Showing our 4 & 5 star reviews",
-                                                                        style: TextStyle(
-                                                                          fontWeight: FontWeight.w400,
-                                                                          fontSize: subTextSize,
-                                                                          fontFamily: "DMSans",
-                                                                        ),
-                                                                      ),
-                                                                    ],
-                                                                  )
-                                                                : Row(
-                                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                    children: [
-                                                                      Text(
-                                                                        "What our customers say",
-                                                                        style: TextStyle(
-                                                                          fontWeight: FontWeight.w700,
-                                                                          fontSize: textSize,
-                                                                          fontFamily: "DMSans",
-                                                                        ),
-                                                                      ),
-                                                                      Text(
-                                                                        "Rated ${calculateAverageRating().toStringAsFixed(1)} / 5 based on $totalReviews reviews Showing our 4 & 5 star reviews",
-                                                                        style: TextStyle(
-                                                                          fontWeight: FontWeight.w400,
-                                                                          fontSize: subTextSize,
-                                                                          fontFamily: "DMSans",
-                                                                        ),
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                          ],
-                                                        );
-                                                      },
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 20),
-                                                  Padding(
-                                                    padding: EdgeInsets.symmetric(
-                                                      horizontal: screenWidth >= 1024
-                                                          ? 0
-                                                          : screenWidth >= 600
-                                                              ? 0
-                                                              : 0, // Adjust if you want more padding on mobile
-                                                    ),
-                                                    child: LayoutBuilder(
-                                                      builder: (context, constraints) {
-                                                        bool isDesktop = constraints.maxWidth >= 1024;
-                                                        bool isTablet = constraints.maxWidth >= 600 && constraints.maxWidth < 1024;
-                                                        bool isMobile = constraints.maxWidth < 600;
-
-                                                        double containerHeight = isDesktop
-                                                            ? 490
-                                                            : isTablet
-                                                                ? 390
-                                                                : 320;
-                                                        double containerWidth = isDesktop
-                                                            ? screenWidth * 0.9
-                                                            : isTablet
-                                                                ? screenWidth * 0.95
-                                                                : screenWidth * 0.98;
-                                                        double imageWidth = isDesktop
-                                                            ? 480
-                                                            : isTablet
-                                                                ? 300
-                                                                : containerWidth;
-                                                        double imageHeight = isDesktop
-                                                            ? 550
-                                                            : isTablet
-                                                                ? 350
-                                                                : 180;
-                                                        double nameSize = isDesktop
-                                                            ? 18
-                                                            : isTablet
-                                                                ? 16
-                                                                : 14;
-                                                        double designationSize = isDesktop
-                                                            ? 15
-                                                            : isTablet
-                                                                ? 13
-                                                                : 11;
-                                                        double reviewTextSize = isDesktop
-                                                            ? 22
-                                                            : isTablet
-                                                                ? 16
-                                                                : 12;
-                                                        double starSize = isDesktop
-                                                            ? 16
-                                                            : isTablet
-                                                                ? 13
-                                                                : 11;
-
-                                                        return Builder(
-                                                          builder: (context) {
-                                                            if (isLoadingReviews) {
-                                                              return Center(child: CircularProgressIndicator());
-                                                            }
-                                                            if (errorMessageReviews != null) {
-                                                              return Center(child: Text(errorMessageReviews!));
-                                                            }
-                                                            if (reviews.isEmpty) {
-                                                              return Center(child: Text('No high-rated reviews available'));
-                                                            }
-                                                            return CarouselSlider(
-                                                              carouselController: reviewCarouselController,
-                                                              options: CarouselOptions(
-                                                                height: containerHeight,
-                                                                autoPlay: false,
-                                                                enlargeCenterPage: false,
-                                                                enableInfiniteScroll: false,
-                                                                viewportFraction: 1,
-                                                                onPageChanged: (index, reason) {
-                                                                  setState(() {
-                                                                    reviewCurrentPage = index;
-                                                                  });
-                                                                },
-                                                              ),
-                                                              items: reviews.asMap().entries.map((entry) {
-                                                                int index = entry.key;
-                                                                Map<String, dynamic> review = entry.value;
-                                                                return Padding(
-                                                                  padding: const EdgeInsets.all(0.0),
-                                                                  child: Container(
-                                                                    height: containerHeight,
-                                                                    width: containerWidth,
-                                                                    child: isMobile
-                                                                        ? Column(
-                                                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                                                            children: [
-                                                                              Image.asset(
-                                                                                review["image"] ?? 'assets/placeholder.png',
-                                                                                height: imageHeight,
-                                                                                width: imageWidth,
-                                                                                fit: BoxFit.cover,
-                                                                                errorBuilder: (context, error, stackTrace) =>
-                                                                                    Image.asset(
-                                                                                  'assets/placeholder.png',
+                                                          return Builder(
+                                                            builder: (context) {
+                                                              if (isLoadingReviews) {
+                                                                return Center(child: CircularProgressIndicator());
+                                                              }
+                                                              if (errorMessageReviews != null) {
+                                                                return Center(child: Text(errorMessageReviews!));
+                                                              }
+                                                              if (reviews.isEmpty) {
+                                                                return Center(child: Text('No high-rated reviews available'));
+                                                              }
+                                                              return CarouselSlider(
+                                                                carouselController: reviewCarouselController,
+                                                                options: CarouselOptions(
+                                                                  height: containerHeight,
+                                                                  autoPlay: false,
+                                                                  enlargeCenterPage: false,
+                                                                  enableInfiniteScroll: false,
+                                                                  viewportFraction: 1,
+                                                                  onPageChanged: (index, reason) {
+                                                                    setState(() {
+                                                                      reviewCurrentPage = index;
+                                                                    });
+                                                                  },
+                                                                ),
+                                                                items: reviews.asMap().entries.map((entry) {
+                                                                  int index = entry.key;
+                                                                  Map<String, dynamic> review = entry.value;
+                                                                  return Padding(
+                                                                    padding: const EdgeInsets.all(0.0),
+                                                                    child: Container(
+                                                                      height: containerHeight,
+                                                                      width: containerWidth,
+                                                                      child: isMobile
+                                                                          ? Column(
+                                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                                              children: [
+                                                                                Image.asset(
+                                                                                  review["image"] ?? 'assets/placeholder.png',
                                                                                   height: imageHeight,
                                                                                   width: imageWidth,
                                                                                   fit: BoxFit.cover,
-                                                                                ),
-                                                                              ),
-                                                                              SizedBox(height: 12),
-                                                                              Row(
-                                                                                children: [
-                                                                                  Row(
-                                                                                    children: List.generate(5, (starIndex) {
-                                                                                      return Icon(
-                                                                                        starIndex < (review["rating"] ?? 0)
-                                                                                            ? Icons.star
-                                                                                            : Icons.star_border,
-                                                                                        color: Color.fromRGBO(225, 192, 63, 1),
-                                                                                        size: starSize.toDouble(),
-                                                                                      );
-                                                                                    }),
+                                                                                  errorBuilder: (context, error, stackTrace) =>
+                                                                                      Image.asset(
+                                                                                    'assets/placeholder.png',
+                                                                                    height: imageHeight,
+                                                                                    width: imageWidth,
+                                                                                    fit: BoxFit.cover,
                                                                                   ),
-                                                                                  SizedBox(width: 6),
-                                                                                  Container(
-                                                                                    decoration: BoxDecoration(
-                                                                                      color: Color.fromRGBO(225, 192, 63, 1),
-                                                                                      borderRadius: BorderRadius.circular(10),
+                                                                                ),
+                                                                                SizedBox(height: 12),
+                                                                                Row(
+                                                                                  children: [
+                                                                                    Row(
+                                                                                      children: List.generate(5, (starIndex) {
+                                                                                        return Icon(
+                                                                                          starIndex < (review["rating"] ?? 0)
+                                                                                              ? Icons.star
+                                                                                              : Icons.star_border,
+                                                                                          color: Color.fromRGBO(225, 192, 63, 1),
+                                                                                          size: starSize.toDouble(),
+                                                                                        );
+                                                                                      }),
                                                                                     ),
-                                                                                    child: Padding(
-                                                                                      padding: const EdgeInsets.symmetric(
-                                                                                          horizontal: 10, vertical: 2),
-                                                                                      child: Text(
-                                                                                        (review["rating"] ?? 0).toStringAsFixed(1),
-                                                                                        style: TextStyle(
-                                                                                          fontSize: designationSize,
-                                                                                          color: Colors.white,
-                                                                                          fontWeight: FontWeight.w500,
+                                                                                    SizedBox(width: 6),
+                                                                                    Container(
+                                                                                      decoration: BoxDecoration(
+                                                                                        color: Color.fromRGBO(225, 192, 63, 1),
+                                                                                        borderRadius: BorderRadius.circular(10),
+                                                                                      ),
+                                                                                      child: Padding(
+                                                                                        padding: const EdgeInsets.symmetric(
+                                                                                            horizontal: 10, vertical: 2),
+                                                                                        child: Text(
+                                                                                          (review["rating"] ?? 0).toStringAsFixed(1),
+                                                                                          style: TextStyle(
+                                                                                            fontSize: designationSize,
+                                                                                            color: Colors.white,
+                                                                                            fontWeight: FontWeight.w500,
+                                                                                          ),
                                                                                         ),
                                                                                       ),
                                                                                     ),
+                                                                                  ],
+                                                                                ),
+                                                                                SizedBox(height: 8),
+                                                                                Text(
+                                                                                  review["name"] ?? 'Anonymous',
+                                                                                  style: TextStyle(
+                                                                                    fontSize: nameSize,
+                                                                                    fontWeight: FontWeight.bold,
+                                                                                    fontFamily: "DMSans",
                                                                                   ),
-                                                                                ],
-                                                                              ),
-                                                                              SizedBox(height: 8),
-                                                                              Text(
-                                                                                review["name"] ?? 'Anonymous',
-                                                                                style: TextStyle(
-                                                                                  fontSize: nameSize,
-                                                                                  fontWeight: FontWeight.bold,
-                                                                                  fontFamily: "DMSans",
                                                                                 ),
-                                                                              ),
-                                                                              SizedBox(height: 4),
-                                                                              Text(
-                                                                                review["designation"] ?? 'Reviewer',
-                                                                                style: TextStyle(
-                                                                                  fontSize: designationSize,
-                                                                                  color: Color.fromRGBO(139, 139, 139, 1),
-                                                                                  fontFamily: "DMSans",
+                                                                                SizedBox(height: 4),
+                                                                                Text(
+                                                                                  review["designation"] ?? 'Reviewer',
+                                                                                  style: TextStyle(
+                                                                                    fontSize: designationSize,
+                                                                                    color: Color.fromRGBO(139, 139, 139, 1),
+                                                                                    fontFamily: "DMSans",
+                                                                                  ),
                                                                                 ),
-                                                                              ),
-                                                                              SizedBox(height: 12),
-                                                                              Text(
-                                                                                review["review"] ?? 'No review provided',
-                                                                                style: TextStyle(fontSize: reviewTextSize),
-                                                                              ),
-                                                                            ],
-                                                                          )
-                                                                        : Row(
-                                                                            children: [
-                                                                              Image.asset(
-                                                                                review["image"] ?? 'assets/placeholder.png',
-                                                                                height: imageHeight,
-                                                                                width: imageWidth,
-                                                                                fit: BoxFit.cover,
-                                                                                errorBuilder: (context, error, stackTrace) =>
-                                                                                    Image.asset(
-                                                                                  'assets/placeholder.png',
+                                                                                SizedBox(height: 12),
+                                                                                Text(
+                                                                                  review["review"] ?? 'No review provided',
+                                                                                  style: TextStyle(fontSize: reviewTextSize),
+                                                                                ),
+                                                                              ],
+                                                                            )
+                                                                          : Row(
+                                                                              children: [
+                                                                                Image.asset(
+                                                                                  review["image"] ?? 'assets/placeholder.png',
                                                                                   height: imageHeight,
                                                                                   width: imageWidth,
                                                                                   fit: BoxFit.cover,
+                                                                                  errorBuilder: (context, error, stackTrace) =>
+                                                                                      Image.asset(
+                                                                                    'assets/placeholder.png',
+                                                                                    height: imageHeight,
+                                                                                    width: imageWidth,
+                                                                                    fit: BoxFit.cover,
+                                                                                  ),
                                                                                 ),
-                                                                              ),
-                                                                              SizedBox(width: 24),
-                                                                              Expanded(
-                                                                                child: Center(
-                                                                                  child: Column(
-                                                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                    children: [
-                                                                                      Row(
-                                                                                        children: [
-                                                                                          Row(
-                                                                                            children: List.generate(5, (starIndex) {
-                                                                                              return Icon(
-                                                                                                starIndex < (review["rating"] ?? 0)
-                                                                                                    ? Icons.star
-                                                                                                    : Icons.star_border,
+                                                                                SizedBox(width: 24),
+                                                                                Expanded(
+                                                                                  child: Center(
+                                                                                    child: Column(
+                                                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                                                      children: [
+                                                                                        Row(
+                                                                                          children: [
+                                                                                            Row(
+                                                                                              children: List.generate(5, (starIndex) {
+                                                                                                return Icon(
+                                                                                                  starIndex < (review["rating"] ?? 0)
+                                                                                                      ? Icons.star
+                                                                                                      : Icons.star_border,
+                                                                                                  color:
+                                                                                                      Color.fromRGBO(225, 192, 63, 1),
+                                                                                                  size: starSize.toDouble(),
+                                                                                                );
+                                                                                              }),
+                                                                                            ),
+                                                                                            SizedBox(width: 10),
+                                                                                            Container(
+                                                                                              decoration: BoxDecoration(
                                                                                                 color:
                                                                                                     Color.fromRGBO(225, 192, 63, 1),
-                                                                                                size: starSize.toDouble(),
-                                                                                              );
-                                                                                            }),
-                                                                                          ),
-                                                                                          SizedBox(width: 10),
-                                                                                          Container(
-                                                                                            decoration: BoxDecoration(
-                                                                                              color:
-                                                                                                  Color.fromRGBO(225, 192, 63, 1),
-                                                                                              borderRadius:
-                                                                                                  BorderRadius.circular(10),
-                                                                                            ),
-                                                                                            child: Padding(
-                                                                                              padding: const EdgeInsets.symmetric(
-                                                                                                  horizontal: 10, vertical: 2),
-                                                                                              child: Text(
-                                                                                                (review["rating"] ?? 0)
-                                                                                                    .toStringAsFixed(1),
-                                                                                                style: TextStyle(
-                                                                                                  fontSize: designationSize,
-                                                                                                  color: Colors.white,
-                                                                                                  fontWeight: FontWeight.w500,
+                                                                                                borderRadius:
+                                                                                                    BorderRadius.circular(10),
+                                                                                              ),
+                                                                                              child: Padding(
+                                                                                                padding: const EdgeInsets.symmetric(
+                                                                                                    horizontal: 10, vertical: 2),
+                                                                                                child: Text(
+                                                                                                  (review["rating"] ?? 0)
+                                                                                                      .toStringAsFixed(1),
+                                                                                                  style: TextStyle(
+                                                                                                    fontSize: designationSize,
+                                                                                                    color: Colors.white,
+                                                                                                    fontWeight: FontWeight.w500,
+                                                                                                  ),
                                                                                                 ),
                                                                                               ),
                                                                                             ),
+                                                                                          ],
+                                                                                        ),
+                                                                                        SizedBox(height: 16),
+                                                                                        Text(
+                                                                                          review["name"] ?? 'Anonymous',
+                                                                                          style: TextStyle(
+                                                                                            fontSize: nameSize,
+                                                                                            fontWeight: FontWeight.bold,
+                                                                                            fontFamily: "DMSans",
                                                                                           ),
-                                                                                        ],
-                                                                                      ),
-                                                                                      SizedBox(height: 16),
-                                                                                      Text(
-                                                                                        review["name"] ?? 'Anonymous',
-                                                                                        style: TextStyle(
-                                                                                          fontSize: nameSize,
-                                                                                          fontWeight: FontWeight.bold,
-                                                                                          fontFamily: "DMSans",
                                                                                         ),
-                                                                                      ),
-                                                                                      SizedBox(height: 8),
-                                                                                      Text(
-                                                                                        review["designation"] ?? 'Reviewer',
-                                                                                        style: TextStyle(
-                                                                                          fontSize: designationSize,
-                                                                                          color: Color.fromRGBO(139, 139, 139, 1),
-                                                                                          fontFamily: "DMSans",
+                                                                                        SizedBox(height: 8),
+                                                                                        Text(
+                                                                                          review["designation"] ?? 'Reviewer',
+                                                                                          style: TextStyle(
+                                                                                            fontSize: designationSize,
+                                                                                            color: Color.fromRGBO(139, 139, 139, 1),
+                                                                                            fontFamily: "DMSans",
+                                                                                          ),
                                                                                         ),
-                                                                                      ),
-                                                                                      SizedBox(height: 24),
-                                                                                      Text(
-                                                                                        review["review"] ?? 'No review provided',
-                                                                                        style: TextStyle(fontSize: reviewTextSize),
-                                                                                      ),
-                                                                                    ],
+                                                                                        SizedBox(height: 24),
+                                                                                        Text(
+                                                                                          review["review"] ?? 'No review provided',
+                                                                                          style: TextStyle(fontSize: reviewTextSize),
+                                                                                        ),
+                                                                                      ],
+                                                                                    ),
                                                                                   ),
                                                                                 ),
-                                                                              ),
-                                                                            ],
-                                                                          ),
-                                                                  ),
-                                                                );
-                                                              }).toList(),
-                                                            );
-                                                          },
-                                                        );
-                                                      },
+                                                                              ],
+                                                                            ),
+                                                                    ),
+                                                                  );
+                                                                }).toList(),
+                                                              );
+                                                            },
+                                                          );
+                                                        },
+                                                      ),
                                                     ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            // Left button
+                                          if (reviewCurrentPage >= 0)
+                                            Positioned(
+                                              height: screenWidth >= 1024
+                                                  ? screenHeight * 0.05
+                                                  : screenWidth >= 600
+                                                      ? screenHeight * 0.045
+                                                      : 36,
+                                              left: screenWidth >= 1024
+                                                  ? screenWidth * 0.03
+                                                  : screenWidth >= 600
+                                                      ? screenWidth * 0.02
+                                                      : 8,
+                                              top: screenWidth >= 1024
+                                                  ? screenHeight * 0.38
+                                                  : screenWidth >= 600
+                                                      ? screenHeight * 0.36
+                                                      : screenHeight * 0.33,
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(10),
+                                                ),
+                                                child: FloatingActionButton(
+                                                  onPressed: () {
+                                                    reviewCarouselController.animateToPage(reviewCurrentPage - 1, curve: Curves.easeIn);
+                                                  },
+                                                  backgroundColor: Colors.white,
+                                                  elevation: 0.0,
+                                                  highlightElevation: 0.0,
+                                                  child: Icon(
+                                                    Icons.arrow_back_ios_outlined,
+                                                    size: screenWidth >= 1024
+                                                        ? 18
+                                                        : screenWidth >= 600
+                                                            ? 14
+                                                            : 12,
                                                   ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                          // Left button
-                                        if (reviewCurrentPage >= 0)
-                                          Positioned(
-                                            height: screenWidth >= 1024
-                                                ? screenHeight * 0.05
-                                                : screenWidth >= 600
-                                                    ? screenHeight * 0.045
-                                                    : 36,
-                                            left: screenWidth >= 1024
-                                                ? screenWidth * 0.03
-                                                : screenWidth >= 600
-                                                    ? screenWidth * 0.02
-                                                    : 8,
-                                            top: screenWidth >= 1024
-                                                ? screenHeight * 0.5
-                                                : screenWidth >= 600
-                                                    ? screenHeight * 0.48
-                                                    : screenHeight * 0.38,
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(10),
-                                              ),
-                                              child: FloatingActionButton(
-                                                onPressed: () {
-                                                  reviewCarouselController.animateToPage(reviewCurrentPage - 1, curve: Curves.easeIn);
-                                                },
-                                                backgroundColor: Colors.white,
-                                                elevation: 0.0,
-                                                highlightElevation: 0.0,
-                                                child: Icon(
-                                                  Icons.arrow_back_ios_outlined,
-                                                  size: screenWidth >= 1024
-                                                      ? 18
-                                                      : screenWidth >= 600
-                                                          ? 14
-                                                          : 12,
+                                                  mini: true,
                                                 ),
-                                                mini: true,
                                               ),
                                             ),
-                                          ),
-                                        // Right button
-                                        if (reviewCurrentPage <= reviews.length - 1)
-                                          Positioned(
-                                            height: screenWidth >= 1024
-                                                ? screenHeight * 0.05
-                                                : screenWidth >= 600
-                                                    ? screenHeight * 0.045
-                                                    : 36,
-                                            right: screenWidth >= 1024
-                                                ? screenWidth * 0.03
-                                                : screenWidth >= 600
-                                                    ? screenWidth * 0.02
-                                                    : 8,
-                                            top: screenWidth >= 1024
-                                                ? screenHeight * 0.5
-                                                : screenWidth >= 600
-                                                    ? screenHeight * 0.48
-                                                    : screenHeight * 0.38,
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(10),
-                                              ),
-                                              child: FloatingActionButton(
-                                                onPressed: () {
-                                                  reviewCarouselController.animateToPage(reviewCurrentPage + 1, curve: Curves.easeIn);
-                                                },
-                                                backgroundColor: Colors.white,
-                                                elevation: 0.0,
-                                                child: Icon(
-                                                  Icons.arrow_forward_ios_outlined,
-                                                  size: screenWidth >= 1024
-                                                      ? 18
-                                                      : screenWidth >= 600
-                                                          ? 14
-                                                          : 12,
+                                          // Right button
+                                          if (reviewCurrentPage <= reviews.length - 1)
+                                            Positioned(
+                                              height: screenWidth >= 1024
+                                                  ? screenHeight * 0.05
+                                                  : screenWidth >= 600
+                                                      ? screenHeight * 0.045
+                                                      : 36,
+                                              right: screenWidth >= 1024
+                                                  ? screenWidth * 0.03
+                                                  : screenWidth >= 600
+                                                      ? screenWidth * 0.02
+                                                      : 8,
+                                              top: screenWidth >= 1024
+                                                  ? screenHeight * 0.38
+                                                  : screenWidth >= 600
+                                                      ? screenHeight * 0.36
+                                                      : screenHeight * 0.33,
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(10),
                                                 ),
-                                                mini: true,
+                                                child: FloatingActionButton(
+                                                  onPressed: () {
+                                                    reviewCarouselController.animateToPage(reviewCurrentPage + 1, curve: Curves.easeIn);
+                                                  },
+                                                  backgroundColor: Colors.white,
+                                                  elevation: 0.0,
+                                                  child: Icon(
+                                                    Icons.arrow_forward_ios_outlined,
+                                                    size: screenWidth >= 1024
+                                                        ? 18
+                                                        : screenWidth >= 600
+                                                            ? 14
+                                                            : 12,
+                                                  ),
+                                                  mini: true,
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
+                                          ],
+                                        ),
                                         
                                               
                                         SizedBox(height: 40),
@@ -7096,11 +6609,6 @@ Widget buildBrandCards(BuildContext context) {
                                             );
                                           },
                                         ),
-
-
-
-                                                            
-                           
                                       ]
                                     );
                                     
@@ -7118,49 +6626,6637 @@ Widget buildBrandCards(BuildContext context) {
                   );
                 }
 
-                  Widget Sedan(){
-                    return Container(
-                      margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
-                      child: Column(
+                  Widget Sedan() {
+                    // List of keywords to match sedan cars
+                    final List<String> sedanKeywords = [
+                      "camry", "accord", "elantra", "3 series", "c-class", "e-class", "sedan",
+                      "avalon", "crown", "yaris sedan", "etios", "city", "amaze", "civic", "verna", "aura",
+                      "dzire", "ciaz", "slavia", "octavia", "superb", "virtus", "vento", "passat",
+                      "tigor", "zest", "sunny", "altima", "k5", "optima", "rio sedan", "aspire",
+                      "fiesta sedan", "mondeo", "taurus", "cruze", "malibu", "aveo", "logan", "taliant",
+                      "mazda6", "mazda3 sedan", "a3 sedan", "a4", "a6", "a8", "es", "is", "ls", "xe", "xf",
+                      "g70", "g80", "g90", "5 series", "7 series", "s-class", "legend", "insight", "forenza",
+                      "verona", "pegas", "sonata", "coupe", "cayman", "bmw", "gran coupe", "mercedes", "audi", 
+                      "tt", "lexus", "infiniti", "volvo", "jaguar", "porsche", "tesla", "6 series"
+                    ];
+
+                    // Filter cars for sedans using keywords (case-insensitive)
+                    List<Map<String, dynamic>> sedanCars = cars.where((car) {
+                      final name = (car["name"] ?? "").toString().toLowerCase();
+                      // Check if any keyword is in the car name
+                      return sedanKeywords.any((keyword) => name.contains(keyword));
+                    }).toList();
+
+                    // If no sedan cars found, show a message
+                    if (sedanCars.isEmpty) {
+                      return Container(
+                        margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
+                        child: Column(
+                          children: const [
+                            Text("Sedan", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
+                            SizedBox(height: 20),
+                            Text("No sedan cars available.", style: TextStyle(fontSize: 16)),
+                          ],
+                        ),
+                      );
+                    }
+
+                    // If only one sedan, show as a single card (reuse your card UI)
+                    if (sedanCars.length == 1) {
+                      final car = sedanCars.first;
+                      return Container(
+                        margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
+                        child: Column(
+                          children: [
+                            const Text("Sedan", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
+                            const SizedBox(height: 20),
+                            // Use the same card UI as in your All() carousel
+                            LayoutBuilder(
+                              builder: (context, constraints) {
+                                // Copy the card UI from your All() carousel here, using `car`
+                                // For brevity, you can call a helper widget if you want
+                                return _buildCarCard(car, constraints, context);
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+
+                    // If more than one sedan, show as a carousel (same as All() tab)
+                    return Column(
                         children: [
-                          const Text("Sedan", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500))
-                        ],
+                    
+                          Padding(
+                            padding: EdgeInsets.only(left: 0),
+                            child: buildBrandCards(context),
+                            ),
+                            const SizedBox(height: 20,),
+                            
+                            Stack(
+                              children: [
+                                CarouselSlider(
+                                  carouselController: innerCarouselController,
+                                  options: CarouselOptions(
+                                    height: MediaQuery.of(context).size.height * 0.8,
+                                    autoPlay: false,
+                                    enableInfiniteScroll: true,
+                                    enlargeCenterPage: false,
+                                    viewportFraction: 1,
+                                    onPageChanged: (index, reason) {
+                                      setState(() {
+                                        innerCurrentPage = index;
+                                      });
+                                    },
+                                  ),
+                                  items: sedanCars.asMap().entries.map((entry) {
+                                    int index = entry.key;
+                                    Map<String, dynamic> car = entry.value;
+                                    return LayoutBuilder(
+                                      builder: (context, constraints) {
+                                        // Copy the card UI from your All() carousel here, using `car`
+                                        return _buildCarCard(car, constraints, context);
+                                      },
+                                    );
+                                  }).toList(),
+                                ),
+                                if (innerCurrentPage >= 0)
+                                  Positioned(
+                                    height: (MediaQuery.of(context).size.width < 600 ? 30.0 : MediaQuery.of(context).size.width < 1024 ? 50.0 : 60.0),
+                                    left: (MediaQuery.of(context).size.width < 600 ? -5.0 : MediaQuery.of(context).size.width < 1024 ? -6.0 : -10.0),
+                                    top: (MediaQuery.of(context).size.width < 600 ? MediaQuery.of(context).size.height * 0.35 : MediaQuery.of(context).size.width < 1024 ? MediaQuery.of(context).size.height * 0.30 : MediaQuery.of(context).size.height * 0.22),
+                                    child: FloatingActionButton(
+                                      onPressed: () {
+                                        innerCarouselController.animateToPage(innerCurrentPage - 1, curve: Curves.easeIn);
+                                      },
+                                      backgroundColor: Color.fromRGBO(26, 76, 142, 1),
+                                      child: const Icon(Icons.arrow_back_ios_outlined, color: Colors.white),
+                                      mini: true,
+                                    ),
+                                  ),
+                                if (innerCurrentPage <= sedanCars.length - 1)
+                                  Positioned(
+                                    height: (MediaQuery.of(context).size.width < 600 ? 30.0 : MediaQuery.of(context).size.width < 1024 ? 50.0 : 60.0),
+                                    right: (MediaQuery.of(context).size.width < 600 ? -5.0 : MediaQuery.of(context).size.width < 1024 ? -6.0 : -10.0),
+                                    top: (MediaQuery.of(context).size.width < 600 ? MediaQuery.of(context).size.height * 0.35 : MediaQuery.of(context).size.width < 1024 ? MediaQuery.of(context).size.height * 0.30 : MediaQuery.of(context).size.height * 0.22),
+                                    child: FloatingActionButton(
+                                      onPressed: () {
+                                        innerCarouselController.animateToPage(innerCurrentPage + 1, curve: Curves.easeIn);
+                                      },
+                                      backgroundColor: Color.fromRGBO(26, 76, 142, 1),
+                                      child: Icon(Icons.arrow_forward_ios_outlined, color: Colors.white),
+                                      mini: true,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                        
+                            SizedBox(height: MediaQuery.of(context).size.height * 0.07,),
+                            LayoutBuilder(
+                              builder: (context, constraints) {
+                    
+                                double screenWidth = MediaQuery.of(context).size.width;
+                                double screenHeight = MediaQuery.of(context).size.height;
+                    
+                                double imageSize;
+                                if (screenWidth > 1200) {
+                                  imageSize = (screenWidth / 6) - 100;
+                                } else if (screenWidth > 600) {
+                                  imageSize = (screenWidth / 6) - 100; 
+                                } else {
+                                  imageSize = (screenWidth / 3) - 30; 
+                                }
+                                imageSize = imageSize.clamp(80.0, 300.0);
+                    
+                                double titleFontSize = screenWidth > 600 ? 40 : screenWidth * 0.08;
+                                
+                                return Padding(
+                                  padding: const EdgeInsets.only(left: 0, right: 0),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          RichText(
+                                            text: TextSpan(
+                                              children: [
+                                                TextSpan(
+                                                  text: 'Similar Brands',
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: screenHeight * 0.038,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontFamily: "DMSans",
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {},
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  'Show all Brands',
+                                                  style: TextStyle(
+                                                    color: Color.fromRGBO(0, 147, 255, 1),
+                                                    fontSize: screenHeight * 0.02,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontFamily: "DMSans",
+                                                  ),
+                                                ),
+                                                Icon(Icons.arrow_outward, color: Color.fromRGBO(0, 147, 255, 1)),
+                                              ],
+                                            ),
+                                          ),
+                                          
+                                        ],
+                                      ),
+                                      SizedBox(height: screenHeight * 0.05),
+                    
+                                      //Similar Brands Section
+                                      Column(
+                                        children: [
+                                          LayoutBuilder(
+                                            builder: (context, constraints) {
+                                              return Builder(
+                                                builder: (context) {
+                                                  print('[buildBrands] isLoadingBrands: $isLoadingBrands, errorMessageBrands: $errorMessageBrands, brands: $brands');
+                                                  if (isLoadingBrands) {
+                                                    return const Center(child: CircularProgressIndicator());
+                                                  }
+                                                  if (errorMessageBrands != null) {
+                                                    return Center(child: Text(errorMessageBrands!));
+                                                  }
+                                                  if (brands.isEmpty) {
+                                                    return const Center(child: Text('No brands available'));
+                                                  }
+                                                  return Padding(
+                                                    padding: const EdgeInsets.all(0.0),
+                                                    child: Wrap(
+                                                      spacing: screenWidth * 0.05,
+                                                      runSpacing: screenHeight * 0.02,
+                                                      children: brands.map((brand) {
+                                                        return Container(
+                                                          decoration: BoxDecoration(
+                                                            color: Colors.white,
+                                                            border: Border.all(width: 1, color: const Color.fromRGBO(233, 233, 233, 1)),
+                                                            borderRadius: BorderRadius.circular(10),
+                                                          ),
+                                                          child: ClipRRect(
+                                                            borderRadius: BorderRadius.circular(10),
+                                                            child: Column(
+                                                              children: [
+                                                                Image.asset(
+                                                                  brand["image"] ?? 'assets/placeholder.png',
+                                                                  width: imageSize,
+                                                                  fit: BoxFit.contain,
+                                                                  errorBuilder: (context, error, stackTrace) => Image.asset(
+                                                                    'assets/placeholder.png',
+                                                                    width: imageSize,
+                                                                    fit: BoxFit.contain,
+                                                                  ),
+                                                                ),
+                                                                Text(
+                                                                  brand["name"] ?? 'Unknown Brand',
+                                                                  style: const TextStyle(fontFamily: "DMSans"),
+                                                                  textAlign: TextAlign.center,
+                                                                  softWrap: true,
+                                                                  overflow: TextOverflow.visible,
+                                                                  maxLines: 2, // Allow up to 2 lines
+                                                                ),
+                                                                SizedBox(height: screenHeight * 0.02),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        );
+                                                      }).toList(),
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            },
+                                          ),
+                                          const SizedBox(height: 30),
+                                        ],
+                                      ),
+                    
+                    
+                                      LayoutBuilder(
+                                        builder: (context, constraints) {
+                                          double screenWidth = MediaQuery.of(context).size.width;
+                                          double imageWidth = screenWidth * 0.40;
+                                          double imageHeight = (imageWidth * 9 / 16) * 1.49;
+                                          double playButtonSize = screenWidth * 0.052;
+                                          double sectionSpacing = screenWidth * 0.01;
+                                        return Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            SizedBox(height: sectionSpacing),
+                    
+                                          // Responsive "video + info" section
+                                          Builder(
+                                            builder: (context) {
+                                              final screenWidth = MediaQuery.of(context).size.width;
+                                              final isMobile = screenWidth < 800;
+                                              final isTablet = screenWidth >= 800 && screenWidth < 1024;
+                                              final isDesktop = screenWidth >= 1024;
+                    
+                                              // Responsive sizes
+                                              double imageWidth, imageHeight, playButtonSize, infoPadding, titleFontSize, descFontSize, bulletFontSize, buttonFontSize, sectionSpacing;
+                                              if (isMobile) {
+                                                imageWidth = screenWidth * 0.9;
+                                                imageHeight = screenWidth * 0.5;
+                                                playButtonSize = 40;
+                                                infoPadding = 16;
+                                                titleFontSize = 18;
+                                                descFontSize = 12;
+                                                bulletFontSize = 12;
+                                                buttonFontSize = 14;
+                                                sectionSpacing = 10;
+                                              } else if (isTablet) {
+                                                imageWidth = screenWidth * 0.4;
+                                                imageHeight = screenWidth * 0.5;
+                                                playButtonSize = 50;
+                                                infoPadding = 32;
+                                                titleFontSize = 24;
+                                                descFontSize = 14;
+                                                bulletFontSize = 14;
+                                                buttonFontSize = 16;
+                                                sectionSpacing = 16;
+                                              } else {
+                                                imageWidth = screenWidth * 0.35;
+                                                imageHeight = screenWidth * 0.33;
+                                                playButtonSize = 60;
+                                                infoPadding = 70;
+                                                titleFontSize = 32;
+                                                descFontSize = 16;
+                                                bulletFontSize = 16;
+                                                buttonFontSize = 18;
+                                                sectionSpacing = 24;
+                                              }
+                    
+                                              Widget imageStack = Stack(
+                                                alignment: Alignment.center,
+                                                children: [
+                                                  ClipRRect(
+                                                    borderRadius: BorderRadius.only(
+                                                      topLeft: Radius.circular(10),
+                                                      bottomLeft: isMobile ? Radius.circular(10) : Radius.circular(0),
+                                                      topRight: isMobile ? Radius.circular(10) : Radius.circular(0),
+                                                      bottomRight: Radius.circular(0),
+                                                    ),
+                                                    child: Image.asset(
+                                                      "assets/videoImage.jpeg",
+                                                      width: imageWidth,
+                                                      height: imageHeight,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
+                                                  CircleAvatar(
+                                                    radius: playButtonSize / 2,
+                                                    backgroundColor: Colors.white,
+                                                    child: Icon(
+                                                      Icons.play_arrow,
+                                                      size: playButtonSize * 0.5,
+                                                      color: Colors.black,
+                                                    ),
+                                                  ),
+                                                ],
+                                              );
+                    
+                                              Widget infoSection = Container(
+                                                width: isMobile ? double.infinity : screenWidth * 0.48,
+                                                decoration: BoxDecoration(
+                                                  color: Color.fromRGBO(238, 241, 251, 1),
+                                                  borderRadius: isMobile
+                                                      ? BorderRadius.only(
+                                                          bottomLeft: Radius.circular(10),
+                                                          bottomRight: Radius.circular(10),
+                                                        )
+                                                      : null,
+                                                ),
+                                                child: Padding(
+                                                  padding: EdgeInsets.all(infoPadding),
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        "Buying a car has never been this easy.",
+                                                        style: TextStyle(
+                                                          fontSize: titleFontSize,
+                                                          fontWeight: FontWeight.bold,
+                                                          color: Colors.black,
+                                                          fontFamily: "DMSans",
+                                                        ),
+                                                      ),
+                                                      SizedBox(height: sectionSpacing),
+                                                      Text(
+                                                        "We are committed to providing our customers with exceptional service, competitive pricing, and a wide range of options.",
+                                                        style: TextStyle(
+                                                          fontSize: descFontSize,
+                                                          color: Color.fromRGBO(5, 11, 32, 1),
+                                                          fontFamily: "DMSans",
+                                                        ),
+                                                      ),
+                                                      SizedBox(height: sectionSpacing),
+                                                      Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          buildBulletPoint(
+                                                            "We are the UK's largest provider, with more patrols in more places",
+                                                            fontSize: bulletFontSize,
+                                                          ),
+                                                          buildBulletPoint(
+                                                            "You get 24/7 roadside assistance",
+                                                            fontSize: bulletFontSize,
+                                                          ),
+                                                          buildBulletPoint(
+                                                            "We fix 4 out of 5 cars at the roadside",
+                                                            fontSize: bulletFontSize,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      SizedBox(height: sectionSpacing),
+                                                      ElevatedButton(
+                                                        onPressed: () {
+                                                          _bookTestDrive();
+                                                        },
+                                                        style: ElevatedButton.styleFrom(
+                                                          backgroundColor: Color(0xFF004C90),
+                                                          padding: EdgeInsets.symmetric(
+                                                            horizontal: infoPadding,
+                                                            vertical: infoPadding / 2.5,
+                                                          ),
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.circular(8),
+                                                          ),
+                                                        ),
+                                                        child: Row(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          children: [
+                                                            Text(
+                                                              "Book a test drive",
+                                                              style: TextStyle(
+                                                                color: Colors.white,
+                                                                fontSize: buttonFontSize,
+                                                                fontFamily: "DMSans",
+                                                              ),
+                                                            ),
+                                                            SizedBox(width: sectionSpacing / 2),
+                                                            Icon(Icons.arrow_outward, color: Colors.white, size: buttonFontSize + 2),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              );
+                    
+                                              if (isMobile) {
+                                                return Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                  children: [
+                                                    imageStack,
+                                                    infoSection,
+                                                  ],
+                                                );
+                                              } else {
+                                                return Row(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    imageStack,
+                                                    infoSection,
+                                                  ],
+                                                );
+                                              }
+                                            },
+                                          ),
+                    
+                                          SizedBox(height: sectionSpacing),
+                                          Builder(
+                                            builder: (context) {
+                                              double screenWidth = MediaQuery.of(context).size.width;
+                                              int crossAxisCount;
+                                              if (screenWidth < 600) {
+                                                crossAxisCount = 2;
+                                              } else if (screenWidth < 1024) {
+                                                crossAxisCount = 4;
+                                              } else {
+                                                crossAxisCount = 4;
+                                              }
+                                              return Wrap(
+                                                alignment: WrapAlignment.center,
+                                                spacing: 8,
+                                                runSpacing: 8,
+                                                children: [
+                                                  buildStatBox("836M", "CARS FOR SALE", context),
+                                                  buildStatBox("738M", "DEALER REVIEWS", context),
+                                                  buildStatBox("100M", "VISITORS PER DAY", context),
+                                                  buildStatBox("238M", "VERIFIED DEALERS", context),
+                                                ],
+                                              );
+                                            },
+                                          ),
+                    
+                                          Divider(
+                                            thickness: 1,
+                                            color: Color.fromRGBO(223, 223, 223, 1),
+                                          ),
+                                          SizedBox(height: sectionSpacing),
+                    
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                              left: screenWidth >= 1024
+                                                  ? 100
+                                                  : screenWidth >= 600
+                                                      ? 40
+                                                      : 10,
+                                              right: screenWidth >= 1024
+                                                  ? 50
+                                                  : screenWidth >= 600
+                                                      ? 24
+                                                      : 10,
+                                              top: screenWidth >= 1024
+                                                  ? 50
+                                                  : screenWidth >= 600
+                                                      ? 30
+                                                      : 16,
+                                              bottom: screenWidth >= 1024
+                                                  ? 20
+                                                  : screenWidth >= 600
+                                                      ? 16
+                                                      : 8,
+                                            ),
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text("Why Choose Us?", style: TextStyle(fontWeight: FontWeight.bold,fontSize: screenHeight * 0.038, fontFamily: "DMSans",),),
+                                              ],
+                                            ),
+                                          ),
+                                          SizedBox(height: sectionSpacing),
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                              left: screenWidth >= 1024
+                                                  ? 100
+                                                  : screenWidth >= 600
+                                                      ? 40
+                                                      : 10,
+                                              right: screenWidth >= 1024
+                                                  ? 50
+                                                  : screenWidth >= 600
+                                                      ? 24
+                                                      : 10,
+                                              top: screenWidth >= 1024
+                                                  ? 50
+                                                  : screenWidth >= 600
+                                                      ? 30
+                                                      : 16,
+                                              bottom: screenWidth >= 1024
+                                                  ? 20
+                                                  : screenWidth >= 600
+                                                      ? 16
+                                                      : 8,
+                                            ),
+                                            child: LayoutBuilder(
+                                              builder: (context, constraints) {
+                                                double screenWidth = MediaQuery.of(context).size.width;
+                                                bool isMobile = screenWidth < 600;
+                    
+                                                double imageSize;
+                                                double titleFontSize;
+                                                double descFontSize;
+                                                if (screenWidth >= 1024) {
+                                                  // Desktop
+                                                  imageSize = 52;
+                                                  titleFontSize = 22;
+                                                  descFontSize = 15;
+                                                } else if (screenWidth >= 600) {
+                                                  // Tablet
+                                                  imageSize = 40;
+                                                  titleFontSize = 19;
+                                                  descFontSize = 15;
+                                                } else {
+                                                  // Mobile
+                                                  imageSize = 33;
+                                                  titleFontSize = 15;
+                                                  descFontSize = 13;
+                                                }
+                    
+                                                List<Widget> infoBlocks = [
+                                                  Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Image.asset("assets/financialOffer.png", height: imageSize),
+                                                      SizedBox(height: screenWidth * 0.02),
+                                                      Text("Special Financing Offers", style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold, fontFamily: "DMSans",),),
+                                                      SizedBox(height: screenWidth * 0.01),
+                                                      Text("Our stress-free finance department that can \nfind financial solutions to save you money.",
+                                                        style: TextStyle(fontFamily: "DMSans", fontSize: descFontSize),),
+                                                    ],
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Image.asset("assets/dealership.png", height: imageSize),
+                                                      SizedBox(height: screenWidth * 0.02),
+                                                      Text("Trusted Car Dealership", style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold, fontFamily: "DMSans",),),
+                                                      SizedBox(height: screenWidth * 0.01),
+                                                      Text("Our stress-free finance department that can \nfind financial solutions to save you money.",
+                                                        style: TextStyle(fontFamily: "DMSans", fontSize: descFontSize),),
+                                                    ],
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Image.asset("assets/transparent.png", height: imageSize),
+                                                      SizedBox(height: screenWidth*0.02),
+                                                      Text("Transparent Pricing", style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold, fontFamily: "DMSans",),),
+                                                      SizedBox(height: screenWidth * 0.01),
+                                                      Text("Our stress-free finance department that can \nfind financial solutions to save you money.",
+                                                        style: TextStyle(fontFamily: "DMSans", fontSize: descFontSize),),
+                                                    ],
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Image.asset("assets/expertCar.png", height: imageSize),
+                                                      SizedBox(height: screenWidth * 0.02),
+                                                      Text("Expert Car Service", style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold),),
+                                                      SizedBox(height: screenWidth * 0.01),
+                                                      Text("Our stress-free finance department that can \nfind financial solutions to save you money.",
+                                                        style: TextStyle(fontFamily: "DMSans", fontSize: descFontSize),),
+                                                    ],
+                                                  ),
+                                                ];
+                    
+                                                if (isMobile) {
+                                                  // Display vertically for mobile
+                                                  return Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: infoBlocks
+                                                        .map((block) => Padding(
+                                                              padding: EdgeInsets.only(bottom: screenWidth * 0.04),
+                                                              child: block,
+                                                            ))
+                                                        .toList(),
+                                                  );
+                                                } else {
+                                                  // Display horizontally for tablet/desktop
+                                                  return Row(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: infoBlocks
+                                                        .map((block) => Padding(
+                                                              padding: EdgeInsets.only(right: screenWidth * 0.02),
+                                                              child: block,
+                                                            ))
+                                                        .toList(),
+                                                  );
+                                                }
+                                              }
+                                            ),
+                                          ),
+                                          SizedBox(height: screenHeight * 0.1),
+                                          
+                                          Stack(
+                                          children: [
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                color: Color.fromRGBO(249, 251, 252, 1),
+                                              ),
+                                              child: Padding(
+                                                padding: EdgeInsets.only(
+                                                  left: screenWidth >= 1024
+                                                      ? screenWidth * 0.15
+                                                      : screenWidth >= 600
+                                                          ? screenWidth * 0.08
+                                                          : 16,
+                                                  right: screenWidth >= 1024
+                                                      ? screenWidth * 0.15
+                                                      : screenWidth >= 600
+                                                          ? screenWidth * 0.08
+                                                          : 16,
+                                                  top: screenWidth >= 1024
+                                                      ? screenHeight * 0.10
+                                                      : screenWidth >= 600
+                                                          ? screenHeight * 0.06
+                                                          : 16,
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Padding(
+                                                      padding: EdgeInsets.symmetric(
+                                                        horizontal: screenWidth >= 1024
+                                                            ? 0
+                                                            : screenWidth >= 600
+                                                                ? 0
+                                                                : 0, // You can adjust if you want more padding on mobile
+                                                      ),
+                                                      child: LayoutBuilder(
+                                                        builder: (context, constraints) {
+                                                          double textSize;
+                                                          double subTextSize;
+                                                          if (constraints.maxWidth >= 1024) {
+                                                            textSize = 28;
+                                                            subTextSize = 14;
+                                                          } else if (constraints.maxWidth >= 600) {
+                                                            textSize = 24;
+                                                            subTextSize = 12;
+                                                          } else {
+                                                            textSize = 18;
+                                                            subTextSize = 10;
+                                                          }
+                    
+                                                          bool isMobile = constraints.maxWidth < 600;
+                    
+                                                          return Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: [
+                                                              isMobile
+                                                                  ? Column(
+                                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                                      children: [
+                                                                        Text(
+                                                                          "What our customers say",
+                                                                          style: TextStyle(
+                                                                            fontWeight: FontWeight.w700,
+                                                                            fontSize: textSize,
+                                                                            fontFamily: "DMSans",
+                                                                          ),
+                                                                        ),
+                                                                        SizedBox(height: 8),
+                                                                        Text(
+                                                                          "Rated ${calculateAverageRating().toStringAsFixed(1)} / 5 based on $totalReviews reviews Showing our 4 & 5 star reviews",
+                                                                          style: TextStyle(
+                                                                            fontWeight: FontWeight.w400,
+                                                                            fontSize: subTextSize,
+                                                                            fontFamily: "DMSans",
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    )
+                                                                  : Row(
+                                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                      children: [
+                                                                        Text(
+                                                                          "What our customers say",
+                                                                          style: TextStyle(
+                                                                            fontWeight: FontWeight.w700,
+                                                                            fontSize: textSize,
+                                                                            fontFamily: "DMSans",
+                                                                          ),
+                                                                        ),
+                                                                        Text(
+                                                                          "Rated ${calculateAverageRating().toStringAsFixed(1)} / 5 based on $totalReviews reviews Showing our 4 & 5 star reviews",
+                                                                          style: TextStyle(
+                                                                            fontWeight: FontWeight.w400,
+                                                                            fontSize: subTextSize,
+                                                                            fontFamily: "DMSans",
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                            ],
+                                                          );
+                                                        },
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 20),
+                                                    Padding(
+                                                      padding: EdgeInsets.symmetric(
+                                                        horizontal: screenWidth >= 1024
+                                                            ? 0
+                                                            : screenWidth >= 600
+                                                                ? 0
+                                                                : 0, // Adjust if you want more padding on mobile
+                                                      ),
+                                                      child: LayoutBuilder(
+                                                        builder: (context, constraints) {
+                                                          bool isDesktop = constraints.maxWidth >= 1024;
+                                                          bool isTablet = constraints.maxWidth >= 600 && constraints.maxWidth < 1024;
+                                                          bool isMobile = constraints.maxWidth < 600;
+                    
+                                                          double containerHeight = isDesktop
+                                                              ? 490
+                                                              : isTablet
+                                                                  ? 420
+                                                                  : 320;
+                                                          double containerWidth = isDesktop
+                                                              ? screenWidth * 0.9
+                                                              : isTablet
+                                                                  ? screenWidth * 0.95
+                                                                  : screenWidth * 0.98;
+                                                          double imageWidth = isDesktop
+                                                              ? 480
+                                                              : isTablet
+                                                                  ? 300
+                                                                  : containerWidth;
+                                                          double imageHeight = isDesktop
+                                                              ? 550
+                                                              : isTablet
+                                                                  ? 380
+                                                                  : 180;
+                                                          double nameSize = isDesktop
+                                                              ? 18
+                                                              : isTablet
+                                                                  ? 16
+                                                                  : 14;
+                                                          double designationSize = isDesktop
+                                                              ? 15
+                                                              : isTablet
+                                                                  ? 13
+                                                                  : 11;
+                                                          double reviewTextSize = isDesktop
+                                                              ? 22
+                                                              : isTablet
+                                                                  ? 16
+                                                                  : 12;
+                                                          double starSize = isDesktop
+                                                              ? 16
+                                                              : isTablet
+                                                                  ? 13
+                                                                  : 11;
+                    
+                                                          return Builder(
+                                                            builder: (context) {
+                                                              if (isLoadingReviews) {
+                                                                return Center(child: CircularProgressIndicator());
+                                                              }
+                                                              if (errorMessageReviews != null) {
+                                                                return Center(child: Text(errorMessageReviews!));
+                                                              }
+                                                              if (reviews.isEmpty) {
+                                                                return Center(child: Text('No high-rated reviews available'));
+                                                              }
+                                                              return CarouselSlider(
+                                                                carouselController: reviewCarouselController,
+                                                                options: CarouselOptions(
+                                                                  height: containerHeight,
+                                                                  autoPlay: false,
+                                                                  enlargeCenterPage: false,
+                                                                  enableInfiniteScroll: false,
+                                                                  viewportFraction: 1,
+                                                                  onPageChanged: (index, reason) {
+                                                                    setState(() {
+                                                                      reviewCurrentPage = index;
+                                                                    });
+                                                                  },
+                                                                ),
+                                                                items: reviews.asMap().entries.map((entry) {
+                                                                  int index = entry.key;
+                                                                  Map<String, dynamic> review = entry.value;
+                                                                  return Padding(
+                                                                    padding: const EdgeInsets.all(0.0),
+                                                                    child: Container(
+                                                                      height: containerHeight,
+                                                                      width: containerWidth,
+                                                                      child: isMobile
+                                                                          ? Column(
+                                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                                              children: [
+                                                                                Image.asset(
+                                                                                  review["image"] ?? 'assets/placeholder.png',
+                                                                                  height: imageHeight,
+                                                                                  width: imageWidth,
+                                                                                  fit: BoxFit.cover,
+                                                                                  errorBuilder: (context, error, stackTrace) =>
+                                                                                      Image.asset(
+                                                                                    'assets/placeholder.png',
+                                                                                    height: imageHeight,
+                                                                                    width: imageWidth,
+                                                                                    fit: BoxFit.cover,
+                                                                                  ),
+                                                                                ),
+                                                                                SizedBox(height: 12),
+                                                                                Row(
+                                                                                  children: [
+                                                                                    Row(
+                                                                                      children: List.generate(5, (starIndex) {
+                                                                                        return Icon(
+                                                                                          starIndex < (review["rating"] ?? 0)
+                                                                                              ? Icons.star
+                                                                                              : Icons.star_border,
+                                                                                          color: Color.fromRGBO(225, 192, 63, 1),
+                                                                                          size: starSize.toDouble(),
+                                                                                        );
+                                                                                      }),
+                                                                                    ),
+                                                                                    SizedBox(width: 6),
+                                                                                    Container(
+                                                                                      decoration: BoxDecoration(
+                                                                                        color: Color.fromRGBO(225, 192, 63, 1),
+                                                                                        borderRadius: BorderRadius.circular(10),
+                                                                                      ),
+                                                                                      child: Padding(
+                                                                                        padding: const EdgeInsets.symmetric(
+                                                                                            horizontal: 10, vertical: 2),
+                                                                                        child: Text(
+                                                                                          (review["rating"] ?? 0).toStringAsFixed(1),
+                                                                                          style: TextStyle(
+                                                                                            fontSize: designationSize,
+                                                                                            color: Colors.white,
+                                                                                            fontWeight: FontWeight.w500,
+                                                                                          ),
+                                                                                        ),
+                                                                                      ),
+                                                                                    ),
+                                                                                  ],
+                                                                                ),
+                                                                                SizedBox(height: 8),
+                                                                                Text(
+                                                                                  review["name"] ?? 'Anonymous',
+                                                                                  style: TextStyle(
+                                                                                    fontSize: nameSize,
+                                                                                    fontWeight: FontWeight.bold,
+                                                                                    fontFamily: "DMSans",
+                                                                                  ),
+                                                                                ),
+                                                                                SizedBox(height: 4),
+                                                                                Text(
+                                                                                  review["designation"] ?? 'Reviewer',
+                                                                                  style: TextStyle(
+                                                                                    fontSize: designationSize,
+                                                                                    color: Color.fromRGBO(139, 139, 139, 1),
+                                                                                    fontFamily: "DMSans",
+                                                                                  ),
+                                                                                ),
+                                                                                SizedBox(height: 12),
+                                                                                Text(
+                                                                                  review["review"] ?? 'No review provided',
+                                                                                  style: TextStyle(fontSize: reviewTextSize),
+                                                                                ),
+                                                                              ],
+                                                                            )
+                                                                          : Row(
+                                                                              children: [
+                                                                                Image.asset(
+                                                                                  review["image"] ?? 'assets/placeholder.png',
+                                                                                  height: imageHeight,
+                                                                                  width: imageWidth,
+                                                                                  fit: BoxFit.cover,
+                                                                                  errorBuilder: (context, error, stackTrace) =>
+                                                                                      Image.asset(
+                                                                                    'assets/placeholder.png',
+                                                                                    height: imageHeight,
+                                                                                    width: imageWidth,
+                                                                                    fit: BoxFit.cover,
+                                                                                  ),
+                                                                                ),
+                                                                                SizedBox(width: 24),
+                                                                                Expanded(
+                                                                                  child: Center(
+                                                                                    child: Column(
+                                                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                                                      children: [
+                                                                                        Row(
+                                                                                          children: [
+                                                                                            Row(
+                                                                                              children: List.generate(5, (starIndex) {
+                                                                                                return Icon(
+                                                                                                  starIndex < (review["rating"] ?? 0)
+                                                                                                      ? Icons.star
+                                                                                                      : Icons.star_border,
+                                                                                                  color:
+                                                                                                      Color.fromRGBO(225, 192, 63, 1),
+                                                                                                  size: starSize.toDouble(),
+                                                                                                );
+                                                                                              }),
+                                                                                            ),
+                                                                                            SizedBox(width: 10),
+                                                                                            Container(
+                                                                                              decoration: BoxDecoration(
+                                                                                                color:
+                                                                                                    Color.fromRGBO(225, 192, 63, 1),
+                                                                                                borderRadius:
+                                                                                                    BorderRadius.circular(10),
+                                                                                              ),
+                                                                                              child: Padding(
+                                                                                                padding: const EdgeInsets.symmetric(
+                                                                                                    horizontal: 10, vertical: 2),
+                                                                                                child: Text(
+                                                                                                  (review["rating"] ?? 0)
+                                                                                                      .toStringAsFixed(1),
+                                                                                                  style: TextStyle(
+                                                                                                    fontSize: designationSize,
+                                                                                                    color: Colors.white,
+                                                                                                    fontWeight: FontWeight.w500,
+                                                                                                  ),
+                                                                                                ),
+                                                                                              ),
+                                                                                            ),
+                                                                                          ],
+                                                                                        ),
+                                                                                        SizedBox(height: 16),
+                                                                                        Text(
+                                                                                          review["name"] ?? 'Anonymous',
+                                                                                          style: TextStyle(
+                                                                                            fontSize: nameSize,
+                                                                                            fontWeight: FontWeight.bold,
+                                                                                            fontFamily: "DMSans",
+                                                                                          ),
+                                                                                        ),
+                                                                                        SizedBox(height: 8),
+                                                                                        Text(
+                                                                                          review["designation"] ?? 'Reviewer',
+                                                                                          style: TextStyle(
+                                                                                            fontSize: designationSize,
+                                                                                            color: Color.fromRGBO(139, 139, 139, 1),
+                                                                                            fontFamily: "DMSans",
+                                                                                          ),
+                                                                                        ),
+                                                                                        SizedBox(height: 24),
+                                                                                        Text(
+                                                                                          review["review"] ?? 'No review provided',
+                                                                                          style: TextStyle(fontSize: reviewTextSize),
+                                                                                        ),
+                                                                                      ],
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                              ],
+                                                                            ),
+                                                                    ),
+                                                                  );
+                                                                }).toList(),
+                                                              );
+                                                            },
+                                                          );
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            // Left button
+                                          if (reviewCurrentPage >= 0)
+                                            Positioned(
+                                              height: screenWidth >= 1024
+                                                  ? screenHeight * 0.05
+                                                  : screenWidth >= 600
+                                                      ? screenHeight * 0.045
+                                                      : 36,
+                                              left: screenWidth >= 1024
+                                                  ? screenWidth * 0.03
+                                                  : screenWidth >= 600
+                                                      ? screenWidth * 0.02
+                                                      : 8,
+                                              top: screenWidth >= 1024
+                                                  ? screenHeight * 0.38
+                                                  : screenWidth >= 600
+                                                      ? screenHeight * 0.36
+                                                      : screenHeight * 0.33,
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(10),
+                                                ),
+                                                child: FloatingActionButton(
+                                                  onPressed: () {
+                                                    reviewCarouselController.animateToPage(reviewCurrentPage - 1, curve: Curves.easeIn);
+                                                  },
+                                                  backgroundColor: Colors.white,
+                                                  elevation: 0.0,
+                                                  highlightElevation: 0.0,
+                                                  child: Icon(
+                                                    Icons.arrow_back_ios_outlined,
+                                                    size: screenWidth >= 1024
+                                                        ? 18
+                                                        : screenWidth >= 600
+                                                            ? 14
+                                                            : 12,
+                                                  ),
+                                                  mini: true,
+                                                ),
+                                              ),
+                                            ),
+                                          // Right button
+                                          if (reviewCurrentPage <= reviews.length - 1)
+                                            Positioned(
+                                              height: screenWidth >= 1024
+                                                  ? screenHeight * 0.05
+                                                  : screenWidth >= 600
+                                                      ? screenHeight * 0.045
+                                                      : 36,
+                                              right: screenWidth >= 1024
+                                                  ? screenWidth * 0.03
+                                                  : screenWidth >= 600
+                                                      ? screenWidth * 0.02
+                                                      : 8,
+                                              top: screenWidth >= 1024
+                                                  ? screenHeight * 0.38
+                                                  : screenWidth >= 600
+                                                      ? screenHeight * 0.36
+                                                      : screenHeight * 0.33,
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(10),
+                                                ),
+                                                child: FloatingActionButton(
+                                                  onPressed: () {
+                                                    reviewCarouselController.animateToPage(reviewCurrentPage + 1, curve: Curves.easeIn);
+                                                  },
+                                                  backgroundColor: Colors.white,
+                                                  elevation: 0.0,
+                                                  child: Icon(
+                                                    Icons.arrow_forward_ios_outlined,
+                                                    size: screenWidth >= 1024
+                                                        ? 18
+                                                        : screenWidth >= 600
+                                                            ? 14
+                                                            : 12,
+                                                  ),
+                                                  mini: true,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        
+                                              
+                                        SizedBox(height: 40),
+                                        LayoutBuilder(
+                                          builder: (context, constraints) {
+                                            double fontSize = constraints.maxWidth > 600 ? 28 : 23;
+                                            double paddingValue = constraints.maxWidth > 600 ? 20.0 : 10.0;
+                                              
+                                            return Padding(
+                                              padding: EdgeInsets.all(paddingValue),
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Text(
+                                                        "Latest Blog Posts",
+                                                        style: TextStyle(
+                                                          fontSize: fontSize,
+                                                          fontWeight: FontWeight.bold,
+                                                          fontFamily: "DMSans",
+                                                        ),
+                                                      ),
+                                                    
+                                                      TextButton(
+                                                        onPressed: () {},
+                                                        child: Row(
+                                                          children: [
+                                                            Text(
+                                                              'View All',
+                                                              style: TextStyle(
+                                                                color: Color.fromRGBO(0, 147, 255, 1),
+                                                                fontSize: screenHeight * 0.02,
+                                                                fontWeight: FontWeight.bold,
+                                                                fontFamily: "DMSans",
+                                                              ),
+                                                            ),
+                                                            Icon(
+                                                              Icons.arrow_outward,
+                                                              color: Color.fromRGBO(0, 147, 255, 1),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                              
+                                        
+                                        LayoutBuilder(
+                                          builder: (context, constraints) {
+                                            double screenWidth = constraints.maxWidth;
+                    
+                                            if (screenWidth < 600) {
+                                              // Mobile: Use CarouselSlider
+                                              return CarouselSlider(
+                                                options: CarouselOptions(
+                                                  height: 420, // Adjust as needed
+                                                  enableInfiniteScroll: true,
+                                                  enlargeCenterPage: true,
+                                                  viewportFraction: 0.9,
+                                                ),
+                                                items: blogs.map((blog) {
+                                                  double imageHeight = 220;
+                                                  double textSize = 13;
+                                                  double buttonPadding = 20;
+                                                  return Padding(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Stack(
+                                                          children: [
+                                                            ClipRRect(
+                                                              borderRadius: BorderRadius.circular(10),
+                                                              child: Image.asset(
+                                                                blog["image"]!,
+                                                                height: imageHeight,
+                                                                width: double.infinity,
+                                                                fit: BoxFit.cover,
+                                                              ),
+                                                            ),
+                                                            Positioned(
+                                                              top: 5,
+                                                              left: 5,
+                                                              child: ElevatedButton(
+                                                                onPressed: () {},
+                                                                style: ElevatedButton.styleFrom(
+                                                                  backgroundColor: Colors.white,
+                                                                  foregroundColor: Colors.black,
+                                                                  padding: EdgeInsets.symmetric(
+                                                                    horizontal: buttonPadding,
+                                                                    vertical: 8,
+                                                                  ),
+                                                                  shape: RoundedRectangleBorder(
+                                                                    borderRadius: BorderRadius.circular(8),
+                                                                  ),
+                                                                ),
+                                                                child: Text(
+                                                                  blog["name"]!,
+                                                                  style: TextStyle(
+                                                                    fontSize: textSize - 3,
+                                                                    fontFamily: "DMSans",
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        const SizedBox(height: 8),
+                                                        Padding(
+                                                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                                          child: Row(
+                                                            children: [
+                                                              Text(
+                                                                blog["position"]!,
+                                                                style: const TextStyle(
+                                                                  color: Color.fromRGBO(5, 11, 32, 1),
+                                                                  fontFamily: "DMSans",
+                                                                  fontWeight: FontWeight.w500,
+                                                                ),
+                                                              ),
+                                                              const SizedBox(width: 10),
+                                                              const Icon(
+                                                                Icons.circle,
+                                                                size: 8,
+                                                                color: Color.fromRGBO(225, 225, 225, 1),
+                                                              ),
+                                                              const SizedBox(width: 5),
+                                                              Text(
+                                                                blog["date"]!,
+                                                                style: const TextStyle(
+                                                                  color: Color.fromRGBO(5, 11, 32, 1),
+                                                                  fontFamily: "DMSans",
+                                                                  fontWeight: FontWeight.w500,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        const SizedBox(height: 10),
+                                                        Padding(
+                                                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                                          child: Text(
+                                                            blog["description"]!,
+                                                            style: TextStyle(
+                                                              fontSize: textSize,
+                                                              color: const Color.fromRGBO(5, 11, 32, 1),
+                                                              fontWeight: FontWeight.w500,
+                                                              fontFamily: "DMSans",
+                                                            ),
+                                                            maxLines: 2,
+                                                            overflow: TextOverflow.ellipsis,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                }).toList(),
+                                              );
+                                            } else {
+                                              // Tablet/Web: Use GridView
+                                              return GridView.builder(
+                                                shrinkWrap: true,
+                                                physics: NeverScrollableScrollPhysics(),
+                                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                                  crossAxisCount: screenWidth > 900
+                                                      ? 3
+                                                      : screenWidth > 600
+                                                          ? 2
+                                                          : 1,
+                                                  mainAxisSpacing: 20,
+                                                  crossAxisSpacing: 20,
+                                                  childAspectRatio: screenWidth > 900
+                                                      ? 1.2
+                                                      : screenWidth > 600
+                                                          ? 1.1
+                                                          : 0.9,
+                                                ),
+                                                itemCount: blogs.length,
+                                                itemBuilder: (context, index) {
+                                                  final blog = blogs[index];
+                                                  double imageHeight = screenWidth > 900
+                                                      ? 360
+                                                      : screenWidth > 600
+                                                          ? 280
+                                                          : 220;
+                                                  double textSize = screenWidth > 900
+                                                      ? 22
+                                                      : screenWidth > 600
+                                                          ? 16
+                                                          : 13;
+                                                  double buttonPadding = screenWidth > 900
+                                                      ? 30
+                                                      : screenWidth > 600
+                                                          ? 25
+                                                          : 20;
+                    
+                                                  return Padding(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Stack(
+                                                          children: [
+                                                            ClipRRect(
+                                                              borderRadius: BorderRadius.circular(10),
+                                                              child: Image.asset(
+                                                                blog["image"]!,
+                                                                height: imageHeight,
+                                                                width: double.infinity,
+                                                                fit: BoxFit.cover,
+                                                              ),
+                                                            ),
+                                                            Positioned(
+                                                              top: 5,
+                                                              left: 5,
+                                                              child: ElevatedButton(
+                                                                onPressed: () {},
+                                                                style: ElevatedButton.styleFrom(
+                                                                  backgroundColor: Colors.white,
+                                                                  foregroundColor: Colors.black,
+                                                                  padding: EdgeInsets.symmetric(
+                                                                    horizontal: buttonPadding,
+                                                                    vertical: 8,
+                                                                  ),
+                                                                  shape: RoundedRectangleBorder(
+                                                                    borderRadius: BorderRadius.circular(8),
+                                                                  ),
+                                                                ),
+                                                                child: Text(
+                                                                  blog["name"]!,
+                                                                  style: TextStyle(
+                                                                    fontSize: textSize - 3,
+                                                                    fontFamily: "DMSans",
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        const SizedBox(height: 8),
+                                                        Padding(
+                                                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                                          child: Row(
+                                                            children: [
+                                                              Text(
+                                                                blog["position"]!,
+                                                                style: const TextStyle(
+                                                                  color: Color.fromRGBO(5, 11, 32, 1),
+                                                                  fontFamily: "DMSans",
+                                                                  fontWeight: FontWeight.w500,
+                                                                ),
+                                                              ),
+                                                              const SizedBox(width: 10),
+                                                              const Icon(
+                                                                Icons.circle,
+                                                                size: 8,
+                                                                color: Color.fromRGBO(225, 225, 225, 1),
+                                                              ),
+                                                              const SizedBox(width: 5),
+                                                              Text(
+                                                                blog["date"]!,
+                                                                style: const TextStyle(
+                                                                  color: Color.fromRGBO(5, 11, 32, 1),
+                                                                  fontFamily: "DMSans",
+                                                                  fontWeight: FontWeight.w500,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        const SizedBox(height: 10),
+                                                        Padding(
+                                                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                                          child: Text(
+                                                            blog["description"]!,
+                                                            style: TextStyle(
+                                                              fontSize: textSize,
+                                                              color: const Color.fromRGBO(5, 11, 32, 1),
+                                                              fontWeight: FontWeight.w500,
+                                                              fontFamily: "DMSans",
+                                                            ),
+                                                            maxLines: 2,
+                                                            overflow: TextOverflow.ellipsis,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            }
+                                          },
+                                        ),
+                    
+                    
+                                        //responsive SizedBox for spacing
+                                        Builder(
+                                          builder: (context) {
+                                            double screenWidth = MediaQuery.of(context).size.width;
+                                            double offsetY = screenWidth < 600
+                                                ? -70
+                                                : screenWidth < 1024
+                                                    ? 40
+                                                    : 120;
+                                            return Transform.translate(
+                                              offset: Offset(0, offsetY),
+                                              child: LayoutBuilder(
+                                                builder: (context, constraints) {
+                                                  double screenWidth = constraints.maxWidth;
+                                                  bool isMobile = screenWidth < 600;
+                                                  bool isTablet = screenWidth >= 600 && screenWidth < 1024;
+                    
+                                                  double cardWidth = isMobile
+                                                      ? double.infinity
+                                                      : isTablet
+                                                          ? (screenWidth / 2) - 32
+                                                          : 650;
+                                                  double imageHeight = isMobile
+                                                      ? 60
+                                                      : isTablet
+                                                          ? 80
+                                                          : 100;
+                                                  double fontSizeTitle = isMobile ? 16 : 20;
+                                                  double fontSizeDesc = isMobile ? 12 : 14;
+                                                  double buttonFontSize = isMobile ? 11.36 : 14;
+                                                  double buttonPaddingH = isMobile ? 15 : 20;
+                                                  double buttonPaddingV = isMobile ? 15 : 18;
+                                                  double cardPadding = isMobile ? 20 : 40;
+                    
+                                                  Widget buildCard({
+                                                    required Color color,
+                                                    required String title,
+                                                    required String desc,
+                                                    required String imagePath,
+                                                    required Color buttonColor,
+                                                    required Color buttonTextColor,
+                                                    required double imageHeight,
+                                                  }) {
+                                                    return Container(
+                                                      width: cardWidth,
+                                                      margin: EdgeInsets.only(bottom: isMobile ? 16 : 0, right: isMobile ? 0 : 16),
+                                                      decoration: BoxDecoration(
+                                                        color: color,
+                                                        borderRadius: BorderRadius.circular(10),
+                                                      ),
+                                                      child: Padding(
+                                                        padding: EdgeInsets.all(cardPadding),
+                                                        child: Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            Text(
+                                                              title,
+                                                              style: TextStyle(
+                                                                fontFamily: "DMSans",
+                                                                fontWeight: FontWeight.w700,
+                                                                fontSize: fontSizeTitle,
+                                                              ),
+                                                            ),
+                                                            const SizedBox(height: 10),
+                                                            Text(
+                                                              desc,
+                                                              style: TextStyle(
+                                                                fontFamily: "DMSans",
+                                                                fontWeight: FontWeight.w400,
+                                                                fontSize: fontSizeDesc,
+                                                              ),
+                                                            ),
+                                                            const SizedBox(height: 10),
+                                                            Row(
+                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                              children: [
+                                                                ElevatedButton(
+                                                                  onPressed: () {},
+                                                                  style: ElevatedButton.styleFrom(
+                                                                    backgroundColor: buttonColor,
+                                                                    foregroundColor: buttonTextColor,
+                                                                    padding: EdgeInsets.symmetric(
+                                                                      horizontal: buttonPaddingH,
+                                                                      vertical: buttonPaddingV,
+                                                                    ),
+                                                                    shape: RoundedRectangleBorder(
+                                                                      borderRadius: BorderRadius.circular(10),
+                                                                    ),
+                                                                  ),
+                                                                  child: Row(
+                                                                    children: [
+                                                                      Text(
+                                                                        "Get Started",
+                                                                        style: TextStyle(
+                                                                          fontSize: buttonFontSize,
+                                                                          fontWeight: FontWeight.w500,
+                                                                          fontFamily: "DMSans",
+                                                                        ),
+                                                                      ),
+                                                                      const SizedBox(width: 5),
+                                                                      Icon(Icons.arrow_outward_sharp, size: isMobile ? 20 : 24),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                                const SizedBox(width: 10),
+                                                                Image.asset(
+                                                                  imagePath,
+                                                                  height: imageHeight,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    );
+                                                  }
+                    
+                                                  final card1 = buildCard(
+                                                    color: Color.fromRGBO(233, 242, 255, 1),
+                                                    title: "Are You Looking \nFor a Car?",
+                                                    desc: "We are committed to providing our customers with \nexceptional service.",
+                                                    imagePath: "assets/Home_Images/Footer_Images/lookingCar.png",
+                                                    buttonColor: Color.fromRGBO(26, 76, 142, 1),
+                                                    buttonTextColor: Colors.white,
+                                                    imageHeight: imageHeight,
+                                                  );
+                    
+                                                  final card2 = buildCard(
+                                                    color: Color.fromRGBO(255, 233, 243, 1),
+                                                    title: "Best place for \ncar financing",
+                                                    desc: "We are committed to providing our customers with \nexceptional service.",
+                                                    imagePath: "assets/Home_Images/Footer_Images/carFinance.png",
+                                                    buttonColor: Color.fromRGBO(5, 11, 32, 1),
+                                                    buttonTextColor: Colors.white,
+                                                    imageHeight: imageHeight,
+                                                  );
+                    
+                                                  if (isMobile) {
+                                                    return Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                      children: [card1, card2],
+                                                    );
+                                                  } else {
+                                                    return Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                      children: [card1, card2],
+                                                    );
+                                                  }
+                                                },
+                                              ), // Wrap the widget you want to shift upward
+                                            );
+                                          },
+                                        ),
+                                      ]
+                                    );
+                                    
+                                  }
+                                ),
+                              ]
+                            ),
+                          );
+                                
+                        }
+                        
                       ),
-                    );
-                  }
-                                  
-                  Widget Hatchback(){
-                    return Container(
-                      margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
-                      child: Column(
-                        children: [
-                          const Text("Hatchback", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500))
-                        ],
-                      ),
+                    
+                      ],
                     );
                   }
 
-                  Widget SUV(){
-                    return Container(
-                      margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
-                      child: Column(
-                        children: [
-                          const Text("SUV's", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500))
-                        ],
+              
+                  Widget Hatchback() {
+                    final List<String> hatchbackKeywords = [
+                      "golf", "polo", "id.3", "fit", "jazz", "civic hatchback", "focus", "fiesta", "puma",
+                      "yaris", "corolla hatchback", "aqua", "i10", "nios", "i20", "i30", "veloster", "rio", "ceed", "picanto",
+                      "mazda 2", "mazda2", "mazda3 hatchback", "swift", "baleno", "celerio", "spark", "aveo hatchback",
+                      "clio", "zoe", "sandero", "208", "308", "micra", "leaf", "note", "fabia", "scala", "citigo",
+                      "ibiza", "leon hatchback", "mini", "clubman", "mini electric", "fiat 500", "panda", "punto",
+                      "dacia sandero", "corsa", "astra hatchback", "mirage", "c3", "c4", "impreza hatchback",
+                      "xv", "crosstrek", "hatchback"
+                    ];
+
+                    List<Map<String, dynamic>> hatchbackCars = cars.where((car) {
+                      final name = (car["name"] ?? "").toString().toLowerCase();
+                      return hatchbackKeywords.any((keyword) => name.contains(keyword));
+                    }).toList();
+
+                    if (hatchbackCars.isEmpty) {
+                      return Container(
+                        margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
+                        child: Column(
+                          children: const [
+                            Text("Hatchback", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
+                            SizedBox(height: 20),
+                            Text("No hatchback cars available.", style: TextStyle(fontSize: 16)),
+                          ],
+                        ),
+                      );
+                    }
+
+                    if (hatchbackCars.length == 1) {
+                      final car = hatchbackCars.first;
+                      return Container(
+                        margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
+                        child: Column(
+                          children: [
+                            LayoutBuilder(
+                              builder: (context, constraints) {
+                                return _buildCarCard(car, constraints, context);
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+
+                    return Column(
+                      children: [
+                        Padding(
+                            padding: EdgeInsets.only(left: 0),
+                            child: buildBrandCards(context),
+                          ),
+                          const SizedBox(height: 20,),
+                    
+                        Stack(
+                          children: [
+                            CarouselSlider(
+                              carouselController: innerCarouselController,
+                              options: CarouselOptions(
+                                height: MediaQuery.of(context).size.height * 0.8,
+                                autoPlay: false,
+                                enableInfiniteScroll: true,
+                                enlargeCenterPage: false,
+                                viewportFraction: 1,
+                                onPageChanged: (index, reason) {
+                                  setState(() {
+                                    innerCurrentPage = index;
+                                  });
+                                },
+                              ),
+                              items: hatchbackCars.asMap().entries.map((entry) {
+                                int index = entry.key;
+                                Map<String, dynamic> car = entry.value;
+                                return LayoutBuilder(
+                                  builder: (context, constraints) {
+                                    return _buildCarCard(car, constraints, context);
+                                  },
+                                );
+                              }).toList(),
+                            ),
+                            if (innerCurrentPage >= 0)
+                              Positioned(
+                                height: (MediaQuery.of(context).size.width < 600 ? 30.0 : MediaQuery.of(context).size.width < 1024 ? 50.0 : 60.0),
+                                left: (MediaQuery.of(context).size.width < 600 ? -5.0 : MediaQuery.of(context).size.width < 1024 ? -6.0 : -10.0),
+                                top: (MediaQuery.of(context).size.width < 600 ? MediaQuery.of(context).size.height * 0.35 : MediaQuery.of(context).size.width < 1024 ? MediaQuery.of(context).size.height * 0.30 : MediaQuery.of(context).size.height * 0.22),
+                                child: FloatingActionButton(
+                                  onPressed: () {
+                                    innerCarouselController.animateToPage(innerCurrentPage - 1, curve: Curves.easeIn);
+                                  },
+                                  backgroundColor: Color.fromRGBO(26, 76, 142, 1),
+                                  child: const Icon(Icons.arrow_back_ios_outlined, color: Colors.white),
+                                  mini: true,
+                                ),
+                              ),
+                            if (innerCurrentPage <= hatchbackCars.length - 1)
+                              Positioned(
+                                height: (MediaQuery.of(context).size.width < 600 ? 30.0 : MediaQuery.of(context).size.width < 1024 ? 50.0 : 60.0),
+                                right: (MediaQuery.of(context).size.width < 600 ? -5.0 : MediaQuery.of(context).size.width < 1024 ? -6.0 : -10.0),
+                                top: (MediaQuery.of(context).size.width < 600 ? MediaQuery.of(context).size.height * 0.35 : MediaQuery.of(context).size.width < 1024 ? MediaQuery.of(context).size.height * 0.30 : MediaQuery.of(context).size.height * 0.22),
+                                child: FloatingActionButton(
+                                  onPressed: () {
+                                    innerCarouselController.animateToPage(innerCurrentPage + 1, curve: Curves.easeIn);
+                                  },
+                                  backgroundColor: Color.fromRGBO(26, 76, 142, 1),
+                                  child: Icon(Icons.arrow_forward_ios_outlined, color: Colors.white),
+                                  mini: true,
+                                ),
+                              ),
+                          ],
+                        ),
+                      
+                            SizedBox(height: MediaQuery.of(context).size.height * 0.07,),
+                            LayoutBuilder(
+                              builder: (context, constraints) {
+                    
+                                double screenWidth = MediaQuery.of(context).size.width;
+                                double screenHeight = MediaQuery.of(context).size.height;
+                    
+                                double imageSize;
+                                if (screenWidth > 1200) {
+                                  imageSize = (screenWidth / 6) - 100;
+                                } else if (screenWidth > 600) {
+                                  imageSize = (screenWidth / 6) - 100; 
+                                } else {
+                                  imageSize = (screenWidth / 3) - 30; 
+                                }
+                                imageSize = imageSize.clamp(80.0, 300.0);
+                    
+                                double titleFontSize = screenWidth > 600 ? 40 : screenWidth * 0.08;
+                                
+                                return Padding(
+                                  padding: const EdgeInsets.only(left: 0, right: 0),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          RichText(
+                                            text: TextSpan(
+                                              children: [
+                                                TextSpan(
+                                                  text: 'Similar Brands',
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: screenHeight * 0.038,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontFamily: "DMSans",
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {},
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  'Show all Brands',
+                                                  style: TextStyle(
+                                                    color: Color.fromRGBO(0, 147, 255, 1),
+                                                    fontSize: screenHeight * 0.02,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontFamily: "DMSans",
+                                                  ),
+                                                ),
+                                                Icon(Icons.arrow_outward, color: Color.fromRGBO(0, 147, 255, 1)),
+                                              ],
+                                            ),
+                                          ),
+                                          
+                                        ],
+                                      ),
+                                      SizedBox(height: screenHeight * 0.05),
+                    
+                                      //Similar Brands Section
+                                      Column(
+                                        children: [
+                                          LayoutBuilder(
+                                            builder: (context, constraints) {
+                                              return Builder(
+                                                builder: (context) {
+                                                  print('[buildBrands] isLoadingBrands: $isLoadingBrands, errorMessageBrands: $errorMessageBrands, brands: $brands');
+                                                  if (isLoadingBrands) {
+                                                    return const Center(child: CircularProgressIndicator());
+                                                  }
+                                                  if (errorMessageBrands != null) {
+                                                    return Center(child: Text(errorMessageBrands!));
+                                                  }
+                                                  if (brands.isEmpty) {
+                                                    return const Center(child: Text('No brands available'));
+                                                  }
+                                                  return Padding(
+                                                    padding: const EdgeInsets.all(0.0),
+                                                    child: Wrap(
+                                                      spacing: screenWidth * 0.05,
+                                                      runSpacing: screenHeight * 0.02,
+                                                      children: brands.map((brand) {
+                                                        return Container(
+                                                          decoration: BoxDecoration(
+                                                            color: Colors.white,
+                                                            border: Border.all(width: 1, color: const Color.fromRGBO(233, 233, 233, 1)),
+                                                            borderRadius: BorderRadius.circular(10),
+                                                          ),
+                                                          child: ClipRRect(
+                                                            borderRadius: BorderRadius.circular(10),
+                                                            child: Column(
+                                                              children: [
+                                                                Image.asset(
+                                                                  brand["image"] ?? 'assets/placeholder.png',
+                                                                  width: imageSize,
+                                                                  fit: BoxFit.contain,
+                                                                  errorBuilder: (context, error, stackTrace) => Image.asset(
+                                                                    'assets/placeholder.png',
+                                                                    width: imageSize,
+                                                                    fit: BoxFit.contain,
+                                                                  ),
+                                                                ),
+                                                                Text(
+                                                                  brand["name"] ?? 'Unknown Brand',
+                                                                  style: const TextStyle(fontFamily: "DMSans"),
+                                                                  textAlign: TextAlign.center,
+                                                                  softWrap: true,
+                                                                  overflow: TextOverflow.visible,
+                                                                  maxLines: 2, // Allow up to 2 lines
+                                                                ),
+                                                                SizedBox(height: screenHeight * 0.02),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        );
+                                                      }).toList(),
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            },
+                                          ),
+                                          const SizedBox(height: 30),
+                                        ],
+                                      ),
+                    
+                    
+                                      LayoutBuilder(
+                                        builder: (context, constraints) {
+                                          double screenWidth = MediaQuery.of(context).size.width;
+                                          double imageWidth = screenWidth * 0.40;
+                                          double imageHeight = (imageWidth * 9 / 16) * 1.49;
+                                          double playButtonSize = screenWidth * 0.052;
+                                          double sectionSpacing = screenWidth * 0.01;
+                                        return Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            SizedBox(height: sectionSpacing),
+                    
+                                          // Responsive "video + info" section
+                                          Builder(
+                                            builder: (context) {
+                                              final screenWidth = MediaQuery.of(context).size.width;
+                                              final isMobile = screenWidth < 800;
+                                              final isTablet = screenWidth >= 800 && screenWidth < 1024;
+                                              final isDesktop = screenWidth >= 1024;
+                    
+                                              // Responsive sizes
+                                              double imageWidth, imageHeight, playButtonSize, infoPadding, titleFontSize, descFontSize, bulletFontSize, buttonFontSize, sectionSpacing;
+                                              if (isMobile) {
+                                                imageWidth = screenWidth * 0.9;
+                                                imageHeight = screenWidth * 0.5;
+                                                playButtonSize = 40;
+                                                infoPadding = 16;
+                                                titleFontSize = 18;
+                                                descFontSize = 12;
+                                                bulletFontSize = 12;
+                                                buttonFontSize = 14;
+                                                sectionSpacing = 10;
+                                              } else if (isTablet) {
+                                                imageWidth = screenWidth * 0.4;
+                                                imageHeight = screenWidth * 0.5;
+                                                playButtonSize = 50;
+                                                infoPadding = 32;
+                                                titleFontSize = 24;
+                                                descFontSize = 14;
+                                                bulletFontSize = 14;
+                                                buttonFontSize = 16;
+                                                sectionSpacing = 16;
+                                              } else {
+                                                imageWidth = screenWidth * 0.35;
+                                                imageHeight = screenWidth * 0.33;
+                                                playButtonSize = 60;
+                                                infoPadding = 70;
+                                                titleFontSize = 32;
+                                                descFontSize = 16;
+                                                bulletFontSize = 16;
+                                                buttonFontSize = 18;
+                                                sectionSpacing = 24;
+                                              }
+                    
+                                              Widget imageStack = Stack(
+                                                alignment: Alignment.center,
+                                                children: [
+                                                  ClipRRect(
+                                                    borderRadius: BorderRadius.only(
+                                                      topLeft: Radius.circular(10),
+                                                      bottomLeft: isMobile ? Radius.circular(10) : Radius.circular(0),
+                                                      topRight: isMobile ? Radius.circular(10) : Radius.circular(0),
+                                                      bottomRight: Radius.circular(0),
+                                                    ),
+                                                    child: Image.asset(
+                                                      "assets/videoImage.jpeg",
+                                                      width: imageWidth,
+                                                      height: imageHeight,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
+                                                  CircleAvatar(
+                                                    radius: playButtonSize / 2,
+                                                    backgroundColor: Colors.white,
+                                                    child: Icon(
+                                                      Icons.play_arrow,
+                                                      size: playButtonSize * 0.5,
+                                                      color: Colors.black,
+                                                    ),
+                                                  ),
+                                                ],
+                                              );
+                    
+                                              Widget infoSection = Container(
+                                                width: isMobile ? double.infinity : screenWidth * 0.48,
+                                                decoration: BoxDecoration(
+                                                  color: Color.fromRGBO(238, 241, 251, 1),
+                                                  borderRadius: isMobile
+                                                      ? BorderRadius.only(
+                                                          bottomLeft: Radius.circular(10),
+                                                          bottomRight: Radius.circular(10),
+                                                        )
+                                                      : null,
+                                                ),
+                                                child: Padding(
+                                                  padding: EdgeInsets.all(infoPadding),
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        "Buying a car has never been this easy.",
+                                                        style: TextStyle(
+                                                          fontSize: titleFontSize,
+                                                          fontWeight: FontWeight.bold,
+                                                          color: Colors.black,
+                                                          fontFamily: "DMSans",
+                                                        ),
+                                                      ),
+                                                      SizedBox(height: sectionSpacing),
+                                                      Text(
+                                                        "We are committed to providing our customers with exceptional service, competitive pricing, and a wide range of options.",
+                                                        style: TextStyle(
+                                                          fontSize: descFontSize,
+                                                          color: Color.fromRGBO(5, 11, 32, 1),
+                                                          fontFamily: "DMSans",
+                                                        ),
+                                                      ),
+                                                      SizedBox(height: sectionSpacing),
+                                                      Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          buildBulletPoint(
+                                                            "We are the UK's largest provider, with more patrols in more places",
+                                                            fontSize: bulletFontSize,
+                                                          ),
+                                                          buildBulletPoint(
+                                                            "You get 24/7 roadside assistance",
+                                                            fontSize: bulletFontSize,
+                                                          ),
+                                                          buildBulletPoint(
+                                                            "We fix 4 out of 5 cars at the roadside",
+                                                            fontSize: bulletFontSize,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      SizedBox(height: sectionSpacing),
+                                                      ElevatedButton(
+                                                        onPressed: () {
+                                                          _bookTestDrive();
+                                                        },
+                                                        style: ElevatedButton.styleFrom(
+                                                          backgroundColor: Color(0xFF004C90),
+                                                          padding: EdgeInsets.symmetric(
+                                                            horizontal: infoPadding,
+                                                            vertical: infoPadding / 2.5,
+                                                          ),
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.circular(8),
+                                                          ),
+                                                        ),
+                                                        child: Row(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          children: [
+                                                            Text(
+                                                              "Book a test drive",
+                                                              style: TextStyle(
+                                                                color: Colors.white,
+                                                                fontSize: buttonFontSize,
+                                                                fontFamily: "DMSans",
+                                                              ),
+                                                            ),
+                                                            SizedBox(width: sectionSpacing / 2),
+                                                            Icon(Icons.arrow_outward, color: Colors.white, size: buttonFontSize + 2),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              );
+                    
+                                              if (isMobile) {
+                                                return Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                  children: [
+                                                    imageStack,
+                                                    infoSection,
+                                                  ],
+                                                );
+                                              } else {
+                                                return Row(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    imageStack,
+                                                    infoSection,
+                                                  ],
+                                                );
+                                              }
+                                            },
+                                          ),
+                    
+                                          SizedBox(height: sectionSpacing),
+                                          Builder(
+                                            builder: (context) {
+                                              double screenWidth = MediaQuery.of(context).size.width;
+                                              int crossAxisCount;
+                                              if (screenWidth < 600) {
+                                                crossAxisCount = 2;
+                                              } else if (screenWidth < 1024) {
+                                                crossAxisCount = 4;
+                                              } else {
+                                                crossAxisCount = 4;
+                                              }
+                                              return Wrap(
+                                                alignment: WrapAlignment.center,
+                                                spacing: 8,
+                                                runSpacing: 8,
+                                                children: [
+                                                  buildStatBox("836M", "CARS FOR SALE", context),
+                                                  buildStatBox("738M", "DEALER REVIEWS", context),
+                                                  buildStatBox("100M", "VISITORS PER DAY", context),
+                                                  buildStatBox("238M", "VERIFIED DEALERS", context),
+                                                ],
+                                              );
+                                            },
+                                          ),
+                    
+                                          Divider(
+                                            thickness: 1,
+                                            color: Color.fromRGBO(223, 223, 223, 1),
+                                          ),
+                                          SizedBox(height: sectionSpacing),
+                    
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                              left: screenWidth >= 1024
+                                                  ? 100
+                                                  : screenWidth >= 600
+                                                      ? 40
+                                                      : 10,
+                                              right: screenWidth >= 1024
+                                                  ? 50
+                                                  : screenWidth >= 600
+                                                      ? 24
+                                                      : 10,
+                                              top: screenWidth >= 1024
+                                                  ? 50
+                                                  : screenWidth >= 600
+                                                      ? 30
+                                                      : 16,
+                                              bottom: screenWidth >= 1024
+                                                  ? 20
+                                                  : screenWidth >= 600
+                                                      ? 16
+                                                      : 8,
+                                            ),
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text("Why Choose Us?", style: TextStyle(fontWeight: FontWeight.bold,fontSize: screenHeight * 0.038, fontFamily: "DMSans",),),
+                                              ],
+                                            ),
+                                          ),
+                                          SizedBox(height: sectionSpacing),
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                              left: screenWidth >= 1024
+                                                  ? 100
+                                                  : screenWidth >= 600
+                                                      ? 40
+                                                      : 10,
+                                              right: screenWidth >= 1024
+                                                  ? 50
+                                                  : screenWidth >= 600
+                                                      ? 24
+                                                      : 10,
+                                              top: screenWidth >= 1024
+                                                  ? 50
+                                                  : screenWidth >= 600
+                                                      ? 30
+                                                      : 16,
+                                              bottom: screenWidth >= 1024
+                                                  ? 20
+                                                  : screenWidth >= 600
+                                                      ? 16
+                                                      : 8,
+                                            ),
+                                            child: LayoutBuilder(
+                                              builder: (context, constraints) {
+                                                double screenWidth = MediaQuery.of(context).size.width;
+                                                bool isMobile = screenWidth < 600;
+                    
+                                                double imageSize;
+                                                double titleFontSize;
+                                                double descFontSize;
+                                                if (screenWidth >= 1024) {
+                                                  // Desktop
+                                                  imageSize = 52;
+                                                  titleFontSize = 22;
+                                                  descFontSize = 15;
+                                                } else if (screenWidth >= 600) {
+                                                  // Tablet
+                                                  imageSize = 40;
+                                                  titleFontSize = 19;
+                                                  descFontSize = 15;
+                                                } else {
+                                                  // Mobile
+                                                  imageSize = 33;
+                                                  titleFontSize = 15;
+                                                  descFontSize = 13;
+                                                }
+                    
+                                                List<Widget> infoBlocks = [
+                                                  Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Image.asset("assets/financialOffer.png", height: imageSize),
+                                                      SizedBox(height: screenWidth * 0.02),
+                                                      Text("Special Financing Offers", style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold, fontFamily: "DMSans",),),
+                                                      SizedBox(height: screenWidth * 0.01),
+                                                      Text("Our stress-free finance department that can \nfind financial solutions to save you money.",
+                                                        style: TextStyle(fontFamily: "DMSans", fontSize: descFontSize),),
+                                                    ],
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Image.asset("assets/dealership.png", height: imageSize),
+                                                      SizedBox(height: screenWidth * 0.02),
+                                                      Text("Trusted Car Dealership", style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold, fontFamily: "DMSans",),),
+                                                      SizedBox(height: screenWidth * 0.01),
+                                                      Text("Our stress-free finance department that can \nfind financial solutions to save you money.",
+                                                        style: TextStyle(fontFamily: "DMSans", fontSize: descFontSize),),
+                                                    ],
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Image.asset("assets/transparent.png", height: imageSize),
+                                                      SizedBox(height: screenWidth*0.02),
+                                                      Text("Transparent Pricing", style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold, fontFamily: "DMSans",),),
+                                                      SizedBox(height: screenWidth * 0.01),
+                                                      Text("Our stress-free finance department that can \nfind financial solutions to save you money.",
+                                                        style: TextStyle(fontFamily: "DMSans", fontSize: descFontSize),),
+                                                    ],
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Image.asset("assets/expertCar.png", height: imageSize),
+                                                      SizedBox(height: screenWidth * 0.02),
+                                                      Text("Expert Car Service", style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold),),
+                                                      SizedBox(height: screenWidth * 0.01),
+                                                      Text("Our stress-free finance department that can \nfind financial solutions to save you money.",
+                                                        style: TextStyle(fontFamily: "DMSans", fontSize: descFontSize),),
+                                                    ],
+                                                  ),
+                                                ];
+                    
+                                                if (isMobile) {
+                                                  // Display vertically for mobile
+                                                  return Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: infoBlocks
+                                                        .map((block) => Padding(
+                                                              padding: EdgeInsets.only(bottom: screenWidth * 0.04),
+                                                              child: block,
+                                                            ))
+                                                        .toList(),
+                                                  );
+                                                } else {
+                                                  // Display horizontally for tablet/desktop
+                                                  return Row(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: infoBlocks
+                                                        .map((block) => Padding(
+                                                              padding: EdgeInsets.only(right: screenWidth * 0.02),
+                                                              child: block,
+                                                            ))
+                                                        .toList(),
+                                                  );
+                                                }
+                                              }
+                                            ),
+                                          ),
+                                          SizedBox(height: screenHeight * 0.1),
+                                          
+                                          Stack(
+                                          children: [
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                color: Color.fromRGBO(249, 251, 252, 1),
+                                              ),
+                                              child: Padding(
+                                                padding: EdgeInsets.only(
+                                                  left: screenWidth >= 1024
+                                                      ? screenWidth * 0.15
+                                                      : screenWidth >= 600
+                                                          ? screenWidth * 0.08
+                                                          : 16,
+                                                  right: screenWidth >= 1024
+                                                      ? screenWidth * 0.15
+                                                      : screenWidth >= 600
+                                                          ? screenWidth * 0.08
+                                                          : 16,
+                                                  top: screenWidth >= 1024
+                                                      ? screenHeight * 0.10
+                                                      : screenWidth >= 600
+                                                          ? screenHeight * 0.06
+                                                          : 16,
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Padding(
+                                                      padding: EdgeInsets.symmetric(
+                                                        horizontal: screenWidth >= 1024
+                                                            ? 0
+                                                            : screenWidth >= 600
+                                                                ? 0
+                                                                : 0, // You can adjust if you want more padding on mobile
+                                                      ),
+                                                      child: LayoutBuilder(
+                                                        builder: (context, constraints) {
+                                                          double textSize;
+                                                          double subTextSize;
+                                                          if (constraints.maxWidth >= 1024) {
+                                                            textSize = 28;
+                                                            subTextSize = 14;
+                                                          } else if (constraints.maxWidth >= 600) {
+                                                            textSize = 24;
+                                                            subTextSize = 12;
+                                                          } else {
+                                                            textSize = 18;
+                                                            subTextSize = 10;
+                                                          }
+                    
+                                                          bool isMobile = constraints.maxWidth < 600;
+                    
+                                                          return Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: [
+                                                              isMobile
+                                                                  ? Column(
+                                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                                      children: [
+                                                                        Text(
+                                                                          "What our customers say",
+                                                                          style: TextStyle(
+                                                                            fontWeight: FontWeight.w700,
+                                                                            fontSize: textSize,
+                                                                            fontFamily: "DMSans",
+                                                                          ),
+                                                                        ),
+                                                                        SizedBox(height: 8),
+                                                                        Text(
+                                                                          "Rated ${calculateAverageRating().toStringAsFixed(1)} / 5 based on $totalReviews reviews Showing our 4 & 5 star reviews",
+                                                                          style: TextStyle(
+                                                                            fontWeight: FontWeight.w400,
+                                                                            fontSize: subTextSize,
+                                                                            fontFamily: "DMSans",
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    )
+                                                                  : Row(
+                                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                      children: [
+                                                                        Text(
+                                                                          "What our customers say",
+                                                                          style: TextStyle(
+                                                                            fontWeight: FontWeight.w700,
+                                                                            fontSize: textSize,
+                                                                            fontFamily: "DMSans",
+                                                                          ),
+                                                                        ),
+                                                                        Text(
+                                                                          "Rated ${calculateAverageRating().toStringAsFixed(1)} / 5 based on $totalReviews reviews Showing our 4 & 5 star reviews",
+                                                                          style: TextStyle(
+                                                                            fontWeight: FontWeight.w400,
+                                                                            fontSize: subTextSize,
+                                                                            fontFamily: "DMSans",
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                            ],
+                                                          );
+                                                        },
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 20),
+                                                    Padding(
+                                                      padding: EdgeInsets.symmetric(
+                                                        horizontal: screenWidth >= 1024
+                                                            ? 0
+                                                            : screenWidth >= 600
+                                                                ? 0
+                                                                : 0, // Adjust if you want more padding on mobile
+                                                      ),
+                                                      child: LayoutBuilder(
+                                                        builder: (context, constraints) {
+                                                          bool isDesktop = constraints.maxWidth >= 1024;
+                                                          bool isTablet = constraints.maxWidth >= 600 && constraints.maxWidth < 1024;
+                                                          bool isMobile = constraints.maxWidth < 600;
+                    
+                                                          double containerHeight = isDesktop
+                                                              ? 490
+                                                              : isTablet
+                                                                  ? 420
+                                                                  : 320;
+                                                          double containerWidth = isDesktop
+                                                              ? screenWidth * 0.9
+                                                              : isTablet
+                                                                  ? screenWidth * 0.95
+                                                                  : screenWidth * 0.98;
+                                                          double imageWidth = isDesktop
+                                                              ? 480
+                                                              : isTablet
+                                                                  ? 300
+                                                                  : containerWidth;
+                                                          double imageHeight = isDesktop
+                                                              ? 550
+                                                              : isTablet
+                                                                  ? 380
+                                                                  : 180;
+                                                          double nameSize = isDesktop
+                                                              ? 18
+                                                              : isTablet
+                                                                  ? 16
+                                                                  : 14;
+                                                          double designationSize = isDesktop
+                                                              ? 15
+                                                              : isTablet
+                                                                  ? 13
+                                                                  : 11;
+                                                          double reviewTextSize = isDesktop
+                                                              ? 22
+                                                              : isTablet
+                                                                  ? 16
+                                                                  : 12;
+                                                          double starSize = isDesktop
+                                                              ? 16
+                                                              : isTablet
+                                                                  ? 13
+                                                                  : 11;
+                    
+                                                          return Builder(
+                                                            builder: (context) {
+                                                              if (isLoadingReviews) {
+                                                                return Center(child: CircularProgressIndicator());
+                                                              }
+                                                              if (errorMessageReviews != null) {
+                                                                return Center(child: Text(errorMessageReviews!));
+                                                              }
+                                                              if (reviews.isEmpty) {
+                                                                return Center(child: Text('No high-rated reviews available'));
+                                                              }
+                                                              return CarouselSlider(
+                                                                carouselController: reviewCarouselController,
+                                                                options: CarouselOptions(
+                                                                  height: containerHeight,
+                                                                  autoPlay: false,
+                                                                  enlargeCenterPage: false,
+                                                                  enableInfiniteScroll: false,
+                                                                  viewportFraction: 1,
+                                                                  onPageChanged: (index, reason) {
+                                                                    setState(() {
+                                                                      reviewCurrentPage = index;
+                                                                    });
+                                                                  },
+                                                                ),
+                                                                items: reviews.asMap().entries.map((entry) {
+                                                                  int index = entry.key;
+                                                                  Map<String, dynamic> review = entry.value;
+                                                                  return Padding(
+                                                                    padding: const EdgeInsets.all(0.0),
+                                                                    child: Container(
+                                                                      height: containerHeight,
+                                                                      width: containerWidth,
+                                                                      child: isMobile
+                                                                          ? Column(
+                                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                                              children: [
+                                                                                Image.asset(
+                                                                                  review["image"] ?? 'assets/placeholder.png',
+                                                                                  height: imageHeight,
+                                                                                  width: imageWidth,
+                                                                                  fit: BoxFit.cover,
+                                                                                  errorBuilder: (context, error, stackTrace) =>
+                                                                                      Image.asset(
+                                                                                    'assets/placeholder.png',
+                                                                                    height: imageHeight,
+                                                                                    width: imageWidth,
+                                                                                    fit: BoxFit.cover,
+                                                                                  ),
+                                                                                ),
+                                                                                SizedBox(height: 12),
+                                                                                Row(
+                                                                                  children: [
+                                                                                    Row(
+                                                                                      children: List.generate(5, (starIndex) {
+                                                                                        return Icon(
+                                                                                          starIndex < (review["rating"] ?? 0)
+                                                                                              ? Icons.star
+                                                                                              : Icons.star_border,
+                                                                                          color: Color.fromRGBO(225, 192, 63, 1),
+                                                                                          size: starSize.toDouble(),
+                                                                                        );
+                                                                                      }),
+                                                                                    ),
+                                                                                    SizedBox(width: 6),
+                                                                                    Container(
+                                                                                      decoration: BoxDecoration(
+                                                                                        color: Color.fromRGBO(225, 192, 63, 1),
+                                                                                        borderRadius: BorderRadius.circular(10),
+                                                                                      ),
+                                                                                      child: Padding(
+                                                                                        padding: const EdgeInsets.symmetric(
+                                                                                            horizontal: 10, vertical: 2),
+                                                                                        child: Text(
+                                                                                          (review["rating"] ?? 0).toStringAsFixed(1),
+                                                                                          style: TextStyle(
+                                                                                            fontSize: designationSize,
+                                                                                            color: Colors.white,
+                                                                                            fontWeight: FontWeight.w500,
+                                                                                          ),
+                                                                                        ),
+                                                                                      ),
+                                                                                    ),
+                                                                                  ],
+                                                                                ),
+                                                                                SizedBox(height: 8),
+                                                                                Text(
+                                                                                  review["name"] ?? 'Anonymous',
+                                                                                  style: TextStyle(
+                                                                                    fontSize: nameSize,
+                                                                                    fontWeight: FontWeight.bold,
+                                                                                    fontFamily: "DMSans",
+                                                                                  ),
+                                                                                ),
+                                                                                SizedBox(height: 4),
+                                                                                Text(
+                                                                                  review["designation"] ?? 'Reviewer',
+                                                                                  style: TextStyle(
+                                                                                    fontSize: designationSize,
+                                                                                    color: Color.fromRGBO(139, 139, 139, 1),
+                                                                                    fontFamily: "DMSans",
+                                                                                  ),
+                                                                                ),
+                                                                                SizedBox(height: 12),
+                                                                                Text(
+                                                                                  review["review"] ?? 'No review provided',
+                                                                                  style: TextStyle(fontSize: reviewTextSize),
+                                                                                ),
+                                                                              ],
+                                                                            )
+                                                                          : Row(
+                                                                              children: [
+                                                                                Image.asset(
+                                                                                  review["image"] ?? 'assets/placeholder.png',
+                                                                                  height: imageHeight,
+                                                                                  width: imageWidth,
+                                                                                  fit: BoxFit.cover,
+                                                                                  errorBuilder: (context, error, stackTrace) =>
+                                                                                      Image.asset(
+                                                                                    'assets/placeholder.png',
+                                                                                    height: imageHeight,
+                                                                                    width: imageWidth,
+                                                                                    fit: BoxFit.cover,
+                                                                                  ),
+                                                                                ),
+                                                                                SizedBox(width: 24),
+                                                                                Expanded(
+                                                                                  child: Center(
+                                                                                    child: Column(
+                                                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                                                      children: [
+                                                                                        Row(
+                                                                                          children: [
+                                                                                            Row(
+                                                                                              children: List.generate(5, (starIndex) {
+                                                                                                return Icon(
+                                                                                                  starIndex < (review["rating"] ?? 0)
+                                                                                                      ? Icons.star
+                                                                                                      : Icons.star_border,
+                                                                                                  color:
+                                                                                                      Color.fromRGBO(225, 192, 63, 1),
+                                                                                                  size: starSize.toDouble(),
+                                                                                                );
+                                                                                              }),
+                                                                                            ),
+                                                                                            SizedBox(width: 10),
+                                                                                            Container(
+                                                                                              decoration: BoxDecoration(
+                                                                                                color:
+                                                                                                    Color.fromRGBO(225, 192, 63, 1),
+                                                                                                borderRadius:
+                                                                                                    BorderRadius.circular(10),
+                                                                                              ),
+                                                                                              child: Padding(
+                                                                                                padding: const EdgeInsets.symmetric(
+                                                                                                    horizontal: 10, vertical: 2),
+                                                                                                child: Text(
+                                                                                                  (review["rating"] ?? 0)
+                                                                                                      .toStringAsFixed(1),
+                                                                                                  style: TextStyle(
+                                                                                                    fontSize: designationSize,
+                                                                                                    color: Colors.white,
+                                                                                                    fontWeight: FontWeight.w500,
+                                                                                                  ),
+                                                                                                ),
+                                                                                              ),
+                                                                                            ),
+                                                                                          ],
+                                                                                        ),
+                                                                                        SizedBox(height: 16),
+                                                                                        Text(
+                                                                                          review["name"] ?? 'Anonymous',
+                                                                                          style: TextStyle(
+                                                                                            fontSize: nameSize,
+                                                                                            fontWeight: FontWeight.bold,
+                                                                                            fontFamily: "DMSans",
+                                                                                          ),
+                                                                                        ),
+                                                                                        SizedBox(height: 8),
+                                                                                        Text(
+                                                                                          review["designation"] ?? 'Reviewer',
+                                                                                          style: TextStyle(
+                                                                                            fontSize: designationSize,
+                                                                                            color: Color.fromRGBO(139, 139, 139, 1),
+                                                                                            fontFamily: "DMSans",
+                                                                                          ),
+                                                                                        ),
+                                                                                        SizedBox(height: 24),
+                                                                                        Text(
+                                                                                          review["review"] ?? 'No review provided',
+                                                                                          style: TextStyle(fontSize: reviewTextSize),
+                                                                                        ),
+                                                                                      ],
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                              ],
+                                                                            ),
+                                                                    ),
+                                                                  );
+                                                                }).toList(),
+                                                              );
+                                                            },
+                                                          );
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            // Left button
+                                          if (reviewCurrentPage >= 0)
+                                            Positioned(
+                                              height: screenWidth >= 1024
+                                                  ? screenHeight * 0.05
+                                                  : screenWidth >= 600
+                                                      ? screenHeight * 0.045
+                                                      : 36,
+                                              left: screenWidth >= 1024
+                                                  ? screenWidth * 0.03
+                                                  : screenWidth >= 600
+                                                      ? screenWidth * 0.02
+                                                      : 8,
+                                              top: screenWidth >= 1024
+                                                  ? screenHeight * 0.38
+                                                  : screenWidth >= 600
+                                                      ? screenHeight * 0.36
+                                                      : screenHeight * 0.33,
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(10),
+                                                ),
+                                                child: FloatingActionButton(
+                                                  onPressed: () {
+                                                    reviewCarouselController.animateToPage(reviewCurrentPage - 1, curve: Curves.easeIn);
+                                                  },
+                                                  backgroundColor: Colors.white,
+                                                  elevation: 0.0,
+                                                  highlightElevation: 0.0,
+                                                  child: Icon(
+                                                    Icons.arrow_back_ios_outlined,
+                                                    size: screenWidth >= 1024
+                                                        ? 18
+                                                        : screenWidth >= 600
+                                                            ? 14
+                                                            : 12,
+                                                  ),
+                                                  mini: true,
+                                                ),
+                                              ),
+                                            ),
+                                          // Right button
+                                          if (reviewCurrentPage <= reviews.length - 1)
+                                            Positioned(
+                                              height: screenWidth >= 1024
+                                                  ? screenHeight * 0.05
+                                                  : screenWidth >= 600
+                                                      ? screenHeight * 0.045
+                                                      : 36,
+                                              right: screenWidth >= 1024
+                                                  ? screenWidth * 0.03
+                                                  : screenWidth >= 600
+                                                      ? screenWidth * 0.02
+                                                      : 8,
+                                              top: screenWidth >= 1024
+                                                  ? screenHeight * 0.38
+                                                  : screenWidth >= 600
+                                                      ? screenHeight * 0.36
+                                                      : screenHeight * 0.33,
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(10),
+                                                ),
+                                                child: FloatingActionButton(
+                                                  onPressed: () {
+                                                    reviewCarouselController.animateToPage(reviewCurrentPage + 1, curve: Curves.easeIn);
+                                                  },
+                                                  backgroundColor: Colors.white,
+                                                  elevation: 0.0,
+                                                  child: Icon(
+                                                    Icons.arrow_forward_ios_outlined,
+                                                    size: screenWidth >= 1024
+                                                        ? 18
+                                                        : screenWidth >= 600
+                                                            ? 14
+                                                            : 12,
+                                                  ),
+                                                  mini: true,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        
+                                              
+                                        SizedBox(height: 40),
+                                        LayoutBuilder(
+                                          builder: (context, constraints) {
+                                            double fontSize = constraints.maxWidth > 600 ? 28 : 23;
+                                            double paddingValue = constraints.maxWidth > 600 ? 20.0 : 10.0;
+                                              
+                                            return Padding(
+                                              padding: EdgeInsets.all(paddingValue),
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Text(
+                                                        "Latest Blog Posts",
+                                                        style: TextStyle(
+                                                          fontSize: fontSize,
+                                                          fontWeight: FontWeight.bold,
+                                                          fontFamily: "DMSans",
+                                                        ),
+                                                      ),
+                                                    
+                                                      TextButton(
+                                                        onPressed: () {},
+                                                        child: Row(
+                                                          children: [
+                                                            Text(
+                                                              'View All',
+                                                              style: TextStyle(
+                                                                color: Color.fromRGBO(0, 147, 255, 1),
+                                                                fontSize: screenHeight * 0.02,
+                                                                fontWeight: FontWeight.bold,
+                                                                fontFamily: "DMSans",
+                                                              ),
+                                                            ),
+                                                            Icon(
+                                                              Icons.arrow_outward,
+                                                              color: Color.fromRGBO(0, 147, 255, 1),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                              
+                                        
+                                        LayoutBuilder(
+                                          builder: (context, constraints) {
+                                            double screenWidth = constraints.maxWidth;
+                    
+                                            if (screenWidth < 600) {
+                                              // Mobile: Use CarouselSlider
+                                              return CarouselSlider(
+                                                options: CarouselOptions(
+                                                  height: 420, // Adjust as needed
+                                                  enableInfiniteScroll: true,
+                                                  enlargeCenterPage: true,
+                                                  viewportFraction: 0.9,
+                                                ),
+                                                items: blogs.map((blog) {
+                                                  double imageHeight = 220;
+                                                  double textSize = 13;
+                                                  double buttonPadding = 20;
+                                                  return Padding(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Stack(
+                                                          children: [
+                                                            ClipRRect(
+                                                              borderRadius: BorderRadius.circular(10),
+                                                              child: Image.asset(
+                                                                blog["image"]!,
+                                                                height: imageHeight,
+                                                                width: double.infinity,
+                                                                fit: BoxFit.cover,
+                                                              ),
+                                                            ),
+                                                            Positioned(
+                                                              top: 5,
+                                                              left: 5,
+                                                              child: ElevatedButton(
+                                                                onPressed: () {},
+                                                                style: ElevatedButton.styleFrom(
+                                                                  backgroundColor: Colors.white,
+                                                                  foregroundColor: Colors.black,
+                                                                  padding: EdgeInsets.symmetric(
+                                                                    horizontal: buttonPadding,
+                                                                    vertical: 8,
+                                                                  ),
+                                                                  shape: RoundedRectangleBorder(
+                                                                    borderRadius: BorderRadius.circular(8),
+                                                                  ),
+                                                                ),
+                                                                child: Text(
+                                                                  blog["name"]!,
+                                                                  style: TextStyle(
+                                                                    fontSize: textSize - 3,
+                                                                    fontFamily: "DMSans",
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        const SizedBox(height: 8),
+                                                        Padding(
+                                                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                                          child: Row(
+                                                            children: [
+                                                              Text(
+                                                                blog["position"]!,
+                                                                style: const TextStyle(
+                                                                  color: Color.fromRGBO(5, 11, 32, 1),
+                                                                  fontFamily: "DMSans",
+                                                                  fontWeight: FontWeight.w500,
+                                                                ),
+                                                              ),
+                                                              const SizedBox(width: 10),
+                                                              const Icon(
+                                                                Icons.circle,
+                                                                size: 8,
+                                                                color: Color.fromRGBO(225, 225, 225, 1),
+                                                              ),
+                                                              const SizedBox(width: 5),
+                                                              Text(
+                                                                blog["date"]!,
+                                                                style: const TextStyle(
+                                                                  color: Color.fromRGBO(5, 11, 32, 1),
+                                                                  fontFamily: "DMSans",
+                                                                  fontWeight: FontWeight.w500,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        const SizedBox(height: 10),
+                                                        Padding(
+                                                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                                          child: Text(
+                                                            blog["description"]!,
+                                                            style: TextStyle(
+                                                              fontSize: textSize,
+                                                              color: const Color.fromRGBO(5, 11, 32, 1),
+                                                              fontWeight: FontWeight.w500,
+                                                              fontFamily: "DMSans",
+                                                            ),
+                                                            maxLines: 2,
+                                                            overflow: TextOverflow.ellipsis,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                }).toList(),
+                                              );
+                                            } else {
+                                              // Tablet/Web: Use GridView
+                                              return GridView.builder(
+                                                shrinkWrap: true,
+                                                physics: NeverScrollableScrollPhysics(),
+                                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                                  crossAxisCount: screenWidth > 900
+                                                      ? 3
+                                                      : screenWidth > 600
+                                                          ? 2
+                                                          : 1,
+                                                  mainAxisSpacing: 20,
+                                                  crossAxisSpacing: 20,
+                                                  childAspectRatio: screenWidth > 900
+                                                      ? 1.2
+                                                      : screenWidth > 600
+                                                          ? 1.1
+                                                          : 0.9,
+                                                ),
+                                                itemCount: blogs.length,
+                                                itemBuilder: (context, index) {
+                                                  final blog = blogs[index];
+                                                  double imageHeight = screenWidth > 900
+                                                      ? 360
+                                                      : screenWidth > 600
+                                                          ? 280
+                                                          : 220;
+                                                  double textSize = screenWidth > 900
+                                                      ? 22
+                                                      : screenWidth > 600
+                                                          ? 16
+                                                          : 13;
+                                                  double buttonPadding = screenWidth > 900
+                                                      ? 30
+                                                      : screenWidth > 600
+                                                          ? 25
+                                                          : 20;
+                    
+                                                  return Padding(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Stack(
+                                                          children: [
+                                                            ClipRRect(
+                                                              borderRadius: BorderRadius.circular(10),
+                                                              child: Image.asset(
+                                                                blog["image"]!,
+                                                                height: imageHeight,
+                                                                width: double.infinity,
+                                                                fit: BoxFit.cover,
+                                                              ),
+                                                            ),
+                                                            Positioned(
+                                                              top: 5,
+                                                              left: 5,
+                                                              child: ElevatedButton(
+                                                                onPressed: () {},
+                                                                style: ElevatedButton.styleFrom(
+                                                                  backgroundColor: Colors.white,
+                                                                  foregroundColor: Colors.black,
+                                                                  padding: EdgeInsets.symmetric(
+                                                                    horizontal: buttonPadding,
+                                                                    vertical: 8,
+                                                                  ),
+                                                                  shape: RoundedRectangleBorder(
+                                                                    borderRadius: BorderRadius.circular(8),
+                                                                  ),
+                                                                ),
+                                                                child: Text(
+                                                                  blog["name"]!,
+                                                                  style: TextStyle(
+                                                                    fontSize: textSize - 3,
+                                                                    fontFamily: "DMSans",
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        const SizedBox(height: 8),
+                                                        Padding(
+                                                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                                          child: Row(
+                                                            children: [
+                                                              Text(
+                                                                blog["position"]!,
+                                                                style: const TextStyle(
+                                                                  color: Color.fromRGBO(5, 11, 32, 1),
+                                                                  fontFamily: "DMSans",
+                                                                  fontWeight: FontWeight.w500,
+                                                                ),
+                                                              ),
+                                                              const SizedBox(width: 10),
+                                                              const Icon(
+                                                                Icons.circle,
+                                                                size: 8,
+                                                                color: Color.fromRGBO(225, 225, 225, 1),
+                                                              ),
+                                                              const SizedBox(width: 5),
+                                                              Text(
+                                                                blog["date"]!,
+                                                                style: const TextStyle(
+                                                                  color: Color.fromRGBO(5, 11, 32, 1),
+                                                                  fontFamily: "DMSans",
+                                                                  fontWeight: FontWeight.w500,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        const SizedBox(height: 10),
+                                                        Padding(
+                                                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                                          child: Text(
+                                                            blog["description"]!,
+                                                            style: TextStyle(
+                                                              fontSize: textSize,
+                                                              color: const Color.fromRGBO(5, 11, 32, 1),
+                                                              fontWeight: FontWeight.w500,
+                                                              fontFamily: "DMSans",
+                                                            ),
+                                                            maxLines: 2,
+                                                            overflow: TextOverflow.ellipsis,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            }
+                                          },
+                                        ),
+                    
+                    
+                                        //responsive SizedBox for spacing
+                                        Builder(
+                                          builder: (context) {
+                                            double screenWidth = MediaQuery.of(context).size.width;
+                                            double offsetY = screenWidth < 600
+                                                ? -70
+                                                : screenWidth < 1024
+                                                    ? 40
+                                                    : 120;
+                                            return Transform.translate(
+                                              offset: Offset(0, offsetY),
+                                              child: LayoutBuilder(
+                                                builder: (context, constraints) {
+                                                  double screenWidth = constraints.maxWidth;
+                                                  bool isMobile = screenWidth < 600;
+                                                  bool isTablet = screenWidth >= 600 && screenWidth < 1024;
+                    
+                                                  double cardWidth = isMobile
+                                                      ? double.infinity
+                                                      : isTablet
+                                                          ? (screenWidth / 2) - 32
+                                                          : 650;
+                                                  double imageHeight = isMobile
+                                                      ? 60
+                                                      : isTablet
+                                                          ? 80
+                                                          : 100;
+                                                  double fontSizeTitle = isMobile ? 16 : 20;
+                                                  double fontSizeDesc = isMobile ? 12 : 14;
+                                                  double buttonFontSize = isMobile ? 11.36 : 14;
+                                                  double buttonPaddingH = isMobile ? 15 : 20;
+                                                  double buttonPaddingV = isMobile ? 15 : 18;
+                                                  double cardPadding = isMobile ? 20 : 40;
+                    
+                                                  Widget buildCard({
+                                                    required Color color,
+                                                    required String title,
+                                                    required String desc,
+                                                    required String imagePath,
+                                                    required Color buttonColor,
+                                                    required Color buttonTextColor,
+                                                    required double imageHeight,
+                                                  }) {
+                                                    return Container(
+                                                      width: cardWidth,
+                                                      margin: EdgeInsets.only(bottom: isMobile ? 16 : 0, right: isMobile ? 0 : 16),
+                                                      decoration: BoxDecoration(
+                                                        color: color,
+                                                        borderRadius: BorderRadius.circular(10),
+                                                      ),
+                                                      child: Padding(
+                                                        padding: EdgeInsets.all(cardPadding),
+                                                        child: Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            Text(
+                                                              title,
+                                                              style: TextStyle(
+                                                                fontFamily: "DMSans",
+                                                                fontWeight: FontWeight.w700,
+                                                                fontSize: fontSizeTitle,
+                                                              ),
+                                                            ),
+                                                            const SizedBox(height: 10),
+                                                            Text(
+                                                              desc,
+                                                              style: TextStyle(
+                                                                fontFamily: "DMSans",
+                                                                fontWeight: FontWeight.w400,
+                                                                fontSize: fontSizeDesc,
+                                                              ),
+                                                            ),
+                                                            const SizedBox(height: 10),
+                                                            Row(
+                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                              children: [
+                                                                ElevatedButton(
+                                                                  onPressed: () {},
+                                                                  style: ElevatedButton.styleFrom(
+                                                                    backgroundColor: buttonColor,
+                                                                    foregroundColor: buttonTextColor,
+                                                                    padding: EdgeInsets.symmetric(
+                                                                      horizontal: buttonPaddingH,
+                                                                      vertical: buttonPaddingV,
+                                                                    ),
+                                                                    shape: RoundedRectangleBorder(
+                                                                      borderRadius: BorderRadius.circular(10),
+                                                                    ),
+                                                                  ),
+                                                                  child: Row(
+                                                                    children: [
+                                                                      Text(
+                                                                        "Get Started",
+                                                                        style: TextStyle(
+                                                                          fontSize: buttonFontSize,
+                                                                          fontWeight: FontWeight.w500,
+                                                                          fontFamily: "DMSans",
+                                                                        ),
+                                                                      ),
+                                                                      const SizedBox(width: 5),
+                                                                      Icon(Icons.arrow_outward_sharp, size: isMobile ? 20 : 24),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                                const SizedBox(width: 10),
+                                                                Image.asset(
+                                                                  imagePath,
+                                                                  height: imageHeight,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    );
+                                                  }
+                    
+                                                  final card1 = buildCard(
+                                                    color: Color.fromRGBO(233, 242, 255, 1),
+                                                    title: "Are You Looking \nFor a Car?",
+                                                    desc: "We are committed to providing our customers with \nexceptional service.",
+                                                    imagePath: "assets/Home_Images/Footer_Images/lookingCar.png",
+                                                    buttonColor: Color.fromRGBO(26, 76, 142, 1),
+                                                    buttonTextColor: Colors.white,
+                                                    imageHeight: imageHeight,
+                                                  );
+                    
+                                                  final card2 = buildCard(
+                                                    color: Color.fromRGBO(255, 233, 243, 1),
+                                                    title: "Best place for \ncar financing",
+                                                    desc: "We are committed to providing our customers with \nexceptional service.",
+                                                    imagePath: "assets/Home_Images/Footer_Images/carFinance.png",
+                                                    buttonColor: Color.fromRGBO(5, 11, 32, 1),
+                                                    buttonTextColor: Colors.white,
+                                                    imageHeight: imageHeight,
+                                                  );
+                    
+                                                  if (isMobile) {
+                                                    return Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                      children: [card1, card2],
+                                                    );
+                                                  } else {
+                                                    return Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                      children: [card1, card2],
+                                                    );
+                                                  }
+                                                },
+                                              ), // Wrap the widget you want to shift upward
+                                            );
+                                          },
+                                        ),
+                                      ]
+                                    );
+                                    
+                                  }
+                                ),
+                              ]
+                            ),
+                          );
+                                
+                        }
+                        
                       ),
+                    
+                      ],
                     );
                   }
 
-                  Widget MUV(){
-                    return Container(
-                      margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
-                      child: Column(
-                        children: [
-                          const Text("MUV's", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500))
-                        ],
+                  Widget SUV() {
+                    final List<String> suvKeywords = [
+                      "fortuner", "rav4", "highlander", "land cruiser", "urban cruiser", "corolla cross",
+                      "creta", "tucson", "santa fe", "venue", "palisade", "seltos", "sonet", "sportage", "telluride",
+                      "ecosport", "bronco", "escape", "edge", "explorer", "cr-v", "hr-v", "br-v", "pilot", "elevate",
+                      "xuv700", "xuv300", "scorpio", "thar", "nexon", "harrier", "safari", "punch",
+                      "taigun", "tiguan", "t-roc", "kushaq", "kodiaq", "kicks", "rogue", "pathfinder",
+                      "compass", "grand cherokee", "wrangler", "renegade", "suv", "toyota tacoma", "pickup", "truck", "toyota"
+                    ];
+
+                    List<Map<String, dynamic>> suvCars = cars.where((car) {
+                      final name = (car["name"] ?? "").toString().toLowerCase();
+                      return suvKeywords.any((keyword) => name.contains(keyword));
+                    }).toList();
+
+                    if (suvCars.isEmpty) {
+                      return Container(
+                        margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
+                        child: Column(
+                          children: const [
+                            Text("No SUV cars available.", style: TextStyle(fontSize: 16)),
+                          ],
+                        ),
+                      );
+                    }
+
+                    if (suvCars.length == 1) {
+                      final car = suvCars.first;
+                      return Container(
+                        margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
+                        child: Column(
+                          children: [
+                            const Text("SUV's", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
+                            const SizedBox(height: 20),
+                            LayoutBuilder(
+                              builder: (context, constraints) {
+                                return _buildCarCard(car, constraints, context);
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+
+                    return Column(
+                      children: [
+                        
+                        Padding(
+                          padding: EdgeInsets.only(left: 0),
+                          child: buildBrandCards(context),
+                        ),
+                        const SizedBox(height: 20,),
+                    
+                        Stack(
+                          children: [
+                            CarouselSlider(
+                              carouselController: innerCarouselController,
+                              options: CarouselOptions(
+                                height: MediaQuery.of(context).size.height * 0.8,
+                                autoPlay: false,
+                                enableInfiniteScroll: true,
+                                enlargeCenterPage: false,
+                                viewportFraction: 1,
+                                onPageChanged: (index, reason) {
+                                  setState(() {
+                                    innerCurrentPage = index;
+                                  });
+                                },
+                              ),
+                              items: suvCars.asMap().entries.map((entry) {
+                                int index = entry.key;
+                                Map<String, dynamic> car = entry.value;
+                                return LayoutBuilder(
+                                  builder: (context, constraints) {
+                                    return _buildCarCard(car, constraints, context);
+                                  },
+                                );
+                              }).toList(),
+                            ),
+                            if (innerCurrentPage >= 0)
+                              Positioned(
+                                height: (MediaQuery.of(context).size.width < 600 ? 30.0 : MediaQuery.of(context).size.width < 1024 ? 50.0 : 60.0),
+                                left: (MediaQuery.of(context).size.width < 600 ? -5.0 : MediaQuery.of(context).size.width < 1024 ? -6.0 : -10.0),
+                                top: (MediaQuery.of(context).size.width < 600 ? MediaQuery.of(context).size.height * 0.35 : MediaQuery.of(context).size.width < 1024 ? MediaQuery.of(context).size.height * 0.30 : MediaQuery.of(context).size.height * 0.22),
+                                child: FloatingActionButton(
+                                  onPressed: () {
+                                    innerCarouselController.animateToPage(innerCurrentPage - 1, curve: Curves.easeIn);
+                                  },
+                                  backgroundColor: Color.fromRGBO(26, 76, 142, 1),
+                                  child: const Icon(Icons.arrow_back_ios_outlined, color: Colors.white),
+                                  mini: true,
+                                ),
+                              ),
+                            if (innerCurrentPage <= suvCars.length - 1)
+                              Positioned(
+                                height: (MediaQuery.of(context).size.width < 600 ? 30.0 : MediaQuery.of(context).size.width < 1024 ? 50.0 : 60.0),
+                                right: (MediaQuery.of(context).size.width < 600 ? -5.0 : MediaQuery.of(context).size.width < 1024 ? -6.0 : -10.0),
+                                top: (MediaQuery.of(context).size.width < 600 ? MediaQuery.of(context).size.height * 0.35 : MediaQuery.of(context).size.width < 1024 ? MediaQuery.of(context).size.height * 0.30 : MediaQuery.of(context).size.height * 0.22),
+                                child: FloatingActionButton(
+                                  onPressed: () {
+                                    innerCarouselController.animateToPage(innerCurrentPage + 1, curve: Curves.easeIn);
+                                  },
+                                  backgroundColor: Color.fromRGBO(26, 76, 142, 1),
+                                  child: Icon(Icons.arrow_forward_ios_outlined, color: Colors.white),
+                                  mini: true,
+                                ),
+                              ),
+                          ],
+                        ),
+                      
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.07,),
+                            LayoutBuilder(
+                              builder: (context, constraints) {
+                    
+                                double screenWidth = MediaQuery.of(context).size.width;
+                                double screenHeight = MediaQuery.of(context).size.height;
+                    
+                                double imageSize;
+                                if (screenWidth > 1200) {
+                                  imageSize = (screenWidth / 6) - 100;
+                                } else if (screenWidth > 600) {
+                                  imageSize = (screenWidth / 6) - 100; 
+                                } else {
+                                  imageSize = (screenWidth / 3) - 30; 
+                                }
+                                imageSize = imageSize.clamp(80.0, 300.0);
+                    
+                                double titleFontSize = screenWidth > 600 ? 40 : screenWidth * 0.08;
+                                
+                                return Padding(
+                                  padding: const EdgeInsets.only(left: 0, right: 0),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          RichText(
+                                            text: TextSpan(
+                                              children: [
+                                                TextSpan(
+                                                  text: 'Similar Brands',
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: screenHeight * 0.038,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontFamily: "DMSans",
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {},
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  'Show all Brands',
+                                                  style: TextStyle(
+                                                    color: Color.fromRGBO(0, 147, 255, 1),
+                                                    fontSize: screenHeight * 0.02,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontFamily: "DMSans",
+                                                  ),
+                                                ),
+                                                Icon(Icons.arrow_outward, color: Color.fromRGBO(0, 147, 255, 1)),
+                                              ],
+                                            ),
+                                          ),
+                                          
+                                        ],
+                                      ),
+                                      SizedBox(height: screenHeight * 0.05),
+                    
+                                      //Similar Brands Section
+                                      Column(
+                                        children: [
+                                          LayoutBuilder(
+                                            builder: (context, constraints) {
+                                              return Builder(
+                                                builder: (context) {
+                                                  print('[buildBrands] isLoadingBrands: $isLoadingBrands, errorMessageBrands: $errorMessageBrands, brands: $brands');
+                                                  if (isLoadingBrands) {
+                                                    return const Center(child: CircularProgressIndicator());
+                                                  }
+                                                  if (errorMessageBrands != null) {
+                                                    return Center(child: Text(errorMessageBrands!));
+                                                  }
+                                                  if (brands.isEmpty) {
+                                                    return const Center(child: Text('No brands available'));
+                                                  }
+                                                  return Padding(
+                                                    padding: const EdgeInsets.all(0.0),
+                                                    child: Wrap(
+                                                      spacing: screenWidth * 0.05,
+                                                      runSpacing: screenHeight * 0.02,
+                                                      children: brands.map((brand) {
+                                                        return Container(
+                                                          decoration: BoxDecoration(
+                                                            color: Colors.white,
+                                                            border: Border.all(width: 1, color: const Color.fromRGBO(233, 233, 233, 1)),
+                                                            borderRadius: BorderRadius.circular(10),
+                                                          ),
+                                                          child: ClipRRect(
+                                                            borderRadius: BorderRadius.circular(10),
+                                                            child: Column(
+                                                              children: [
+                                                                Image.asset(
+                                                                  brand["image"] ?? 'assets/placeholder.png',
+                                                                  width: imageSize,
+                                                                  fit: BoxFit.contain,
+                                                                  errorBuilder: (context, error, stackTrace) => Image.asset(
+                                                                    'assets/placeholder.png',
+                                                                    width: imageSize,
+                                                                    fit: BoxFit.contain,
+                                                                  ),
+                                                                ),
+                                                                Text(
+                                                                  brand["name"] ?? 'Unknown Brand',
+                                                                  style: const TextStyle(fontFamily: "DMSans"),
+                                                                  textAlign: TextAlign.center,
+                                                                  softWrap: true,
+                                                                  overflow: TextOverflow.visible,
+                                                                  maxLines: 2, // Allow up to 2 lines
+                                                                ),
+                                                                SizedBox(height: screenHeight * 0.02),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        );
+                                                      }).toList(),
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            },
+                                          ),
+                                          const SizedBox(height: 30),
+                                        ],
+                                      ),
+                    
+                    
+                                      LayoutBuilder(
+                                        builder: (context, constraints) {
+                                          double screenWidth = MediaQuery.of(context).size.width;
+                                          double imageWidth = screenWidth * 0.40;
+                                          double imageHeight = (imageWidth * 9 / 16) * 1.49;
+                                          double playButtonSize = screenWidth * 0.052;
+                                          double sectionSpacing = screenWidth * 0.01;
+                                        return Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            SizedBox(height: sectionSpacing),
+                    
+                                          // Responsive "video + info" section
+                                          Builder(
+                                            builder: (context) {
+                                              final screenWidth = MediaQuery.of(context).size.width;
+                                              final isMobile = screenWidth < 800;
+                                              final isTablet = screenWidth >= 800 && screenWidth < 1024;
+                                              final isDesktop = screenWidth >= 1024;
+                    
+                                              // Responsive sizes
+                                              double imageWidth, imageHeight, playButtonSize, infoPadding, titleFontSize, descFontSize, bulletFontSize, buttonFontSize, sectionSpacing;
+                                              if (isMobile) {
+                                                imageWidth = screenWidth * 0.9;
+                                                imageHeight = screenWidth * 0.5;
+                                                playButtonSize = 40;
+                                                infoPadding = 16;
+                                                titleFontSize = 18;
+                                                descFontSize = 12;
+                                                bulletFontSize = 12;
+                                                buttonFontSize = 14;
+                                                sectionSpacing = 10;
+                                              } else if (isTablet) {
+                                                imageWidth = screenWidth * 0.4;
+                                                imageHeight = screenWidth * 0.5;
+                                                playButtonSize = 50;
+                                                infoPadding = 32;
+                                                titleFontSize = 24;
+                                                descFontSize = 14;
+                                                bulletFontSize = 14;
+                                                buttonFontSize = 16;
+                                                sectionSpacing = 16;
+                                              } else {
+                                                imageWidth = screenWidth * 0.35;
+                                                imageHeight = screenWidth * 0.33;
+                                                playButtonSize = 60;
+                                                infoPadding = 70;
+                                                titleFontSize = 32;
+                                                descFontSize = 16;
+                                                bulletFontSize = 16;
+                                                buttonFontSize = 18;
+                                                sectionSpacing = 24;
+                                              }
+                    
+                                              Widget imageStack = Stack(
+                                                alignment: Alignment.center,
+                                                children: [
+                                                  ClipRRect(
+                                                    borderRadius: BorderRadius.only(
+                                                      topLeft: Radius.circular(10),
+                                                      bottomLeft: isMobile ? Radius.circular(10) : Radius.circular(0),
+                                                      topRight: isMobile ? Radius.circular(10) : Radius.circular(0),
+                                                      bottomRight: Radius.circular(0),
+                                                    ),
+                                                    child: Image.asset(
+                                                      "assets/videoImage.jpeg",
+                                                      width: imageWidth,
+                                                      height: imageHeight,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
+                                                  CircleAvatar(
+                                                    radius: playButtonSize / 2,
+                                                    backgroundColor: Colors.white,
+                                                    child: Icon(
+                                                      Icons.play_arrow,
+                                                      size: playButtonSize * 0.5,
+                                                      color: Colors.black,
+                                                    ),
+                                                  ),
+                                                ],
+                                              );
+                    
+                                              Widget infoSection = Container(
+                                                width: isMobile ? double.infinity : screenWidth * 0.48,
+                                                decoration: BoxDecoration(
+                                                  color: Color.fromRGBO(238, 241, 251, 1),
+                                                  borderRadius: isMobile
+                                                      ? BorderRadius.only(
+                                                          bottomLeft: Radius.circular(10),
+                                                          bottomRight: Radius.circular(10),
+                                                        )
+                                                      : null,
+                                                ),
+                                                child: Padding(
+                                                  padding: EdgeInsets.all(infoPadding),
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        "Buying a car has never been this easy.",
+                                                        style: TextStyle(
+                                                          fontSize: titleFontSize,
+                                                          fontWeight: FontWeight.bold,
+                                                          color: Colors.black,
+                                                          fontFamily: "DMSans",
+                                                        ),
+                                                      ),
+                                                      SizedBox(height: sectionSpacing),
+                                                      Text(
+                                                        "We are committed to providing our customers with exceptional service, competitive pricing, and a wide range of options.",
+                                                        style: TextStyle(
+                                                          fontSize: descFontSize,
+                                                          color: Color.fromRGBO(5, 11, 32, 1),
+                                                          fontFamily: "DMSans",
+                                                        ),
+                                                      ),
+                                                      SizedBox(height: sectionSpacing),
+                                                      Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          buildBulletPoint(
+                                                            "We are the UK's largest provider, with more patrols in more places",
+                                                            fontSize: bulletFontSize,
+                                                          ),
+                                                          buildBulletPoint(
+                                                            "You get 24/7 roadside assistance",
+                                                            fontSize: bulletFontSize,
+                                                          ),
+                                                          buildBulletPoint(
+                                                            "We fix 4 out of 5 cars at the roadside",
+                                                            fontSize: bulletFontSize,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      SizedBox(height: sectionSpacing),
+                                                      ElevatedButton(
+                                                        onPressed: () {
+                                                          _bookTestDrive();
+                                                        },
+                                                        style: ElevatedButton.styleFrom(
+                                                          backgroundColor: Color(0xFF004C90),
+                                                          padding: EdgeInsets.symmetric(
+                                                            horizontal: infoPadding,
+                                                            vertical: infoPadding / 2.5,
+                                                          ),
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.circular(8),
+                                                          ),
+                                                        ),
+                                                        child: Row(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          children: [
+                                                            Text(
+                                                              "Book a test drive",
+                                                              style: TextStyle(
+                                                                color: Colors.white,
+                                                                fontSize: buttonFontSize,
+                                                                fontFamily: "DMSans",
+                                                              ),
+                                                            ),
+                                                            SizedBox(width: sectionSpacing / 2),
+                                                            Icon(Icons.arrow_outward, color: Colors.white, size: buttonFontSize + 2),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              );
+                    
+                                              if (isMobile) {
+                                                return Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                  children: [
+                                                    imageStack,
+                                                    infoSection,
+                                                  ],
+                                                );
+                                              } else {
+                                                return Row(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    imageStack,
+                                                    infoSection,
+                                                  ],
+                                                );
+                                              }
+                                            },
+                                          ),
+                    
+                                          SizedBox(height: sectionSpacing),
+                                          Builder(
+                                            builder: (context) {
+                                              double screenWidth = MediaQuery.of(context).size.width;
+                                              int crossAxisCount;
+                                              if (screenWidth < 600) {
+                                                crossAxisCount = 2;
+                                              } else if (screenWidth < 1024) {
+                                                crossAxisCount = 4;
+                                              } else {
+                                                crossAxisCount = 4;
+                                              }
+                                              return Wrap(
+                                                alignment: WrapAlignment.center,
+                                                spacing: 8,
+                                                runSpacing: 8,
+                                                children: [
+                                                  buildStatBox("836M", "CARS FOR SALE", context),
+                                                  buildStatBox("738M", "DEALER REVIEWS", context),
+                                                  buildStatBox("100M", "VISITORS PER DAY", context),
+                                                  buildStatBox("238M", "VERIFIED DEALERS", context),
+                                                ],
+                                              );
+                                            },
+                                          ),
+                    
+                                          Divider(
+                                            thickness: 1,
+                                            color: Color.fromRGBO(223, 223, 223, 1),
+                                          ),
+                                          SizedBox(height: sectionSpacing),
+                    
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                              left: screenWidth >= 1024
+                                                  ? 100
+                                                  : screenWidth >= 600
+                                                      ? 40
+                                                      : 10,
+                                              right: screenWidth >= 1024
+                                                  ? 50
+                                                  : screenWidth >= 600
+                                                      ? 24
+                                                      : 10,
+                                              top: screenWidth >= 1024
+                                                  ? 50
+                                                  : screenWidth >= 600
+                                                      ? 30
+                                                      : 16,
+                                              bottom: screenWidth >= 1024
+                                                  ? 20
+                                                  : screenWidth >= 600
+                                                      ? 16
+                                                      : 8,
+                                            ),
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text("Why Choose Us?", style: TextStyle(fontWeight: FontWeight.bold,fontSize: screenHeight * 0.038, fontFamily: "DMSans",),),
+                                              ],
+                                            ),
+                                          ),
+                                          SizedBox(height: sectionSpacing),
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                              left: screenWidth >= 1024
+                                                  ? 100
+                                                  : screenWidth >= 600
+                                                      ? 40
+                                                      : 10,
+                                              right: screenWidth >= 1024
+                                                  ? 50
+                                                  : screenWidth >= 600
+                                                      ? 24
+                                                      : 10,
+                                              top: screenWidth >= 1024
+                                                  ? 50
+                                                  : screenWidth >= 600
+                                                      ? 30
+                                                      : 16,
+                                              bottom: screenWidth >= 1024
+                                                  ? 20
+                                                  : screenWidth >= 600
+                                                      ? 16
+                                                      : 8,
+                                            ),
+                                            child: LayoutBuilder(
+                                              builder: (context, constraints) {
+                                                double screenWidth = MediaQuery.of(context).size.width;
+                                                bool isMobile = screenWidth < 600;
+                    
+                                                double imageSize;
+                                                double titleFontSize;
+                                                double descFontSize;
+                                                if (screenWidth >= 1024) {
+                                                  // Desktop
+                                                  imageSize = 52;
+                                                  titleFontSize = 22;
+                                                  descFontSize = 15;
+                                                } else if (screenWidth >= 600) {
+                                                  // Tablet
+                                                  imageSize = 40;
+                                                  titleFontSize = 19;
+                                                  descFontSize = 15;
+                                                } else {
+                                                  // Mobile
+                                                  imageSize = 33;
+                                                  titleFontSize = 15;
+                                                  descFontSize = 13;
+                                                }
+                    
+                                                List<Widget> infoBlocks = [
+                                                  Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Image.asset("assets/financialOffer.png", height: imageSize),
+                                                      SizedBox(height: screenWidth * 0.02),
+                                                      Text("Special Financing Offers", style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold, fontFamily: "DMSans",),),
+                                                      SizedBox(height: screenWidth * 0.01),
+                                                      Text("Our stress-free finance department that can \nfind financial solutions to save you money.",
+                                                        style: TextStyle(fontFamily: "DMSans", fontSize: descFontSize),),
+                                                    ],
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Image.asset("assets/dealership.png", height: imageSize),
+                                                      SizedBox(height: screenWidth * 0.02),
+                                                      Text("Trusted Car Dealership", style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold, fontFamily: "DMSans",),),
+                                                      SizedBox(height: screenWidth * 0.01),
+                                                      Text("Our stress-free finance department that can \nfind financial solutions to save you money.",
+                                                        style: TextStyle(fontFamily: "DMSans", fontSize: descFontSize),),
+                                                    ],
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Image.asset("assets/transparent.png", height: imageSize),
+                                                      SizedBox(height: screenWidth*0.02),
+                                                      Text("Transparent Pricing", style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold, fontFamily: "DMSans",),),
+                                                      SizedBox(height: screenWidth * 0.01),
+                                                      Text("Our stress-free finance department that can \nfind financial solutions to save you money.",
+                                                        style: TextStyle(fontFamily: "DMSans", fontSize: descFontSize),),
+                                                    ],
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Image.asset("assets/expertCar.png", height: imageSize),
+                                                      SizedBox(height: screenWidth * 0.02),
+                                                      Text("Expert Car Service", style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold),),
+                                                      SizedBox(height: screenWidth * 0.01),
+                                                      Text("Our stress-free finance department that can \nfind financial solutions to save you money.",
+                                                        style: TextStyle(fontFamily: "DMSans", fontSize: descFontSize),),
+                                                    ],
+                                                  ),
+                                                ];
+                    
+                                                if (isMobile) {
+                                                  // Display vertically for mobile
+                                                  return Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: infoBlocks
+                                                        .map((block) => Padding(
+                                                              padding: EdgeInsets.only(bottom: screenWidth * 0.04),
+                                                              child: block,
+                                                            ))
+                                                        .toList(),
+                                                  );
+                                                } else {
+                                                  // Display horizontally for tablet/desktop
+                                                  return Row(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: infoBlocks
+                                                        .map((block) => Padding(
+                                                              padding: EdgeInsets.only(right: screenWidth * 0.02),
+                                                              child: block,
+                                                            ))
+                                                        .toList(),
+                                                  );
+                                                }
+                                              }
+                                            ),
+                                          ),
+                                          SizedBox(height: screenHeight * 0.1),
+                                          
+                                          Stack(
+                                          children: [
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                color: Color.fromRGBO(249, 251, 252, 1),
+                                              ),
+                                              child: Padding(
+                                                padding: EdgeInsets.only(
+                                                  left: screenWidth >= 1024
+                                                      ? screenWidth * 0.15
+                                                      : screenWidth >= 600
+                                                          ? screenWidth * 0.08
+                                                          : 16,
+                                                  right: screenWidth >= 1024
+                                                      ? screenWidth * 0.15
+                                                      : screenWidth >= 600
+                                                          ? screenWidth * 0.08
+                                                          : 16,
+                                                  top: screenWidth >= 1024
+                                                      ? screenHeight * 0.10
+                                                      : screenWidth >= 600
+                                                          ? screenHeight * 0.06
+                                                          : 16,
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Padding(
+                                                      padding: EdgeInsets.symmetric(
+                                                        horizontal: screenWidth >= 1024
+                                                            ? 0
+                                                            : screenWidth >= 600
+                                                                ? 0
+                                                                : 0, // You can adjust if you want more padding on mobile
+                                                      ),
+                                                      child: LayoutBuilder(
+                                                        builder: (context, constraints) {
+                                                          double textSize;
+                                                          double subTextSize;
+                                                          if (constraints.maxWidth >= 1024) {
+                                                            textSize = 28;
+                                                            subTextSize = 14;
+                                                          } else if (constraints.maxWidth >= 600) {
+                                                            textSize = 24;
+                                                            subTextSize = 12;
+                                                          } else {
+                                                            textSize = 18;
+                                                            subTextSize = 10;
+                                                          }
+                    
+                                                          bool isMobile = constraints.maxWidth < 600;
+                    
+                                                          return Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: [
+                                                              isMobile
+                                                                  ? Column(
+                                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                                      children: [
+                                                                        Text(
+                                                                          "What our customers say",
+                                                                          style: TextStyle(
+                                                                            fontWeight: FontWeight.w700,
+                                                                            fontSize: textSize,
+                                                                            fontFamily: "DMSans",
+                                                                          ),
+                                                                        ),
+                                                                        SizedBox(height: 8),
+                                                                        Text(
+                                                                          "Rated ${calculateAverageRating().toStringAsFixed(1)} / 5 based on $totalReviews reviews Showing our 4 & 5 star reviews",
+                                                                          style: TextStyle(
+                                                                            fontWeight: FontWeight.w400,
+                                                                            fontSize: subTextSize,
+                                                                            fontFamily: "DMSans",
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    )
+                                                                  : Row(
+                                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                      children: [
+                                                                        Text(
+                                                                          "What our customers say",
+                                                                          style: TextStyle(
+                                                                            fontWeight: FontWeight.w700,
+                                                                            fontSize: textSize,
+                                                                            fontFamily: "DMSans",
+                                                                          ),
+                                                                        ),
+                                                                        Text(
+                                                                          "Rated ${calculateAverageRating().toStringAsFixed(1)} / 5 based on $totalReviews reviews Showing our 4 & 5 star reviews",
+                                                                          style: TextStyle(
+                                                                            fontWeight: FontWeight.w400,
+                                                                            fontSize: subTextSize,
+                                                                            fontFamily: "DMSans",
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                            ],
+                                                          );
+                                                        },
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 20),
+                                                    Padding(
+                                                      padding: EdgeInsets.symmetric(
+                                                        horizontal: screenWidth >= 1024
+                                                            ? 0
+                                                            : screenWidth >= 600
+                                                                ? 0
+                                                                : 0, // Adjust if you want more padding on mobile
+                                                      ),
+                                                      child: LayoutBuilder(
+                                                        builder: (context, constraints) {
+                                                          bool isDesktop = constraints.maxWidth >= 1024;
+                                                          bool isTablet = constraints.maxWidth >= 600 && constraints.maxWidth < 1024;
+                                                          bool isMobile = constraints.maxWidth < 600;
+                    
+                                                          double containerHeight = isDesktop
+                                                              ? 490
+                                                              : isTablet
+                                                                  ? 420
+                                                                  : 320;
+                                                          double containerWidth = isDesktop
+                                                              ? screenWidth * 0.9
+                                                              : isTablet
+                                                                  ? screenWidth * 0.95
+                                                                  : screenWidth * 0.98;
+                                                          double imageWidth = isDesktop
+                                                              ? 480
+                                                              : isTablet
+                                                                  ? 300
+                                                                  : containerWidth;
+                                                          double imageHeight = isDesktop
+                                                              ? 550
+                                                              : isTablet
+                                                                  ? 380
+                                                                  : 180;
+                                                          double nameSize = isDesktop
+                                                              ? 18
+                                                              : isTablet
+                                                                  ? 16
+                                                                  : 14;
+                                                          double designationSize = isDesktop
+                                                              ? 15
+                                                              : isTablet
+                                                                  ? 13
+                                                                  : 11;
+                                                          double reviewTextSize = isDesktop
+                                                              ? 22
+                                                              : isTablet
+                                                                  ? 16
+                                                                  : 12;
+                                                          double starSize = isDesktop
+                                                              ? 16
+                                                              : isTablet
+                                                                  ? 13
+                                                                  : 11;
+                    
+                                                          return Builder(
+                                                            builder: (context) {
+                                                              if (isLoadingReviews) {
+                                                                return Center(child: CircularProgressIndicator());
+                                                              }
+                                                              if (errorMessageReviews != null) {
+                                                                return Center(child: Text(errorMessageReviews!));
+                                                              }
+                                                              if (reviews.isEmpty) {
+                                                                return Center(child: Text('No high-rated reviews available'));
+                                                              }
+                                                              return CarouselSlider(
+                                                                carouselController: reviewCarouselController,
+                                                                options: CarouselOptions(
+                                                                  height: containerHeight,
+                                                                  autoPlay: false,
+                                                                  enlargeCenterPage: false,
+                                                                  enableInfiniteScroll: false,
+                                                                  viewportFraction: 1,
+                                                                  onPageChanged: (index, reason) {
+                                                                    setState(() {
+                                                                      reviewCurrentPage = index;
+                                                                    });
+                                                                  },
+                                                                ),
+                                                                items: reviews.asMap().entries.map((entry) {
+                                                                  int index = entry.key;
+                                                                  Map<String, dynamic> review = entry.value;
+                                                                  return Padding(
+                                                                    padding: const EdgeInsets.all(0.0),
+                                                                    child: Container(
+                                                                      height: containerHeight,
+                                                                      width: containerWidth,
+                                                                      child: isMobile
+                                                                          ? Column(
+                                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                                              children: [
+                                                                                Image.asset(
+                                                                                  review["image"] ?? 'assets/placeholder.png',
+                                                                                  height: imageHeight,
+                                                                                  width: imageWidth,
+                                                                                  fit: BoxFit.cover,
+                                                                                  errorBuilder: (context, error, stackTrace) =>
+                                                                                      Image.asset(
+                                                                                    'assets/placeholder.png',
+                                                                                    height: imageHeight,
+                                                                                    width: imageWidth,
+                                                                                    fit: BoxFit.cover,
+                                                                                  ),
+                                                                                ),
+                                                                                SizedBox(height: 12),
+                                                                                Row(
+                                                                                  children: [
+                                                                                    Row(
+                                                                                      children: List.generate(5, (starIndex) {
+                                                                                        return Icon(
+                                                                                          starIndex < (review["rating"] ?? 0)
+                                                                                              ? Icons.star
+                                                                                              : Icons.star_border,
+                                                                                          color: Color.fromRGBO(225, 192, 63, 1),
+                                                                                          size: starSize.toDouble(),
+                                                                                        );
+                                                                                      }),
+                                                                                    ),
+                                                                                    SizedBox(width: 6),
+                                                                                    Container(
+                                                                                      decoration: BoxDecoration(
+                                                                                        color: Color.fromRGBO(225, 192, 63, 1),
+                                                                                        borderRadius: BorderRadius.circular(10),
+                                                                                      ),
+                                                                                      child: Padding(
+                                                                                        padding: const EdgeInsets.symmetric(
+                                                                                            horizontal: 10, vertical: 2),
+                                                                                        child: Text(
+                                                                                          (review["rating"] ?? 0).toStringAsFixed(1),
+                                                                                          style: TextStyle(
+                                                                                            fontSize: designationSize,
+                                                                                            color: Colors.white,
+                                                                                            fontWeight: FontWeight.w500,
+                                                                                          ),
+                                                                                        ),
+                                                                                      ),
+                                                                                    ),
+                                                                                  ],
+                                                                                ),
+                                                                                SizedBox(height: 8),
+                                                                                Text(
+                                                                                  review["name"] ?? 'Anonymous',
+                                                                                  style: TextStyle(
+                                                                                    fontSize: nameSize,
+                                                                                    fontWeight: FontWeight.bold,
+                                                                                    fontFamily: "DMSans",
+                                                                                  ),
+                                                                                ),
+                                                                                SizedBox(height: 4),
+                                                                                Text(
+                                                                                  review["designation"] ?? 'Reviewer',
+                                                                                  style: TextStyle(
+                                                                                    fontSize: designationSize,
+                                                                                    color: Color.fromRGBO(139, 139, 139, 1),
+                                                                                    fontFamily: "DMSans",
+                                                                                  ),
+                                                                                ),
+                                                                                SizedBox(height: 12),
+                                                                                Text(
+                                                                                  review["review"] ?? 'No review provided',
+                                                                                  style: TextStyle(fontSize: reviewTextSize),
+                                                                                ),
+                                                                              ],
+                                                                            )
+                                                                          : Row(
+                                                                              children: [
+                                                                                Image.asset(
+                                                                                  review["image"] ?? 'assets/placeholder.png',
+                                                                                  height: imageHeight,
+                                                                                  width: imageWidth,
+                                                                                  fit: BoxFit.cover,
+                                                                                  errorBuilder: (context, error, stackTrace) =>
+                                                                                      Image.asset(
+                                                                                    'assets/placeholder.png',
+                                                                                    height: imageHeight,
+                                                                                    width: imageWidth,
+                                                                                    fit: BoxFit.cover,
+                                                                                  ),
+                                                                                ),
+                                                                                SizedBox(width: 24),
+                                                                                Expanded(
+                                                                                  child: Center(
+                                                                                    child: Column(
+                                                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                                                      children: [
+                                                                                        Row(
+                                                                                          children: [
+                                                                                            Row(
+                                                                                              children: List.generate(5, (starIndex) {
+                                                                                                return Icon(
+                                                                                                  starIndex < (review["rating"] ?? 0)
+                                                                                                      ? Icons.star
+                                                                                                      : Icons.star_border,
+                                                                                                  color:
+                                                                                                      Color.fromRGBO(225, 192, 63, 1),
+                                                                                                  size: starSize.toDouble(),
+                                                                                                );
+                                                                                              }),
+                                                                                            ),
+                                                                                            SizedBox(width: 10),
+                                                                                            Container(
+                                                                                              decoration: BoxDecoration(
+                                                                                                color:
+                                                                                                    Color.fromRGBO(225, 192, 63, 1),
+                                                                                                borderRadius:
+                                                                                                    BorderRadius.circular(10),
+                                                                                              ),
+                                                                                              child: Padding(
+                                                                                                padding: const EdgeInsets.symmetric(
+                                                                                                    horizontal: 10, vertical: 2),
+                                                                                                child: Text(
+                                                                                                  (review["rating"] ?? 0)
+                                                                                                      .toStringAsFixed(1),
+                                                                                                  style: TextStyle(
+                                                                                                    fontSize: designationSize,
+                                                                                                    color: Colors.white,
+                                                                                                    fontWeight: FontWeight.w500,
+                                                                                                  ),
+                                                                                                ),
+                                                                                              ),
+                                                                                            ),
+                                                                                          ],
+                                                                                        ),
+                                                                                        SizedBox(height: 16),
+                                                                                        Text(
+                                                                                          review["name"] ?? 'Anonymous',
+                                                                                          style: TextStyle(
+                                                                                            fontSize: nameSize,
+                                                                                            fontWeight: FontWeight.bold,
+                                                                                            fontFamily: "DMSans",
+                                                                                          ),
+                                                                                        ),
+                                                                                        SizedBox(height: 8),
+                                                                                        Text(
+                                                                                          review["designation"] ?? 'Reviewer',
+                                                                                          style: TextStyle(
+                                                                                            fontSize: designationSize,
+                                                                                            color: Color.fromRGBO(139, 139, 139, 1),
+                                                                                            fontFamily: "DMSans",
+                                                                                          ),
+                                                                                        ),
+                                                                                        SizedBox(height: 24),
+                                                                                        Text(
+                                                                                          review["review"] ?? 'No review provided',
+                                                                                          style: TextStyle(fontSize: reviewTextSize),
+                                                                                        ),
+                                                                                      ],
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                              ],
+                                                                            ),
+                                                                    ),
+                                                                  );
+                                                                }).toList(),
+                                                              );
+                                                            },
+                                                          );
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            // Left button
+                                          if (reviewCurrentPage >= 0)
+                                            Positioned(
+                                              height: screenWidth >= 1024
+                                                  ? screenHeight * 0.05
+                                                  : screenWidth >= 600
+                                                      ? screenHeight * 0.045
+                                                      : 36,
+                                              left: screenWidth >= 1024
+                                                  ? screenWidth * 0.03
+                                                  : screenWidth >= 600
+                                                      ? screenWidth * 0.02
+                                                      : 8,
+                                              top: screenWidth >= 1024
+                                                  ? screenHeight * 0.38
+                                                  : screenWidth >= 600
+                                                      ? screenHeight * 0.36
+                                                      : screenHeight * 0.33,
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(10),
+                                                ),
+                                                child: FloatingActionButton(
+                                                  onPressed: () {
+                                                    reviewCarouselController.animateToPage(reviewCurrentPage - 1, curve: Curves.easeIn);
+                                                  },
+                                                  backgroundColor: Colors.white,
+                                                  elevation: 0.0,
+                                                  highlightElevation: 0.0,
+                                                  child: Icon(
+                                                    Icons.arrow_back_ios_outlined,
+                                                    size: screenWidth >= 1024
+                                                        ? 18
+                                                        : screenWidth >= 600
+                                                            ? 14
+                                                            : 12,
+                                                  ),
+                                                  mini: true,
+                                                ),
+                                              ),
+                                            ),
+                                          // Right button
+                                          if (reviewCurrentPage <= reviews.length - 1)
+                                            Positioned(
+                                              height: screenWidth >= 1024
+                                                  ? screenHeight * 0.05
+                                                  : screenWidth >= 600
+                                                      ? screenHeight * 0.045
+                                                      : 36,
+                                              right: screenWidth >= 1024
+                                                  ? screenWidth * 0.03
+                                                  : screenWidth >= 600
+                                                      ? screenWidth * 0.02
+                                                      : 8,
+                                              top: screenWidth >= 1024
+                                                  ? screenHeight * 0.38
+                                                  : screenWidth >= 600
+                                                      ? screenHeight * 0.36
+                                                      : screenHeight * 0.33,
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(10),
+                                                ),
+                                                child: FloatingActionButton(
+                                                  onPressed: () {
+                                                    reviewCarouselController.animateToPage(reviewCurrentPage + 1, curve: Curves.easeIn);
+                                                  },
+                                                  backgroundColor: Colors.white,
+                                                  elevation: 0.0,
+                                                  child: Icon(
+                                                    Icons.arrow_forward_ios_outlined,
+                                                    size: screenWidth >= 1024
+                                                        ? 18
+                                                        : screenWidth >= 600
+                                                            ? 14
+                                                            : 12,
+                                                  ),
+                                                  mini: true,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        
+                                              
+                                        SizedBox(height: 40),
+                                        LayoutBuilder(
+                                          builder: (context, constraints) {
+                                            double fontSize = constraints.maxWidth > 600 ? 28 : 23;
+                                            double paddingValue = constraints.maxWidth > 600 ? 20.0 : 10.0;
+                                              
+                                            return Padding(
+                                              padding: EdgeInsets.all(paddingValue),
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Text(
+                                                        "Latest Blog Posts",
+                                                        style: TextStyle(
+                                                          fontSize: fontSize,
+                                                          fontWeight: FontWeight.bold,
+                                                          fontFamily: "DMSans",
+                                                        ),
+                                                      ),
+                                                    
+                                                      TextButton(
+                                                        onPressed: () {},
+                                                        child: Row(
+                                                          children: [
+                                                            Text(
+                                                              'View All',
+                                                              style: TextStyle(
+                                                                color: Color.fromRGBO(0, 147, 255, 1),
+                                                                fontSize: screenHeight * 0.02,
+                                                                fontWeight: FontWeight.bold,
+                                                                fontFamily: "DMSans",
+                                                              ),
+                                                            ),
+                                                            Icon(
+                                                              Icons.arrow_outward,
+                                                              color: Color.fromRGBO(0, 147, 255, 1),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                              
+                                        
+                                        LayoutBuilder(
+                                          builder: (context, constraints) {
+                                            double screenWidth = constraints.maxWidth;
+                    
+                                            if (screenWidth < 600) {
+                                              // Mobile: Use CarouselSlider
+                                              return CarouselSlider(
+                                                options: CarouselOptions(
+                                                  height: 420, // Adjust as needed
+                                                  enableInfiniteScroll: true,
+                                                  enlargeCenterPage: true,
+                                                  viewportFraction: 0.9,
+                                                ),
+                                                items: blogs.map((blog) {
+                                                  double imageHeight = 220;
+                                                  double textSize = 13;
+                                                  double buttonPadding = 20;
+                                                  return Padding(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Stack(
+                                                          children: [
+                                                            ClipRRect(
+                                                              borderRadius: BorderRadius.circular(10),
+                                                              child: Image.asset(
+                                                                blog["image"]!,
+                                                                height: imageHeight,
+                                                                width: double.infinity,
+                                                                fit: BoxFit.cover,
+                                                              ),
+                                                            ),
+                                                            Positioned(
+                                                              top: 5,
+                                                              left: 5,
+                                                              child: ElevatedButton(
+                                                                onPressed: () {},
+                                                                style: ElevatedButton.styleFrom(
+                                                                  backgroundColor: Colors.white,
+                                                                  foregroundColor: Colors.black,
+                                                                  padding: EdgeInsets.symmetric(
+                                                                    horizontal: buttonPadding,
+                                                                    vertical: 8,
+                                                                  ),
+                                                                  shape: RoundedRectangleBorder(
+                                                                    borderRadius: BorderRadius.circular(8),
+                                                                  ),
+                                                                ),
+                                                                child: Text(
+                                                                  blog["name"]!,
+                                                                  style: TextStyle(
+                                                                    fontSize: textSize - 3,
+                                                                    fontFamily: "DMSans",
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        const SizedBox(height: 8),
+                                                        Padding(
+                                                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                                          child: Row(
+                                                            children: [
+                                                              Text(
+                                                                blog["position"]!,
+                                                                style: const TextStyle(
+                                                                  color: Color.fromRGBO(5, 11, 32, 1),
+                                                                  fontFamily: "DMSans",
+                                                                  fontWeight: FontWeight.w500,
+                                                                ),
+                                                              ),
+                                                              const SizedBox(width: 10),
+                                                              const Icon(
+                                                                Icons.circle,
+                                                                size: 8,
+                                                                color: Color.fromRGBO(225, 225, 225, 1),
+                                                              ),
+                                                              const SizedBox(width: 5),
+                                                              Text(
+                                                                blog["date"]!,
+                                                                style: const TextStyle(
+                                                                  color: Color.fromRGBO(5, 11, 32, 1),
+                                                                  fontFamily: "DMSans",
+                                                                  fontWeight: FontWeight.w500,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        const SizedBox(height: 10),
+                                                        Padding(
+                                                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                                          child: Text(
+                                                            blog["description"]!,
+                                                            style: TextStyle(
+                                                              fontSize: textSize,
+                                                              color: const Color.fromRGBO(5, 11, 32, 1),
+                                                              fontWeight: FontWeight.w500,
+                                                              fontFamily: "DMSans",
+                                                            ),
+                                                            maxLines: 2,
+                                                            overflow: TextOverflow.ellipsis,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                }).toList(),
+                                              );
+                                            } else {
+                                              // Tablet/Web: Use GridView
+                                              return GridView.builder(
+                                                shrinkWrap: true,
+                                                physics: NeverScrollableScrollPhysics(),
+                                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                                  crossAxisCount: screenWidth > 900
+                                                      ? 3
+                                                      : screenWidth > 600
+                                                          ? 2
+                                                          : 1,
+                                                  mainAxisSpacing: 20,
+                                                  crossAxisSpacing: 20,
+                                                  childAspectRatio: screenWidth > 900
+                                                      ? 1.2
+                                                      : screenWidth > 600
+                                                          ? 1.1
+                                                          : 0.9,
+                                                ),
+                                                itemCount: blogs.length,
+                                                itemBuilder: (context, index) {
+                                                  final blog = blogs[index];
+                                                  double imageHeight = screenWidth > 900
+                                                      ? 360
+                                                      : screenWidth > 600
+                                                          ? 280
+                                                          : 220;
+                                                  double textSize = screenWidth > 900
+                                                      ? 22
+                                                      : screenWidth > 600
+                                                          ? 16
+                                                          : 13;
+                                                  double buttonPadding = screenWidth > 900
+                                                      ? 30
+                                                      : screenWidth > 600
+                                                          ? 25
+                                                          : 20;
+                    
+                                                  return Padding(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Stack(
+                                                          children: [
+                                                            ClipRRect(
+                                                              borderRadius: BorderRadius.circular(10),
+                                                              child: Image.asset(
+                                                                blog["image"]!,
+                                                                height: imageHeight,
+                                                                width: double.infinity,
+                                                                fit: BoxFit.cover,
+                                                              ),
+                                                            ),
+                                                            Positioned(
+                                                              top: 5,
+                                                              left: 5,
+                                                              child: ElevatedButton(
+                                                                onPressed: () {},
+                                                                style: ElevatedButton.styleFrom(
+                                                                  backgroundColor: Colors.white,
+                                                                  foregroundColor: Colors.black,
+                                                                  padding: EdgeInsets.symmetric(
+                                                                    horizontal: buttonPadding,
+                                                                    vertical: 8,
+                                                                  ),
+                                                                  shape: RoundedRectangleBorder(
+                                                                    borderRadius: BorderRadius.circular(8),
+                                                                  ),
+                                                                ),
+                                                                child: Text(
+                                                                  blog["name"]!,
+                                                                  style: TextStyle(
+                                                                    fontSize: textSize - 3,
+                                                                    fontFamily: "DMSans",
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        const SizedBox(height: 8),
+                                                        Padding(
+                                                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                                          child: Row(
+                                                            children: [
+                                                              Text(
+                                                                blog["position"]!,
+                                                                style: const TextStyle(
+                                                                  color: Color.fromRGBO(5, 11, 32, 1),
+                                                                  fontFamily: "DMSans",
+                                                                  fontWeight: FontWeight.w500,
+                                                                ),
+                                                              ),
+                                                              const SizedBox(width: 10),
+                                                              const Icon(
+                                                                Icons.circle,
+                                                                size: 8,
+                                                                color: Color.fromRGBO(225, 225, 225, 1),
+                                                              ),
+                                                              const SizedBox(width: 5),
+                                                              Text(
+                                                                blog["date"]!,
+                                                                style: const TextStyle(
+                                                                  color: Color.fromRGBO(5, 11, 32, 1),
+                                                                  fontFamily: "DMSans",
+                                                                  fontWeight: FontWeight.w500,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        const SizedBox(height: 10),
+                                                        Padding(
+                                                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                                          child: Text(
+                                                            blog["description"]!,
+                                                            style: TextStyle(
+                                                              fontSize: textSize,
+                                                              color: const Color.fromRGBO(5, 11, 32, 1),
+                                                              fontWeight: FontWeight.w500,
+                                                              fontFamily: "DMSans",
+                                                            ),
+                                                            maxLines: 2,
+                                                            overflow: TextOverflow.ellipsis,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            }
+                                          },
+                                        ),
+                    
+                    
+                                        //responsive SizedBox for spacing
+                                        Builder(
+                                          builder: (context) {
+                                            double screenWidth = MediaQuery.of(context).size.width;
+                                            double offsetY = screenWidth < 600
+                                                ? -70
+                                                : screenWidth < 1024
+                                                    ? 40
+                                                    : 120;
+                                            return Transform.translate(
+                                              offset: Offset(0, offsetY),
+                                              child: LayoutBuilder(
+                                                builder: (context, constraints) {
+                                                  double screenWidth = constraints.maxWidth;
+                                                  bool isMobile = screenWidth < 600;
+                                                  bool isTablet = screenWidth >= 600 && screenWidth < 1024;
+                    
+                                                  double cardWidth = isMobile
+                                                      ? double.infinity
+                                                      : isTablet
+                                                          ? (screenWidth / 2) - 32
+                                                          : 650;
+                                                  double imageHeight = isMobile
+                                                      ? 60
+                                                      : isTablet
+                                                          ? 80
+                                                          : 100;
+                                                  double fontSizeTitle = isMobile ? 16 : 20;
+                                                  double fontSizeDesc = isMobile ? 12 : 14;
+                                                  double buttonFontSize = isMobile ? 11.36 : 14;
+                                                  double buttonPaddingH = isMobile ? 15 : 20;
+                                                  double buttonPaddingV = isMobile ? 15 : 18;
+                                                  double cardPadding = isMobile ? 20 : 40;
+                    
+                                                  Widget buildCard({
+                                                    required Color color,
+                                                    required String title,
+                                                    required String desc,
+                                                    required String imagePath,
+                                                    required Color buttonColor,
+                                                    required Color buttonTextColor,
+                                                    required double imageHeight,
+                                                  }) {
+                                                    return Container(
+                                                      width: cardWidth,
+                                                      margin: EdgeInsets.only(bottom: isMobile ? 16 : 0, right: isMobile ? 0 : 16),
+                                                      decoration: BoxDecoration(
+                                                        color: color,
+                                                        borderRadius: BorderRadius.circular(10),
+                                                      ),
+                                                      child: Padding(
+                                                        padding: EdgeInsets.all(cardPadding),
+                                                        child: Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            Text(
+                                                              title,
+                                                              style: TextStyle(
+                                                                fontFamily: "DMSans",
+                                                                fontWeight: FontWeight.w700,
+                                                                fontSize: fontSizeTitle,
+                                                              ),
+                                                            ),
+                                                            const SizedBox(height: 10),
+                                                            Text(
+                                                              desc,
+                                                              style: TextStyle(
+                                                                fontFamily: "DMSans",
+                                                                fontWeight: FontWeight.w400,
+                                                                fontSize: fontSizeDesc,
+                                                              ),
+                                                            ),
+                                                            const SizedBox(height: 10),
+                                                            Row(
+                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                              children: [
+                                                                ElevatedButton(
+                                                                  onPressed: () {},
+                                                                  style: ElevatedButton.styleFrom(
+                                                                    backgroundColor: buttonColor,
+                                                                    foregroundColor: buttonTextColor,
+                                                                    padding: EdgeInsets.symmetric(
+                                                                      horizontal: buttonPaddingH,
+                                                                      vertical: buttonPaddingV,
+                                                                    ),
+                                                                    shape: RoundedRectangleBorder(
+                                                                      borderRadius: BorderRadius.circular(10),
+                                                                    ),
+                                                                  ),
+                                                                  child: Row(
+                                                                    children: [
+                                                                      Text(
+                                                                        "Get Started",
+                                                                        style: TextStyle(
+                                                                          fontSize: buttonFontSize,
+                                                                          fontWeight: FontWeight.w500,
+                                                                          fontFamily: "DMSans",
+                                                                        ),
+                                                                      ),
+                                                                      const SizedBox(width: 5),
+                                                                      Icon(Icons.arrow_outward_sharp, size: isMobile ? 20 : 24),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                                const SizedBox(width: 10),
+                                                                Image.asset(
+                                                                  imagePath,
+                                                                  height: imageHeight,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    );
+                                                  }
+                    
+                                                  final card1 = buildCard(
+                                                    color: Color.fromRGBO(233, 242, 255, 1),
+                                                    title: "Are You Looking \nFor a Car?",
+                                                    desc: "We are committed to providing our customers with \nexceptional service.",
+                                                    imagePath: "assets/Home_Images/Footer_Images/lookingCar.png",
+                                                    buttonColor: Color.fromRGBO(26, 76, 142, 1),
+                                                    buttonTextColor: Colors.white,
+                                                    imageHeight: imageHeight,
+                                                  );
+                    
+                                                  final card2 = buildCard(
+                                                    color: Color.fromRGBO(255, 233, 243, 1),
+                                                    title: "Best place for \ncar financing",
+                                                    desc: "We are committed to providing our customers with \nexceptional service.",
+                                                    imagePath: "assets/Home_Images/Footer_Images/carFinance.png",
+                                                    buttonColor: Color.fromRGBO(5, 11, 32, 1),
+                                                    buttonTextColor: Colors.white,
+                                                    imageHeight: imageHeight,
+                                                  );
+                    
+                                                  if (isMobile) {
+                                                    return Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                      children: [card1, card2],
+                                                    );
+                                                  } else {
+                                                    return Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                      children: [card1, card2],
+                                                    );
+                                                  }
+                                                },
+                                              ), // Wrap the widget you want to shift upward
+                                            );
+                                          },
+                                        ),
+                                      ]
+                                    );
+                                    
+                                  }
+                                ),
+                              ]
+                            ),
+                          );
+                                
+                        }
+                        
                       ),
+                    
+                      ],
                     );
                   }
+
+                  Widget MUV() {
+                    final List<String> muvKeywords = [
+                      "innova", "avanza", "veloz", "ertiga", "eeco", "carens", "carnival", "marazzo",
+                      "bolero neo", "triber", "stargazer", "alcazar", "mobilio", "odyssey", "xpander", "go+", "mpv", "muv"
+                    ];
+
+                    List<Map<String, dynamic>> muvCars = cars.where((car) {
+                      final name = (car["name"] ?? "").toString().toLowerCase();
+                      final nameWords = name.split(RegExp(r'\s+'));
+                      return muvKeywords.any((keyword) {
+                        final kw = keyword.toLowerCase();
+                        return nameWords.any((word) => word.contains(kw) || kw.contains(word)) ||
+                              name.replaceAll(' ', '').contains(kw.replaceAll(' ', ''));
+                      });
+                    }).toList();
+
+                    if (muvCars.isEmpty) {
+                      return Container(
+                        margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
+                        child: Column(
+                          children: const [
+                            Text("No MUV cars available.", style: TextStyle(fontSize: 16)),
+                          ],
+                        ),
+                      );
+                    }
+
+                    return Column(
+                      children: [
+                        
+                        Padding(
+                            padding: EdgeInsets.only(left: 0),
+                            child: buildBrandCards(context),
+                          ),
+                          const SizedBox(height: 20,),
+                    
+                        if (muvCars.length == 1)
+                          LayoutBuilder(
+                            builder: (context, constraints) {
+                              return _buildCarCard(muvCars.first, constraints, context);
+                            },
+                          )
+                        else
+                          Stack(
+                            children: [
+                              CarouselSlider(
+                                carouselController: innerCarouselController,
+                                options: CarouselOptions(
+                                  height: MediaQuery.of(context).size.height * 0.8,
+                                  autoPlay: false,
+                                  enableInfiniteScroll: true,
+                                  enlargeCenterPage: false,
+                                  viewportFraction: 1,
+                                  onPageChanged: (index, reason) {
+                                    setState(() {
+                                      innerCurrentPage = index;
+                                    });
+                                  },
+                                ),
+                                items: muvCars.asMap().entries.map((entry) {
+                                  int index = entry.key;
+                                  Map<String, dynamic> car = entry.value;
+                                  return LayoutBuilder(
+                                    builder: (context, constraints) {
+                                      return _buildCarCard(car, constraints, context);
+                                    },
+                                  );
+                                }).toList(),
+                              ),
+                              if (innerCurrentPage >= 0)
+                                Positioned(
+                                  height: (MediaQuery.of(context).size.width < 600 ? 30.0 : MediaQuery.of(context).size.width < 1024 ? 50.0 : 60.0),
+                                  left: (MediaQuery.of(context).size.width < 600 ? -5.0 : MediaQuery.of(context).size.width < 1024 ? -6.0 : -10.0),
+                                  top: (MediaQuery.of(context).size.width < 600 ? MediaQuery.of(context).size.height * 0.35 : MediaQuery.of(context).size.width < 1024 ? MediaQuery.of(context).size.height * 0.30 : MediaQuery.of(context).size.height * 0.22),
+                                  child: FloatingActionButton(
+                                    onPressed: () {
+                                      innerCarouselController.animateToPage(innerCurrentPage - 1, curve: Curves.easeIn);
+                                    },
+                                    backgroundColor: Color.fromRGBO(26, 76, 142, 1),
+                                    child: const Icon(Icons.arrow_back_ios_outlined, color: Colors.white),
+                                    mini: true,
+                                  ),
+                                ),
+                              if (innerCurrentPage <= muvCars.length - 1)
+                                Positioned(
+                                  height: (MediaQuery.of(context).size.width < 600 ? 30.0 : MediaQuery.of(context).size.width < 1024 ? 50.0 : 60.0),
+                                  right: (MediaQuery.of(context).size.width < 600 ? -5.0 : MediaQuery.of(context).size.width < 1024 ? -6.0 : -10.0),
+                                  top: (MediaQuery.of(context).size.width < 600 ? MediaQuery.of(context).size.height * 0.35 : MediaQuery.of(context).size.width < 1024 ? MediaQuery.of(context).size.height * 0.30 : MediaQuery.of(context).size.height * 0.22),
+                                  child: FloatingActionButton(
+                                    onPressed: () {
+                                      innerCarouselController.animateToPage(innerCurrentPage + 1, curve: Curves.easeIn);
+                                    },
+                                    backgroundColor: Color.fromRGBO(26, 76, 142, 1),
+                                    child: Icon(Icons.arrow_forward_ios_outlined, color: Colors.white),
+                                    mini: true,
+                                  ),
+                                ),
+                            ],
+                          ),
+                      
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.07,),
+                            LayoutBuilder(
+                              builder: (context, constraints) {
+                    
+                                double screenWidth = MediaQuery.of(context).size.width;
+                                double screenHeight = MediaQuery.of(context).size.height;
+                    
+                                double imageSize;
+                                if (screenWidth > 1200) {
+                                  imageSize = (screenWidth / 6) - 100;
+                                } else if (screenWidth > 600) {
+                                  imageSize = (screenWidth / 6) - 100; 
+                                } else {
+                                  imageSize = (screenWidth / 3) - 30; 
+                                }
+                                imageSize = imageSize.clamp(80.0, 300.0);
+                    
+                                double titleFontSize = screenWidth > 600 ? 40 : screenWidth * 0.08;
+                                
+                                return Padding(
+                                  padding: const EdgeInsets.only(left: 0, right: 0),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          RichText(
+                                            text: TextSpan(
+                                              children: [
+                                                TextSpan(
+                                                  text: 'Similar Brands',
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: screenHeight * 0.038,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontFamily: "DMSans",
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {},
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  'Show all Brands',
+                                                  style: TextStyle(
+                                                    color: Color.fromRGBO(0, 147, 255, 1),
+                                                    fontSize: screenHeight * 0.02,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontFamily: "DMSans",
+                                                  ),
+                                                ),
+                                                Icon(Icons.arrow_outward, color: Color.fromRGBO(0, 147, 255, 1)),
+                                              ],
+                                            ),
+                                          ),
+                                          
+                                        ],
+                                      ),
+                                      SizedBox(height: screenHeight * 0.05),
+                    
+                                      //Similar Brands Section
+                                      Column(
+                                        children: [
+                                          LayoutBuilder(
+                                            builder: (context, constraints) {
+                                              return Builder(
+                                                builder: (context) {
+                                                  print('[buildBrands] isLoadingBrands: $isLoadingBrands, errorMessageBrands: $errorMessageBrands, brands: $brands');
+                                                  if (isLoadingBrands) {
+                                                    return const Center(child: CircularProgressIndicator());
+                                                  }
+                                                  if (errorMessageBrands != null) {
+                                                    return Center(child: Text(errorMessageBrands!));
+                                                  }
+                                                  if (brands.isEmpty) {
+                                                    return const Center(child: Text('No brands available'));
+                                                  }
+                                                  return Padding(
+                                                    padding: const EdgeInsets.all(0.0),
+                                                    child: Wrap(
+                                                      spacing: screenWidth * 0.05,
+                                                      runSpacing: screenHeight * 0.02,
+                                                      children: brands.map((brand) {
+                                                        return Container(
+                                                          decoration: BoxDecoration(
+                                                            color: Colors.white,
+                                                            border: Border.all(width: 1, color: const Color.fromRGBO(233, 233, 233, 1)),
+                                                            borderRadius: BorderRadius.circular(10),
+                                                          ),
+                                                          child: ClipRRect(
+                                                            borderRadius: BorderRadius.circular(10),
+                                                            child: Column(
+                                                              children: [
+                                                                Image.asset(
+                                                                  brand["image"] ?? 'assets/placeholder.png',
+                                                                  width: imageSize,
+                                                                  fit: BoxFit.contain,
+                                                                  errorBuilder: (context, error, stackTrace) => Image.asset(
+                                                                    'assets/placeholder.png',
+                                                                    width: imageSize,
+                                                                    fit: BoxFit.contain,
+                                                                  ),
+                                                                ),
+                                                                Text(
+                                                                  brand["name"] ?? 'Unknown Brand',
+                                                                  style: const TextStyle(fontFamily: "DMSans"),
+                                                                  textAlign: TextAlign.center,
+                                                                  softWrap: true,
+                                                                  overflow: TextOverflow.visible,
+                                                                  maxLines: 2, // Allow up to 2 lines
+                                                                ),
+                                                                SizedBox(height: screenHeight * 0.02),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        );
+                                                      }).toList(),
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            },
+                                          ),
+                                          const SizedBox(height: 30),
+                                        ],
+                                      ),
+                    
+                    
+                                      LayoutBuilder(
+                                        builder: (context, constraints) {
+                                          double screenWidth = MediaQuery.of(context).size.width;
+                                          double imageWidth = screenWidth * 0.40;
+                                          double imageHeight = (imageWidth * 9 / 16) * 1.49;
+                                          double playButtonSize = screenWidth * 0.052;
+                                          double sectionSpacing = screenWidth * 0.01;
+                                        return Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            SizedBox(height: sectionSpacing),
+                    
+                                          // Responsive "video + info" section
+                                          Builder(
+                                            builder: (context) {
+                                              final screenWidth = MediaQuery.of(context).size.width;
+                                              final isMobile = screenWidth < 800;
+                                              final isTablet = screenWidth >= 800 && screenWidth < 1024;
+                                              final isDesktop = screenWidth >= 1024;
+                    
+                                              // Responsive sizes
+                                              double imageWidth, imageHeight, playButtonSize, infoPadding, titleFontSize, descFontSize, bulletFontSize, buttonFontSize, sectionSpacing;
+                                              if (isMobile) {
+                                                imageWidth = screenWidth * 0.9;
+                                                imageHeight = screenWidth * 0.5;
+                                                playButtonSize = 40;
+                                                infoPadding = 16;
+                                                titleFontSize = 18;
+                                                descFontSize = 12;
+                                                bulletFontSize = 12;
+                                                buttonFontSize = 14;
+                                                sectionSpacing = 10;
+                                              } else if (isTablet) {
+                                                imageWidth = screenWidth * 0.4;
+                                                imageHeight = screenWidth * 0.5;
+                                                playButtonSize = 50;
+                                                infoPadding = 32;
+                                                titleFontSize = 24;
+                                                descFontSize = 14;
+                                                bulletFontSize = 14;
+                                                buttonFontSize = 16;
+                                                sectionSpacing = 16;
+                                              } else {
+                                                imageWidth = screenWidth * 0.35;
+                                                imageHeight = screenWidth * 0.33;
+                                                playButtonSize = 60;
+                                                infoPadding = 70;
+                                                titleFontSize = 32;
+                                                descFontSize = 16;
+                                                bulletFontSize = 16;
+                                                buttonFontSize = 18;
+                                                sectionSpacing = 24;
+                                              }
+                    
+                                              Widget imageStack = Stack(
+                                                alignment: Alignment.center,
+                                                children: [
+                                                  ClipRRect(
+                                                    borderRadius: BorderRadius.only(
+                                                      topLeft: Radius.circular(10),
+                                                      bottomLeft: isMobile ? Radius.circular(10) : Radius.circular(0),
+                                                      topRight: isMobile ? Radius.circular(10) : Radius.circular(0),
+                                                      bottomRight: Radius.circular(0),
+                                                    ),
+                                                    child: Image.asset(
+                                                      "assets/videoImage.jpeg",
+                                                      width: imageWidth,
+                                                      height: imageHeight,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
+                                                  CircleAvatar(
+                                                    radius: playButtonSize / 2,
+                                                    backgroundColor: Colors.white,
+                                                    child: Icon(
+                                                      Icons.play_arrow,
+                                                      size: playButtonSize * 0.5,
+                                                      color: Colors.black,
+                                                    ),
+                                                  ),
+                                                ],
+                                              );
+                    
+                                              Widget infoSection = Container(
+                                                width: isMobile ? double.infinity : screenWidth * 0.48,
+                                                decoration: BoxDecoration(
+                                                  color: Color.fromRGBO(238, 241, 251, 1),
+                                                  borderRadius: isMobile
+                                                      ? BorderRadius.only(
+                                                          bottomLeft: Radius.circular(10),
+                                                          bottomRight: Radius.circular(10),
+                                                        )
+                                                      : null,
+                                                ),
+                                                child: Padding(
+                                                  padding: EdgeInsets.all(infoPadding),
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        "Buying a car has never been this easy.",
+                                                        style: TextStyle(
+                                                          fontSize: titleFontSize,
+                                                          fontWeight: FontWeight.bold,
+                                                          color: Colors.black,
+                                                          fontFamily: "DMSans",
+                                                        ),
+                                                      ),
+                                                      SizedBox(height: sectionSpacing),
+                                                      Text(
+                                                        "We are committed to providing our customers with exceptional service, competitive pricing, and a wide range of options.",
+                                                        style: TextStyle(
+                                                          fontSize: descFontSize,
+                                                          color: Color.fromRGBO(5, 11, 32, 1),
+                                                          fontFamily: "DMSans",
+                                                        ),
+                                                      ),
+                                                      SizedBox(height: sectionSpacing),
+                                                      Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          buildBulletPoint(
+                                                            "We are the UK's largest provider, with more patrols in more places",
+                                                            fontSize: bulletFontSize,
+                                                          ),
+                                                          buildBulletPoint(
+                                                            "You get 24/7 roadside assistance",
+                                                            fontSize: bulletFontSize,
+                                                          ),
+                                                          buildBulletPoint(
+                                                            "We fix 4 out of 5 cars at the roadside",
+                                                            fontSize: bulletFontSize,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      SizedBox(height: sectionSpacing),
+                                                      ElevatedButton(
+                                                        onPressed: () {
+                                                          _bookTestDrive();
+                                                        },
+                                                        style: ElevatedButton.styleFrom(
+                                                          backgroundColor: Color(0xFF004C90),
+                                                          padding: EdgeInsets.symmetric(
+                                                            horizontal: infoPadding,
+                                                            vertical: infoPadding / 2.5,
+                                                          ),
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.circular(8),
+                                                          ),
+                                                        ),
+                                                        child: Row(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          children: [
+                                                            Text(
+                                                              "Book a test drive",
+                                                              style: TextStyle(
+                                                                color: Colors.white,
+                                                                fontSize: buttonFontSize,
+                                                                fontFamily: "DMSans",
+                                                              ),
+                                                            ),
+                                                            SizedBox(width: sectionSpacing / 2),
+                                                            Icon(Icons.arrow_outward, color: Colors.white, size: buttonFontSize + 2),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              );
+                    
+                                              if (isMobile) {
+                                                return Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                  children: [
+                                                    imageStack,
+                                                    infoSection,
+                                                  ],
+                                                );
+                                              } else {
+                                                return Row(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    imageStack,
+                                                    infoSection,
+                                                  ],
+                                                );
+                                              }
+                                            },
+                                          ),
+                    
+                                          SizedBox(height: sectionSpacing),
+                                          Builder(
+                                            builder: (context) {
+                                              double screenWidth = MediaQuery.of(context).size.width;
+                                              int crossAxisCount;
+                                              if (screenWidth < 600) {
+                                                crossAxisCount = 2;
+                                              } else if (screenWidth < 1024) {
+                                                crossAxisCount = 4;
+                                              } else {
+                                                crossAxisCount = 4;
+                                              }
+                                              return Wrap(
+                                                alignment: WrapAlignment.center,
+                                                spacing: 8,
+                                                runSpacing: 8,
+                                                children: [
+                                                  buildStatBox("836M", "CARS FOR SALE", context),
+                                                  buildStatBox("738M", "DEALER REVIEWS", context),
+                                                  buildStatBox("100M", "VISITORS PER DAY", context),
+                                                  buildStatBox("238M", "VERIFIED DEALERS", context),
+                                                ],
+                                              );
+                                            },
+                                          ),
+                    
+                                          Divider(
+                                            thickness: 1,
+                                            color: Color.fromRGBO(223, 223, 223, 1),
+                                          ),
+                                          SizedBox(height: sectionSpacing),
+                    
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                              left: screenWidth >= 1024
+                                                  ? 100
+                                                  : screenWidth >= 600
+                                                      ? 40
+                                                      : 10,
+                                              right: screenWidth >= 1024
+                                                  ? 50
+                                                  : screenWidth >= 600
+                                                      ? 24
+                                                      : 10,
+                                              top: screenWidth >= 1024
+                                                  ? 50
+                                                  : screenWidth >= 600
+                                                      ? 30
+                                                      : 16,
+                                              bottom: screenWidth >= 1024
+                                                  ? 20
+                                                  : screenWidth >= 600
+                                                      ? 16
+                                                      : 8,
+                                            ),
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text("Why Choose Us?", style: TextStyle(fontWeight: FontWeight.bold,fontSize: screenHeight * 0.038, fontFamily: "DMSans",),),
+                                              ],
+                                            ),
+                                          ),
+                                          SizedBox(height: sectionSpacing),
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                              left: screenWidth >= 1024
+                                                  ? 100
+                                                  : screenWidth >= 600
+                                                      ? 40
+                                                      : 10,
+                                              right: screenWidth >= 1024
+                                                  ? 50
+                                                  : screenWidth >= 600
+                                                      ? 24
+                                                      : 10,
+                                              top: screenWidth >= 1024
+                                                  ? 50
+                                                  : screenWidth >= 600
+                                                      ? 30
+                                                      : 16,
+                                              bottom: screenWidth >= 1024
+                                                  ? 20
+                                                  : screenWidth >= 600
+                                                      ? 16
+                                                      : 8,
+                                            ),
+                                            child: LayoutBuilder(
+                                              builder: (context, constraints) {
+                                                double screenWidth = MediaQuery.of(context).size.width;
+                                                bool isMobile = screenWidth < 600;
+                    
+                                                double imageSize;
+                                                double titleFontSize;
+                                                double descFontSize;
+                                                if (screenWidth >= 1024) {
+                                                  // Desktop
+                                                  imageSize = 52;
+                                                  titleFontSize = 22;
+                                                  descFontSize = 15;
+                                                } else if (screenWidth >= 600) {
+                                                  // Tablet
+                                                  imageSize = 40;
+                                                  titleFontSize = 19;
+                                                  descFontSize = 15;
+                                                } else {
+                                                  // Mobile
+                                                  imageSize = 33;
+                                                  titleFontSize = 15;
+                                                  descFontSize = 13;
+                                                }
+                    
+                                                List<Widget> infoBlocks = [
+                                                  Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Image.asset("assets/financialOffer.png", height: imageSize),
+                                                      SizedBox(height: screenWidth * 0.02),
+                                                      Text("Special Financing Offers", style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold, fontFamily: "DMSans",),),
+                                                      SizedBox(height: screenWidth * 0.01),
+                                                      Text("Our stress-free finance department that can \nfind financial solutions to save you money.",
+                                                        style: TextStyle(fontFamily: "DMSans", fontSize: descFontSize),),
+                                                    ],
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Image.asset("assets/dealership.png", height: imageSize),
+                                                      SizedBox(height: screenWidth * 0.02),
+                                                      Text("Trusted Car Dealership", style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold, fontFamily: "DMSans",),),
+                                                      SizedBox(height: screenWidth * 0.01),
+                                                      Text("Our stress-free finance department that can \nfind financial solutions to save you money.",
+                                                        style: TextStyle(fontFamily: "DMSans", fontSize: descFontSize),),
+                                                    ],
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Image.asset("assets/transparent.png", height: imageSize),
+                                                      SizedBox(height: screenWidth*0.02),
+                                                      Text("Transparent Pricing", style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold, fontFamily: "DMSans",),),
+                                                      SizedBox(height: screenWidth * 0.01),
+                                                      Text("Our stress-free finance department that can \nfind financial solutions to save you money.",
+                                                        style: TextStyle(fontFamily: "DMSans", fontSize: descFontSize),),
+                                                    ],
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Image.asset("assets/expertCar.png", height: imageSize),
+                                                      SizedBox(height: screenWidth * 0.02),
+                                                      Text("Expert Car Service", style: TextStyle(fontSize: titleFontSize, fontWeight: FontWeight.bold),),
+                                                      SizedBox(height: screenWidth * 0.01),
+                                                      Text("Our stress-free finance department that can \nfind financial solutions to save you money.",
+                                                        style: TextStyle(fontFamily: "DMSans", fontSize: descFontSize),),
+                                                    ],
+                                                  ),
+                                                ];
+                    
+                                                if (isMobile) {
+                                                  // Display vertically for mobile
+                                                  return Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: infoBlocks
+                                                        .map((block) => Padding(
+                                                              padding: EdgeInsets.only(bottom: screenWidth * 0.04),
+                                                              child: block,
+                                                            ))
+                                                        .toList(),
+                                                  );
+                                                } else {
+                                                  // Display horizontally for tablet/desktop
+                                                  return Row(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: infoBlocks
+                                                        .map((block) => Padding(
+                                                              padding: EdgeInsets.only(right: screenWidth * 0.02),
+                                                              child: block,
+                                                            ))
+                                                        .toList(),
+                                                  );
+                                                }
+                                              }
+                                            ),
+                                          ),
+                                          SizedBox(height: screenHeight * 0.1),
+                                          
+                                          Stack(
+                                          children: [
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                color: Color.fromRGBO(249, 251, 252, 1),
+                                              ),
+                                              child: Padding(
+                                                padding: EdgeInsets.only(
+                                                  left: screenWidth >= 1024
+                                                      ? screenWidth * 0.15
+                                                      : screenWidth >= 600
+                                                          ? screenWidth * 0.08
+                                                          : 16,
+                                                  right: screenWidth >= 1024
+                                                      ? screenWidth * 0.15
+                                                      : screenWidth >= 600
+                                                          ? screenWidth * 0.08
+                                                          : 16,
+                                                  top: screenWidth >= 1024
+                                                      ? screenHeight * 0.10
+                                                      : screenWidth >= 600
+                                                          ? screenHeight * 0.06
+                                                          : 16,
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Padding(
+                                                      padding: EdgeInsets.symmetric(
+                                                        horizontal: screenWidth >= 1024
+                                                            ? 0
+                                                            : screenWidth >= 600
+                                                                ? 0
+                                                                : 0, // You can adjust if you want more padding on mobile
+                                                      ),
+                                                      child: LayoutBuilder(
+                                                        builder: (context, constraints) {
+                                                          double textSize;
+                                                          double subTextSize;
+                                                          if (constraints.maxWidth >= 1024) {
+                                                            textSize = 28;
+                                                            subTextSize = 14;
+                                                          } else if (constraints.maxWidth >= 600) {
+                                                            textSize = 24;
+                                                            subTextSize = 12;
+                                                          } else {
+                                                            textSize = 18;
+                                                            subTextSize = 10;
+                                                          }
+                    
+                                                          bool isMobile = constraints.maxWidth < 600;
+                    
+                                                          return Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: [
+                                                              isMobile
+                                                                  ? Column(
+                                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                                      children: [
+                                                                        Text(
+                                                                          "What our customers say",
+                                                                          style: TextStyle(
+                                                                            fontWeight: FontWeight.w700,
+                                                                            fontSize: textSize,
+                                                                            fontFamily: "DMSans",
+                                                                          ),
+                                                                        ),
+                                                                        SizedBox(height: 8),
+                                                                        Text(
+                                                                          "Rated ${calculateAverageRating().toStringAsFixed(1)} / 5 based on $totalReviews reviews Showing our 4 & 5 star reviews",
+                                                                          style: TextStyle(
+                                                                            fontWeight: FontWeight.w400,
+                                                                            fontSize: subTextSize,
+                                                                            fontFamily: "DMSans",
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    )
+                                                                  : Row(
+                                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                      children: [
+                                                                        Text(
+                                                                          "What our customers say",
+                                                                          style: TextStyle(
+                                                                            fontWeight: FontWeight.w700,
+                                                                            fontSize: textSize,
+                                                                            fontFamily: "DMSans",
+                                                                          ),
+                                                                        ),
+                                                                        Text(
+                                                                          "Rated ${calculateAverageRating().toStringAsFixed(1)} / 5 based on $totalReviews reviews Showing our 4 & 5 star reviews",
+                                                                          style: TextStyle(
+                                                                            fontWeight: FontWeight.w400,
+                                                                            fontSize: subTextSize,
+                                                                            fontFamily: "DMSans",
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                            ],
+                                                          );
+                                                        },
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 20),
+                                                    Padding(
+                                                      padding: EdgeInsets.symmetric(
+                                                        horizontal: screenWidth >= 1024
+                                                            ? 0
+                                                            : screenWidth >= 600
+                                                                ? 0
+                                                                : 0, // Adjust if you want more padding on mobile
+                                                      ),
+                                                      child: LayoutBuilder(
+                                                        builder: (context, constraints) {
+                                                          bool isDesktop = constraints.maxWidth >= 1024;
+                                                          bool isTablet = constraints.maxWidth >= 600 && constraints.maxWidth < 1024;
+                                                          bool isMobile = constraints.maxWidth < 600;
+                    
+                                                          double containerHeight = isDesktop
+                                                              ? 490
+                                                              : isTablet
+                                                                  ? 420
+                                                                  : 320;
+                                                          double containerWidth = isDesktop
+                                                              ? screenWidth * 0.9
+                                                              : isTablet
+                                                                  ? screenWidth * 0.95
+                                                                  : screenWidth * 0.98;
+                                                          double imageWidth = isDesktop
+                                                              ? 480
+                                                              : isTablet
+                                                                  ? 300
+                                                                  : containerWidth;
+                                                          double imageHeight = isDesktop
+                                                              ? 550
+                                                              : isTablet
+                                                                  ? 380
+                                                                  : 180;
+                                                          double nameSize = isDesktop
+                                                              ? 18
+                                                              : isTablet
+                                                                  ? 16
+                                                                  : 14;
+                                                          double designationSize = isDesktop
+                                                              ? 15
+                                                              : isTablet
+                                                                  ? 13
+                                                                  : 11;
+                                                          double reviewTextSize = isDesktop
+                                                              ? 22
+                                                              : isTablet
+                                                                  ? 16
+                                                                  : 12;
+                                                          double starSize = isDesktop
+                                                              ? 16
+                                                              : isTablet
+                                                                  ? 13
+                                                                  : 11;
+                    
+                                                          return Builder(
+                                                            builder: (context) {
+                                                              if (isLoadingReviews) {
+                                                                return Center(child: CircularProgressIndicator());
+                                                              }
+                                                              if (errorMessageReviews != null) {
+                                                                return Center(child: Text(errorMessageReviews!));
+                                                              }
+                                                              if (reviews.isEmpty) {
+                                                                return Center(child: Text('No high-rated reviews available'));
+                                                              }
+                                                              return CarouselSlider(
+                                                                carouselController: reviewCarouselController,
+                                                                options: CarouselOptions(
+                                                                  height: containerHeight,
+                                                                  autoPlay: false,
+                                                                  enlargeCenterPage: false,
+                                                                  enableInfiniteScroll: false,
+                                                                  viewportFraction: 1,
+                                                                  onPageChanged: (index, reason) {
+                                                                    setState(() {
+                                                                      reviewCurrentPage = index;
+                                                                    });
+                                                                  },
+                                                                ),
+                                                                items: reviews.asMap().entries.map((entry) {
+                                                                  int index = entry.key;
+                                                                  Map<String, dynamic> review = entry.value;
+                                                                  return Padding(
+                                                                    padding: const EdgeInsets.all(0.0),
+                                                                    child: Container(
+                                                                      height: containerHeight,
+                                                                      width: containerWidth,
+                                                                      child: isMobile
+                                                                          ? Column(
+                                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                                              children: [
+                                                                                Image.asset(
+                                                                                  review["image"] ?? 'assets/placeholder.png',
+                                                                                  height: imageHeight,
+                                                                                  width: imageWidth,
+                                                                                  fit: BoxFit.cover,
+                                                                                  errorBuilder: (context, error, stackTrace) =>
+                                                                                      Image.asset(
+                                                                                    'assets/placeholder.png',
+                                                                                    height: imageHeight,
+                                                                                    width: imageWidth,
+                                                                                    fit: BoxFit.cover,
+                                                                                  ),
+                                                                                ),
+                                                                                SizedBox(height: 12),
+                                                                                Row(
+                                                                                  children: [
+                                                                                    Row(
+                                                                                      children: List.generate(5, (starIndex) {
+                                                                                        return Icon(
+                                                                                          starIndex < (review["rating"] ?? 0)
+                                                                                              ? Icons.star
+                                                                                              : Icons.star_border,
+                                                                                          color: Color.fromRGBO(225, 192, 63, 1),
+                                                                                          size: starSize.toDouble(),
+                                                                                        );
+                                                                                      }),
+                                                                                    ),
+                                                                                    SizedBox(width: 6),
+                                                                                    Container(
+                                                                                      decoration: BoxDecoration(
+                                                                                        color: Color.fromRGBO(225, 192, 63, 1),
+                                                                                        borderRadius: BorderRadius.circular(10),
+                                                                                      ),
+                                                                                      child: Padding(
+                                                                                        padding: const EdgeInsets.symmetric(
+                                                                                            horizontal: 10, vertical: 2),
+                                                                                        child: Text(
+                                                                                          (review["rating"] ?? 0).toStringAsFixed(1),
+                                                                                          style: TextStyle(
+                                                                                            fontSize: designationSize,
+                                                                                            color: Colors.white,
+                                                                                            fontWeight: FontWeight.w500,
+                                                                                          ),
+                                                                                        ),
+                                                                                      ),
+                                                                                    ),
+                                                                                  ],
+                                                                                ),
+                                                                                SizedBox(height: 8),
+                                                                                Text(
+                                                                                  review["name"] ?? 'Anonymous',
+                                                                                  style: TextStyle(
+                                                                                    fontSize: nameSize,
+                                                                                    fontWeight: FontWeight.bold,
+                                                                                    fontFamily: "DMSans",
+                                                                                  ),
+                                                                                ),
+                                                                                SizedBox(height: 4),
+                                                                                Text(
+                                                                                  review["designation"] ?? 'Reviewer',
+                                                                                  style: TextStyle(
+                                                                                    fontSize: designationSize,
+                                                                                    color: Color.fromRGBO(139, 139, 139, 1),
+                                                                                    fontFamily: "DMSans",
+                                                                                  ),
+                                                                                ),
+                                                                                SizedBox(height: 12),
+                                                                                Text(
+                                                                                  review["review"] ?? 'No review provided',
+                                                                                  style: TextStyle(fontSize: reviewTextSize),
+                                                                                ),
+                                                                              ],
+                                                                            )
+                                                                          : Row(
+                                                                              children: [
+                                                                                Image.asset(
+                                                                                  review["image"] ?? 'assets/placeholder.png',
+                                                                                  height: imageHeight,
+                                                                                  width: imageWidth,
+                                                                                  fit: BoxFit.cover,
+                                                                                  errorBuilder: (context, error, stackTrace) =>
+                                                                                      Image.asset(
+                                                                                    'assets/placeholder.png',
+                                                                                    height: imageHeight,
+                                                                                    width: imageWidth,
+                                                                                    fit: BoxFit.cover,
+                                                                                  ),
+                                                                                ),
+                                                                                SizedBox(width: 24),
+                                                                                Expanded(
+                                                                                  child: Center(
+                                                                                    child: Column(
+                                                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                                                      children: [
+                                                                                        Row(
+                                                                                          children: [
+                                                                                            Row(
+                                                                                              children: List.generate(5, (starIndex) {
+                                                                                                return Icon(
+                                                                                                  starIndex < (review["rating"] ?? 0)
+                                                                                                      ? Icons.star
+                                                                                                      : Icons.star_border,
+                                                                                                  color:
+                                                                                                      Color.fromRGBO(225, 192, 63, 1),
+                                                                                                  size: starSize.toDouble(),
+                                                                                                );
+                                                                                              }),
+                                                                                            ),
+                                                                                            SizedBox(width: 10),
+                                                                                            Container(
+                                                                                              decoration: BoxDecoration(
+                                                                                                color:
+                                                                                                    Color.fromRGBO(225, 192, 63, 1),
+                                                                                                borderRadius:
+                                                                                                    BorderRadius.circular(10),
+                                                                                              ),
+                                                                                              child: Padding(
+                                                                                                padding: const EdgeInsets.symmetric(
+                                                                                                    horizontal: 10, vertical: 2),
+                                                                                                child: Text(
+                                                                                                  (review["rating"] ?? 0)
+                                                                                                      .toStringAsFixed(1),
+                                                                                                  style: TextStyle(
+                                                                                                    fontSize: designationSize,
+                                                                                                    color: Colors.white,
+                                                                                                    fontWeight: FontWeight.w500,
+                                                                                                  ),
+                                                                                                ),
+                                                                                              ),
+                                                                                            ),
+                                                                                          ],
+                                                                                        ),
+                                                                                        SizedBox(height: 16),
+                                                                                        Text(
+                                                                                          review["name"] ?? 'Anonymous',
+                                                                                          style: TextStyle(
+                                                                                            fontSize: nameSize,
+                                                                                            fontWeight: FontWeight.bold,
+                                                                                            fontFamily: "DMSans",
+                                                                                          ),
+                                                                                        ),
+                                                                                        SizedBox(height: 8),
+                                                                                        Text(
+                                                                                          review["designation"] ?? 'Reviewer',
+                                                                                          style: TextStyle(
+                                                                                            fontSize: designationSize,
+                                                                                            color: Color.fromRGBO(139, 139, 139, 1),
+                                                                                            fontFamily: "DMSans",
+                                                                                          ),
+                                                                                        ),
+                                                                                        SizedBox(height: 24),
+                                                                                        Text(
+                                                                                          review["review"] ?? 'No review provided',
+                                                                                          style: TextStyle(fontSize: reviewTextSize),
+                                                                                        ),
+                                                                                      ],
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                              ],
+                                                                            ),
+                                                                    ),
+                                                                  );
+                                                                }).toList(),
+                                                              );
+                                                            },
+                                                          );
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            // Left button
+                                          if (reviewCurrentPage >= 0)
+                                            Positioned(
+                                              height: screenWidth >= 1024
+                                                  ? screenHeight * 0.05
+                                                  : screenWidth >= 600
+                                                      ? screenHeight * 0.045
+                                                      : 36,
+                                              left: screenWidth >= 1024
+                                                  ? screenWidth * 0.03
+                                                  : screenWidth >= 600
+                                                      ? screenWidth * 0.02
+                                                      : 8,
+                                              top: screenWidth >= 1024
+                                                  ? screenHeight * 0.38
+                                                  : screenWidth >= 600
+                                                      ? screenHeight * 0.36
+                                                      : screenHeight * 0.33,
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(10),
+                                                ),
+                                                child: FloatingActionButton(
+                                                  onPressed: () {
+                                                    reviewCarouselController.animateToPage(reviewCurrentPage - 1, curve: Curves.easeIn);
+                                                  },
+                                                  backgroundColor: Colors.white,
+                                                  elevation: 0.0,
+                                                  highlightElevation: 0.0,
+                                                  child: Icon(
+                                                    Icons.arrow_back_ios_outlined,
+                                                    size: screenWidth >= 1024
+                                                        ? 18
+                                                        : screenWidth >= 600
+                                                            ? 14
+                                                            : 12,
+                                                  ),
+                                                  mini: true,
+                                                ),
+                                              ),
+                                            ),
+                                          // Right button
+                                          if (reviewCurrentPage <= reviews.length - 1)
+                                            Positioned(
+                                              height: screenWidth >= 1024
+                                                  ? screenHeight * 0.05
+                                                  : screenWidth >= 600
+                                                      ? screenHeight * 0.045
+                                                      : 36,
+                                              right: screenWidth >= 1024
+                                                  ? screenWidth * 0.03
+                                                  : screenWidth >= 600
+                                                      ? screenWidth * 0.02
+                                                      : 8,
+                                              top: screenWidth >= 1024
+                                                  ? screenHeight * 0.38
+                                                  : screenWidth >= 600
+                                                      ? screenHeight * 0.36
+                                                      : screenHeight * 0.33,
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(10),
+                                                ),
+                                                child: FloatingActionButton(
+                                                  onPressed: () {
+                                                    reviewCarouselController.animateToPage(reviewCurrentPage + 1, curve: Curves.easeIn);
+                                                  },
+                                                  backgroundColor: Colors.white,
+                                                  elevation: 0.0,
+                                                  child: Icon(
+                                                    Icons.arrow_forward_ios_outlined,
+                                                    size: screenWidth >= 1024
+                                                        ? 18
+                                                        : screenWidth >= 600
+                                                            ? 14
+                                                            : 12,
+                                                  ),
+                                                  mini: true,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        
+                                              
+                                        SizedBox(height: 40),
+                                        LayoutBuilder(
+                                          builder: (context, constraints) {
+                                            double fontSize = constraints.maxWidth > 600 ? 28 : 23;
+                                            double paddingValue = constraints.maxWidth > 600 ? 20.0 : 10.0;
+                                              
+                                            return Padding(
+                                              padding: EdgeInsets.all(paddingValue),
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Text(
+                                                        "Latest Blog Posts",
+                                                        style: TextStyle(
+                                                          fontSize: fontSize,
+                                                          fontWeight: FontWeight.bold,
+                                                          fontFamily: "DMSans",
+                                                        ),
+                                                      ),
+                                                    
+                                                      TextButton(
+                                                        onPressed: () {},
+                                                        child: Row(
+                                                          children: [
+                                                            Text(
+                                                              'View All',
+                                                              style: TextStyle(
+                                                                color: Color.fromRGBO(0, 147, 255, 1),
+                                                                fontSize: screenHeight * 0.02,
+                                                                fontWeight: FontWeight.bold,
+                                                                fontFamily: "DMSans",
+                                                              ),
+                                                            ),
+                                                            Icon(
+                                                              Icons.arrow_outward,
+                                                              color: Color.fromRGBO(0, 147, 255, 1),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                              
+                                        
+                                        LayoutBuilder(
+                                          builder: (context, constraints) {
+                                            double screenWidth = constraints.maxWidth;
+                    
+                                            if (screenWidth < 600) {
+                                              // Mobile: Use CarouselSlider
+                                              return CarouselSlider(
+                                                options: CarouselOptions(
+                                                  height: 420, // Adjust as needed
+                                                  enableInfiniteScroll: true,
+                                                  enlargeCenterPage: true,
+                                                  viewportFraction: 0.9,
+                                                ),
+                                                items: blogs.map((blog) {
+                                                  double imageHeight = 220;
+                                                  double textSize = 13;
+                                                  double buttonPadding = 20;
+                                                  return Padding(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Stack(
+                                                          children: [
+                                                            ClipRRect(
+                                                              borderRadius: BorderRadius.circular(10),
+                                                              child: Image.asset(
+                                                                blog["image"]!,
+                                                                height: imageHeight,
+                                                                width: double.infinity,
+                                                                fit: BoxFit.cover,
+                                                              ),
+                                                            ),
+                                                            Positioned(
+                                                              top: 5,
+                                                              left: 5,
+                                                              child: ElevatedButton(
+                                                                onPressed: () {},
+                                                                style: ElevatedButton.styleFrom(
+                                                                  backgroundColor: Colors.white,
+                                                                  foregroundColor: Colors.black,
+                                                                  padding: EdgeInsets.symmetric(
+                                                                    horizontal: buttonPadding,
+                                                                    vertical: 8,
+                                                                  ),
+                                                                  shape: RoundedRectangleBorder(
+                                                                    borderRadius: BorderRadius.circular(8),
+                                                                  ),
+                                                                ),
+                                                                child: Text(
+                                                                  blog["name"]!,
+                                                                  style: TextStyle(
+                                                                    fontSize: textSize - 3,
+                                                                    fontFamily: "DMSans",
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        const SizedBox(height: 8),
+                                                        Padding(
+                                                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                                          child: Row(
+                                                            children: [
+                                                              Text(
+                                                                blog["position"]!,
+                                                                style: const TextStyle(
+                                                                  color: Color.fromRGBO(5, 11, 32, 1),
+                                                                  fontFamily: "DMSans",
+                                                                  fontWeight: FontWeight.w500,
+                                                                ),
+                                                              ),
+                                                              const SizedBox(width: 10),
+                                                              const Icon(
+                                                                Icons.circle,
+                                                                size: 8,
+                                                                color: Color.fromRGBO(225, 225, 225, 1),
+                                                              ),
+                                                              const SizedBox(width: 5),
+                                                              Text(
+                                                                blog["date"]!,
+                                                                style: const TextStyle(
+                                                                  color: Color.fromRGBO(5, 11, 32, 1),
+                                                                  fontFamily: "DMSans",
+                                                                  fontWeight: FontWeight.w500,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        const SizedBox(height: 10),
+                                                        Padding(
+                                                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                                          child: Text(
+                                                            blog["description"]!,
+                                                            style: TextStyle(
+                                                              fontSize: textSize,
+                                                              color: const Color.fromRGBO(5, 11, 32, 1),
+                                                              fontWeight: FontWeight.w500,
+                                                              fontFamily: "DMSans",
+                                                            ),
+                                                            maxLines: 2,
+                                                            overflow: TextOverflow.ellipsis,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                }).toList(),
+                                              );
+                                            } else {
+                                              // Tablet/Web: Use GridView
+                                              return GridView.builder(
+                                                shrinkWrap: true,
+                                                physics: NeverScrollableScrollPhysics(),
+                                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                                  crossAxisCount: screenWidth > 900
+                                                      ? 3
+                                                      : screenWidth > 600
+                                                          ? 2
+                                                          : 1,
+                                                  mainAxisSpacing: 20,
+                                                  crossAxisSpacing: 20,
+                                                  childAspectRatio: screenWidth > 900
+                                                      ? 1.2
+                                                      : screenWidth > 600
+                                                          ? 1.1
+                                                          : 0.9,
+                                                ),
+                                                itemCount: blogs.length,
+                                                itemBuilder: (context, index) {
+                                                  final blog = blogs[index];
+                                                  double imageHeight = screenWidth > 900
+                                                      ? 360
+                                                      : screenWidth > 600
+                                                          ? 280
+                                                          : 220;
+                                                  double textSize = screenWidth > 900
+                                                      ? 22
+                                                      : screenWidth > 600
+                                                          ? 16
+                                                          : 13;
+                                                  double buttonPadding = screenWidth > 900
+                                                      ? 30
+                                                      : screenWidth > 600
+                                                          ? 25
+                                                          : 20;
+                    
+                                                  return Padding(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Stack(
+                                                          children: [
+                                                            ClipRRect(
+                                                              borderRadius: BorderRadius.circular(10),
+                                                              child: Image.asset(
+                                                                blog["image"]!,
+                                                                height: imageHeight,
+                                                                width: double.infinity,
+                                                                fit: BoxFit.cover,
+                                                              ),
+                                                            ),
+                                                            Positioned(
+                                                              top: 5,
+                                                              left: 5,
+                                                              child: ElevatedButton(
+                                                                onPressed: () {},
+                                                                style: ElevatedButton.styleFrom(
+                                                                  backgroundColor: Colors.white,
+                                                                  foregroundColor: Colors.black,
+                                                                  padding: EdgeInsets.symmetric(
+                                                                    horizontal: buttonPadding,
+                                                                    vertical: 8,
+                                                                  ),
+                                                                  shape: RoundedRectangleBorder(
+                                                                    borderRadius: BorderRadius.circular(8),
+                                                                  ),
+                                                                ),
+                                                                child: Text(
+                                                                  blog["name"]!,
+                                                                  style: TextStyle(
+                                                                    fontSize: textSize - 3,
+                                                                    fontFamily: "DMSans",
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        const SizedBox(height: 8),
+                                                        Padding(
+                                                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                                          child: Row(
+                                                            children: [
+                                                              Text(
+                                                                blog["position"]!,
+                                                                style: const TextStyle(
+                                                                  color: Color.fromRGBO(5, 11, 32, 1),
+                                                                  fontFamily: "DMSans",
+                                                                  fontWeight: FontWeight.w500,
+                                                                ),
+                                                              ),
+                                                              const SizedBox(width: 10),
+                                                              const Icon(
+                                                                Icons.circle,
+                                                                size: 8,
+                                                                color: Color.fromRGBO(225, 225, 225, 1),
+                                                              ),
+                                                              const SizedBox(width: 5),
+                                                              Text(
+                                                                blog["date"]!,
+                                                                style: const TextStyle(
+                                                                  color: Color.fromRGBO(5, 11, 32, 1),
+                                                                  fontFamily: "DMSans",
+                                                                  fontWeight: FontWeight.w500,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        const SizedBox(height: 10),
+                                                        Padding(
+                                                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                                          child: Text(
+                                                            blog["description"]!,
+                                                            style: TextStyle(
+                                                              fontSize: textSize,
+                                                              color: const Color.fromRGBO(5, 11, 32, 1),
+                                                              fontWeight: FontWeight.w500,
+                                                              fontFamily: "DMSans",
+                                                            ),
+                                                            maxLines: 2,
+                                                            overflow: TextOverflow.ellipsis,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            }
+                                          },
+                                        ),
+                    
+                    
+                                        //responsive SizedBox for spacing
+                                        Builder(
+                                          builder: (context) {
+                                            double screenWidth = MediaQuery.of(context).size.width;
+                                            double offsetY = screenWidth < 600
+                                                ? -70
+                                                : screenWidth < 1024
+                                                    ? 40
+                                                    : 120;
+                                            return Transform.translate(
+                                              offset: Offset(0, offsetY),
+                                              child: LayoutBuilder(
+                                                builder: (context, constraints) {
+                                                  double screenWidth = constraints.maxWidth;
+                                                  bool isMobile = screenWidth < 600;
+                                                  bool isTablet = screenWidth >= 600 && screenWidth < 1024;
+                    
+                                                  double cardWidth = isMobile
+                                                      ? double.infinity
+                                                      : isTablet
+                                                          ? (screenWidth / 2) - 32
+                                                          : 650;
+                                                  double imageHeight = isMobile
+                                                      ? 60
+                                                      : isTablet
+                                                          ? 80
+                                                          : 100;
+                                                  double fontSizeTitle = isMobile ? 16 : 20;
+                                                  double fontSizeDesc = isMobile ? 12 : 14;
+                                                  double buttonFontSize = isMobile ? 11.36 : 14;
+                                                  double buttonPaddingH = isMobile ? 15 : 20;
+                                                  double buttonPaddingV = isMobile ? 15 : 18;
+                                                  double cardPadding = isMobile ? 20 : 40;
+                    
+                                                  Widget buildCard({
+                                                    required Color color,
+                                                    required String title,
+                                                    required String desc,
+                                                    required String imagePath,
+                                                    required Color buttonColor,
+                                                    required Color buttonTextColor,
+                                                    required double imageHeight,
+                                                  }) {
+                                                    return Container(
+                                                      width: cardWidth,
+                                                      margin: EdgeInsets.only(bottom: isMobile ? 16 : 0, right: isMobile ? 0 : 16),
+                                                      decoration: BoxDecoration(
+                                                        color: color,
+                                                        borderRadius: BorderRadius.circular(10),
+                                                      ),
+                                                      child: Padding(
+                                                        padding: EdgeInsets.all(cardPadding),
+                                                        child: Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            Text(
+                                                              title,
+                                                              style: TextStyle(
+                                                                fontFamily: "DMSans",
+                                                                fontWeight: FontWeight.w700,
+                                                                fontSize: fontSizeTitle,
+                                                              ),
+                                                            ),
+                                                            const SizedBox(height: 10),
+                                                            Text(
+                                                              desc,
+                                                              style: TextStyle(
+                                                                fontFamily: "DMSans",
+                                                                fontWeight: FontWeight.w400,
+                                                                fontSize: fontSizeDesc,
+                                                              ),
+                                                            ),
+                                                            const SizedBox(height: 10),
+                                                            Row(
+                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                              children: [
+                                                                ElevatedButton(
+                                                                  onPressed: () {},
+                                                                  style: ElevatedButton.styleFrom(
+                                                                    backgroundColor: buttonColor,
+                                                                    foregroundColor: buttonTextColor,
+                                                                    padding: EdgeInsets.symmetric(
+                                                                      horizontal: buttonPaddingH,
+                                                                      vertical: buttonPaddingV,
+                                                                    ),
+                                                                    shape: RoundedRectangleBorder(
+                                                                      borderRadius: BorderRadius.circular(10),
+                                                                    ),
+                                                                  ),
+                                                                  child: Row(
+                                                                    children: [
+                                                                      Text(
+                                                                        "Get Started",
+                                                                        style: TextStyle(
+                                                                          fontSize: buttonFontSize,
+                                                                          fontWeight: FontWeight.w500,
+                                                                          fontFamily: "DMSans",
+                                                                        ),
+                                                                      ),
+                                                                      const SizedBox(width: 5),
+                                                                      Icon(Icons.arrow_outward_sharp, size: isMobile ? 20 : 24),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                                const SizedBox(width: 10),
+                                                                Image.asset(
+                                                                  imagePath,
+                                                                  height: imageHeight,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    );
+                                                  }
+                    
+                                                  final card1 = buildCard(
+                                                    color: Color.fromRGBO(233, 242, 255, 1),
+                                                    title: "Are You Looking \nFor a Car?",
+                                                    desc: "We are committed to providing our customers with \nexceptional service.",
+                                                    imagePath: "assets/Home_Images/Footer_Images/lookingCar.png",
+                                                    buttonColor: Color.fromRGBO(26, 76, 142, 1),
+                                                    buttonTextColor: Colors.white,
+                                                    imageHeight: imageHeight,
+                                                  );
+                    
+                                                  final card2 = buildCard(
+                                                    color: Color.fromRGBO(255, 233, 243, 1),
+                                                    title: "Best place for \ncar financing",
+                                                    desc: "We are committed to providing our customers with \nexceptional service.",
+                                                    imagePath: "assets/Home_Images/Footer_Images/carFinance.png",
+                                                    buttonColor: Color.fromRGBO(5, 11, 32, 1),
+                                                    buttonTextColor: Colors.white,
+                                                    imageHeight: imageHeight,
+                                                  );
+                    
+                                                  if (isMobile) {
+                                                    return Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                      children: [card1, card2],
+                                                    );
+                                                  } else {
+                                                    return Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                      children: [card1, card2],
+                                                    );
+                                                  }
+                                                },
+                                              ), // Wrap the widget you want to shift upward
+                                            );
+                                          },
+                                        ),
+                                      ]
+                                    );
+                                    
+                                  }
+                                ),
+                              ]
+                            ),
+                          );
+                                
+                        }
+                        
+                      ),
+                    
+                      ],
+                    );
+                  }
+
+                  Widget _buildCarCard(Map<String, dynamic> car, BoxConstraints constraints, BuildContext context) {
+                    double padding = MediaQuery.of(context).size.width > 1200
+                        ? constraints.maxWidth * 0.023
+                        : MediaQuery.of(context).size.width > 600
+                            ? constraints.maxWidth * 0.02
+                            : constraints.maxWidth * 0.02;
+
+                    double buttonPadding = MediaQuery.of(context).size.width > 1200
+                        ? constraints.maxWidth * 0.02
+                        : MediaQuery.of(context).size.width > 800
+                            ? constraints.maxWidth * 0.015
+                            : constraints.maxWidth * 0.01;
+
+                    double buttonHeight = MediaQuery.of(context).size.height > 900
+                        ? constraints.maxHeight * 0.06
+                        : MediaQuery.of(context).size.height > 600
+                            ? constraints.maxHeight * 0.06
+                            : constraints.maxHeight * 0.04;
+
+                    double fontSizeFactor = MediaQuery.of(context).size.width > 1200
+                        ? 1.3
+                        : MediaQuery.of(context).size.width >= 800
+                            ? 1.15
+                            : 1.0;
+
+                    double fontSize = constraints.maxWidth < 600
+                        ? constraints.maxWidth * 0.03 // Mobile
+                        : constraints.maxWidth < 1024
+                            ? constraints.maxWidth * 0.02 // Tablet
+                            : constraints.maxWidth * 0.006 * fontSizeFactor; // Desktop/Web
+
+                    double viewImageWidth;
+                    if (constraints.maxWidth < 600) {
+                      viewImageWidth = constraints.maxWidth * 0.20;
+                    } else if (constraints.maxWidth < 1024) {
+                      viewImageWidth = constraints.maxWidth * 0.10;
+                    } else {
+                      viewImageWidth = constraints.maxWidth * 0.065;
+                    }
+
+                    return Stack(
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width > 1200
+                              ? constraints.maxWidth * 0.6
+                              : MediaQuery.of(context).size.width > 800
+                                  ? constraints.maxWidth * 0.6
+                                  : constraints.maxWidth * 0.9,
+                          height: MediaQuery.of(context).size.height > 900
+                              ? constraints.maxHeight * 1
+                              : MediaQuery.of(context).size.height > 600
+                                  ? constraints.maxHeight * 1
+                                  : constraints.maxHeight * 0.9,
+                          padding: EdgeInsets.all(padding),
+                          decoration: BoxDecoration(
+                            color: Color.fromRGBO(255, 255, 255, 1),
+                            border: Border.all(
+                              width: 1,
+                              color: Color.fromRGBO(228, 228, 228, 1),
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Stack(
+                                children: [
+                                  SizedBox(
+                                    width: MediaQuery.of(context).size.width > 1200
+                                        ? constraints.maxWidth * 0.98
+                                        : MediaQuery.of(context).size.width > 800
+                                            ? constraints.maxWidth * 0.8
+                                            : constraints.maxWidth * 0.8,
+                                    height: MediaQuery.of(context).size.height * 0.4,
+                                    child: Image.asset(car["image"] ?? 'assets/placeholder.png', fit: BoxFit.contain),
+                                  ),
+                                  Positioned(
+                                    top: 0,
+                                    right: padding,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(builder: (context) => TwocarscompareWeb()),
+                                        );
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.grey,
+                                        foregroundColor: Colors.white,
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: buttonPadding,
+                                          vertical: buttonHeight * 0.2,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.all(5),
+                                            child: Row(
+                                              children: [
+                                                Image.asset(car["compareImage"] ?? "comareImage", width: 17, height: 17, fit: BoxFit.contain),
+                                                SizedBox(width: padding * 0.15),
+                                                Text(
+                                                  car["compareText"] ?? "Comapare",
+                                                  style: TextStyle(fontFamily: "DMSans", fontSize: fontSize),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: (constraints.maxWidth < 600
+                                            ? constraints.maxHeight * 0.20
+                                            : constraints.maxWidth < 1024
+                                                ? constraints.maxHeight * 0.20
+                                                : constraints.maxHeight * 0.22),
+                                    left: (constraints.maxWidth < 600
+                                            ? constraints.maxWidth * 0.30
+                                            : constraints.maxWidth < 1024
+                                                ? constraints.maxWidth * 0.30
+                                                : constraints.maxWidth * 0.23),
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        // Add your view image logic here
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        padding: EdgeInsets.zero,
+                                        backgroundColor: Colors.transparent,
+                                        elevation: 0,
+                                      ),
+                                      child: Hero(
+                                        tag: 'carHeroTag_${car["id"]?.toString() ?? car["name"]}_${car["name"]}_${UniqueKey()}',
+                                        child: Image.asset(
+                                          car["viewImage"]?.toString() ?? "assets/degrees.png",
+                                          width: viewImageWidth,
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: constraints.maxHeight * 0.0),
+                              Container(
+                                child: Text(
+                                  car["name"]?.toString() ?? "Car Name",
+                                  style: TextStyle(
+                                    fontSize: (constraints.maxWidth < 600
+                                            ? constraints.maxWidth * 0.055
+                                            : constraints.maxWidth < 1024
+                                                ? constraints.maxWidth * 0.027
+                                                : constraints.maxWidth * 0.015) *
+                                        fontSizeFactor,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: "DMSans",
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: constraints.maxHeight * 0.03),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          car["moreDetails1"]?.toString() ?? "Starting at",
+                                          style: TextStyle(
+                                            fontSize: (constraints.maxWidth < 600
+                                                    ? constraints.maxWidth * 0.032
+                                                    : constraints.maxWidth < 1024
+                                                        ? constraints.maxWidth * 0.017
+                                                        : constraints.maxWidth * 0.009) *
+                                                fontSizeFactor,
+                                            fontFamily: "DMSans",
+                                          ),
+                                        ),
+                                        SizedBox(height: constraints.maxHeight * 0.02),
+                                        Text(
+                                          car["details1"]?.toString() ?? "N/A",
+                                          style: TextStyle(
+                                            fontSize: (constraints.maxWidth < 600
+                                                    ? constraints.maxWidth * 0.03
+                                                    : constraints.maxWidth < 1024
+                                                        ? constraints.maxWidth * 0.017
+                                                        : constraints.maxWidth * 0.007) *
+                                                fontSizeFactor,
+                                            fontFamily: "DMSans",
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        Text(
+                                          car["details12"]?.toString() ?? "N/A",
+                                          style: TextStyle(
+                                            fontSize: (constraints.maxWidth < 600
+                                                    ? constraints.maxWidth * 0.03
+                                                    : constraints.maxWidth < 1024
+                                                        ? constraints.maxWidth * 0.017
+                                                        : constraints.maxWidth * 0.007) *
+                                                fontSizeFactor,
+                                            fontFamily: "DMSans",
+                                          ),
+                                        ),
+                                        Text(
+                                          car["details13"]?.toString() ?? "N/A",
+                                          style: TextStyle(
+                                            fontSize: (constraints.maxWidth < 600
+                                                    ? constraints.maxWidth * 0.03
+                                                    : constraints.maxWidth < 1024
+                                                        ? constraints.maxWidth * 0.017
+                                                        : constraints.maxWidth * 0.007) *
+                                                fontSizeFactor,
+                                            fontFamily: "DMSans",
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    color: Color.fromRGBO(219, 219, 219, 1),
+                                    height: constraints.maxHeight * 0.15,
+                                    width: constraints.maxWidth * 0.001,
+                                  ),
+                                  SizedBox(width: constraints.maxWidth * 0.02),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          car["moreDetails2"]?.toString() ?? "Engine Options",
+                                          style: TextStyle(
+                                            fontSize: (constraints.maxWidth < 600
+                                                    ? constraints.maxWidth * 0.032
+                                                    : constraints.maxWidth < 1024
+                                                        ? constraints.maxWidth * 0.017
+                                                        : constraints.maxWidth * 0.009) *
+                                                fontSizeFactor,
+                                            fontFamily: "DMSans",
+                                          ),
+                                        ),
+                                        SizedBox(height: constraints.maxHeight * 0.02),
+                                        Image.asset(
+                                          car["dieselImage"]?.toString() ?? "assets/diesel.webp",
+                                          height: (constraints.maxWidth < 600
+                                              ? constraints.maxHeight * 0.03
+                                              : constraints.maxWidth < 1024
+                                                  ? constraints.maxHeight * 0.03
+                                                  : constraints.maxHeight * 0.03),
+                                          width: (constraints.maxWidth < 600
+                                              ? constraints.maxWidth * 0.04
+                                              : constraints.maxWidth < 1024
+                                                  ? constraints.maxWidth * 0.04
+                                                  : constraints.maxWidth * 0.03),
+                                          color: Colors.black,
+                                          fit: BoxFit.contain,
+                                        ),
+                                        SizedBox(height: constraints.maxHeight * 0.01),
+                                        Text(
+                                          car["details2"]?.toString() ?? "N/A",
+                                          style: TextStyle(
+                                            fontSize: (constraints.maxWidth < 600
+                                                    ? constraints.maxWidth * 0.03
+                                                    : constraints.maxWidth < 1024
+                                                        ? constraints.maxWidth * 0.017
+                                                        : constraints.maxWidth * 0.007) *
+                                                fontSizeFactor,
+                                            fontFamily: "DMSans",
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    color: Color.fromRGBO(219, 219, 219, 1),
+                                    height: constraints.maxHeight * 0.15,
+                                    width: constraints.maxWidth * 0.001,
+                                  ),
+                                  SizedBox(width: constraints.maxWidth * 0.02),
+                                  Container(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          car["moreDetails3"]?.toString() ?? "Transmission",
+                                          style: TextStyle(
+                                            fontSize: (constraints.maxWidth < 600
+                                                    ? constraints.maxWidth * 0.032
+                                                    : constraints.maxWidth < 1024
+                                                        ? constraints.maxWidth * 0.017
+                                                        : constraints.maxWidth * 0.009) *
+                                                fontSizeFactor,
+                                            fontFamily: "DMSans",
+                                          ),
+                                        ),
+                                        Text(
+                                          car["moreDetails31"]?.toString() ?? "Available",
+                                          style: TextStyle(
+                                            fontSize: (constraints.maxWidth < 600
+                                                    ? constraints.maxWidth * 0.032
+                                                    : constraints.maxWidth < 1024
+                                                        ? constraints.maxWidth * 0.017
+                                                        : constraints.maxWidth * 0.009) *
+                                                fontSizeFactor,
+                                            fontFamily: "DMSans",
+                                          ),
+                                        ),
+                                        SizedBox(height: constraints.maxHeight * 0.01),
+                                        Image.asset(
+                                          car["manualImage"]?.toString() ?? "assets/manuel.png",
+                                          height: (constraints.maxWidth < 600
+                                              ? constraints.maxHeight * 0.03
+                                              : constraints.maxWidth < 1024
+                                                  ? constraints.maxHeight * 0.03
+                                                  : constraints.maxHeight * 0.03),
+                                          width: (constraints.maxWidth < 600
+                                              ? constraints.maxWidth * 0.04
+                                              : constraints.maxWidth < 1024
+                                                  ? constraints.maxWidth * 0.04
+                                                  : constraints.maxWidth * 0.03),
+                                          color: Colors.black,
+                                          fit: BoxFit.contain,
+                                        ),
+                                        SizedBox(height: constraints.maxHeight * 0.01),
+                                        Text(
+                                          car["details3"]?.toString() ?? "N/A",
+                                          style: TextStyle(
+                                            fontSize: (constraints.maxWidth < 600
+                                                    ? constraints.maxWidth * 0.03
+                                                    : constraints.maxWidth < 1024
+                                                        ? constraints.maxWidth * 0.017
+                                                        : constraints.maxWidth * 0.007) *
+                                                fontSizeFactor,
+                                            fontFamily: "DMSans",
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: constraints.maxHeight * 0.05),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Flexible(
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        side: BorderSide(color: Color(0xFF004C90)),
+                                        backgroundColor: Colors.white,
+                                        minimumSize: Size(
+                                          MediaQuery.of(context).size.width > 1200
+                                              ? constraints.maxWidth * 0.2
+                                              : MediaQuery.of(context).size.width > 800
+                                                  ? constraints.maxWidth * 0.3
+                                                  : constraints.maxWidth * 0.9,
+                                          buttonHeight * 0.45,
+                                        ),
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: buttonHeight * 0.2,
+                                          horizontal: MediaQuery.of(context).size.width * 0.02,
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => Viewcardetails(
+                                              car: car,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(5.0),
+                                        child: Text(
+                                          car["button1"]?.toString() ?? "Learn More",
+                                          style: TextStyle(
+                                            fontSize: (constraints.maxWidth < 600
+                                                    ? constraints.maxWidth * 0.028
+                                                    : constraints.maxWidth < 1024
+                                                        ? constraints.maxWidth * 0.018
+                                                        : constraints.maxWidth * 0.01) *
+                                                fontSizeFactor,
+                                            color: Color(0xFF004C90),
+                                            fontWeight: FontWeight.w700,
+                                            fontFamily: "WorkSans",
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: MediaQuery.of(context).size.width * 0.02),
+                                  Flexible(
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Color(0xFF004C90),
+                                        minimumSize: Size(
+                                          MediaQuery.of(context).size.width > 1200
+                                              ? constraints.maxWidth * 0.2
+                                              : MediaQuery.of(context).size.width > 800
+                                                  ? constraints.maxWidth * 0.3
+                                                  : constraints.maxWidth * 0.9,
+                                          buttonHeight * 0.45,
+                                        ),
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: buttonHeight * 0.2,
+                                          horizontal: MediaQuery.of(context).size.width * 0.02,
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        _bookTestDrive();
+                                        _clearForm();
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(5.0),
+                                        child: Text(
+                                          car["button2"]?.toString() ?? "Book a Test Drive",
+                                          style: TextStyle(
+                                            fontSize: (constraints.maxWidth < 600
+                                                    ? constraints.maxWidth * 0.028
+                                                    : constraints.maxWidth < 1024
+                                                        ? constraints.maxWidth * 0.018
+                                                        : constraints.maxWidth * 0.01) *
+                                                fontSizeFactor,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w700,
+                                            fontFamily: "WorkSans",
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+
 
                   Widget buildIcons(){
                     return Row(

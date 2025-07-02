@@ -98,11 +98,22 @@ flutter:
    - assets/wishlist.png
    - assets/search.png
    - assets/carbackground.jpeg
+   - assets/Audi-audi.png
+   - assets/BMW-bmw.png
+   - assets/Porsche-Porsche.png
+   - assets/Toyota-Toyota.png
+   - assets/Volkswagen-volkswagen.png
    - assets/blackCar.png
    - assets/whiteCar.png
    - assets/redCar.png
    - assets/audi.jpeg
    - assets/bmw.jpeg
+   - assets/Fortuner-fortuner.jpeg
+   - assets/HyundaiStargazer-hyundaistargazer.jpg
+   - assets/Mazda-mazda.jpeg
+   - assets/Scorpio-scorpio.webp
+   - assets/Thar.jpeg
+   - assets/Bolero_Neo-bolero_neo.webp
    - assets/ford.jpeg
    - assets/mercedes.jpeg
    - assets/peugeot.jpeg

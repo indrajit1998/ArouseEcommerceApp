@@ -54,73 +54,55 @@ class _PricebreakupState extends State<Pricebreakup> {
     super.initState();
     _calculatePrincipal();
     _performBookings();
+    fetchCars();
   }
 
-  final List<Map<String, dynamic>> cars = [
-    {
-      "id": "1", // Convert int to String for consistency
-      "name": "E 200",
-      "image": "assets/blackCar.png",
-      "viewImage": "assets/degrees.png",
-      "compareImage": "assets/compare.png",
-      "compareText": "Add to compare",
-      "moreDetails1": "Starting at",
-      "details1": "Rs. 3.07 Crore",
-      "details12": "onwards On-Road",
-      "details13": "Price, Mumbai",
-      "moreDetails2": "Engine Options",
-      "dieselImage": "assets/diesel.webp",
-      "details2": "Diesel",
-      "moreDetails3": "Transmission",
-      "moreDetails31": "Available",
-      "manualImage": "assets/manuel.png",
-      "details3": "Manual",
-      "button1": "Learn More",
-      "button2": "Book a Test Drive",
-    },
-    {
-      "id": "2",
-      "name": "E 300",
-      "image": "assets/whiteCar.png",
-      "viewImage": "assets/degrees.png",
-      "compareImage": "assets/compare.png",
-      "compareText": "Add to compare",
-      "moreDetails1": "Starting at",
-      "details1": "Rs. 3.07 Crore",
-      "details12": "onwards On-Road",
-      "details13": "Price, Mumbai",
-      "moreDetails2": "Engine Options",
-      "dieselImage": "assets/diesel.webp",
-      "details2": "Diesel",
-      "moreDetails3": "Transmission",
-      "moreDetails31": "Available",
-      "manualImage": "assets/manuel.png",
-      "details3": "Manual",
-      "button1": "Learn More",
-      "button2": "Book a Test Drive",
-    },
-    {
-      "id": "3",
-      "name": "E 400",
-      "image": "assets/redCar.png",
-      "viewImage": "assets/degrees.png",
-      "compareImage": "assets/compare.png",
-      "compareText": "Add to compare",
-      "moreDetails1": "Starting at",
-      "details1": "Rs. 3.07 Crore",
-      "details12": "onwards On-Road",
-      "details13": "Price, Mumbai",
-      "moreDetails2": "Engine Options",
-      "dieselImage": "assets/diesel.webp",
-      "details2": "Diesel",
-      "moreDetails3": "Transmission",
-      "moreDetails31": "Available",
-      "manualImage": "assets/manuel.png",
-      "details3": "Manual",
-      "button1": "Learn More",
-      "button2": "Book a Test Drive",
-    },
-  ];
+  List<Map<String, dynamic>> cars = [];
+  Map<String, dynamic>? selectedCar;
+  List<Map<String, dynamic>> carouselCars = [];
+  bool isLoading = true;
+  String? errorMessage;
+
+  Future<void> fetchCars() async {
+  try {
+    final response = await http.get(
+      Uri.parse('$apiUrl/carData/getAll'),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data['success'] && data['cars'] != null) {
+        setState(() {
+          cars = List<Map<String, dynamic>>.from(data['cars']);
+          // Set selectedCar and carouselCars after fetching
+          selectedCar = cars.isNotEmpty ? cars[0] : null;
+          final selectedCarId = selectedCar?['id']?.toString() ?? '';
+          carouselCars = cars.where((car) => car["id"] != selectedCarId).toList();
+          if (carouselCars.isEmpty) {
+            carouselCars = cars;
+          }
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          errorMessage = data['message'] ?? 'No cars found';
+          isLoading = false;
+        });
+      }
+    } else {
+      setState(() {
+        errorMessage = 'Failed to load cars: ${response.statusCode}';
+        isLoading = false;
+      });
+    }
+  } catch (e) {
+    setState(() {
+      errorMessage = 'Error fetching cars: $e';
+      isLoading = false;
+    });
+  }
+}
 
   int? _hoveredIndex;
   int? _selectedIndex;
@@ -1979,8 +1961,8 @@ class _PricebreakupState extends State<Pricebreakup> {
               bool isDesktop = constraints.maxWidth >= 1024;
               bool showMenu = isMobile || isTablet;
 
-              imageHeight = isMobile ? 30 : isTablet ? 40 : 50;
-              imageWidth = isMobile ? 30 : isTablet ? 40 : 50;
+              imageHeight = isMobile ? 30 : isTablet ? 40 : 70;
+              imageWidth = isMobile ? 30 : isTablet ? 40 : 70;
               fontSize = isMobile ? 12 : isTablet ? 12 : 12;
 
               return AppBar(
@@ -2042,8 +2024,8 @@ class _PricebreakupState extends State<Pricebreakup> {
                     children: [
                       Image.asset(
                         'assets/image.png',
-                        height: isMobile ? 30 : imageHeight,
-                        width: isMobile ? 30 : imageWidth,
+                        height: isMobile ? 40 : imageHeight,
+                        width: isMobile ? 40 : imageWidth,
                         fit: BoxFit.contain,
                       ),
                       SizedBox(width: 8),
@@ -2051,7 +2033,7 @@ class _PricebreakupState extends State<Pricebreakup> {
                         'AROUSE',
                         style: TextStyle(
                           color: Color(0xFF004C90),
-                          fontSize: isMobile ? 12 : fontSize,
+                          fontSize: isMobile ? 15 : fontSize,
                           fontWeight: FontWeight.bold,
                           fontFamily: "DMSans",
                         ),
@@ -2059,7 +2041,7 @@ class _PricebreakupState extends State<Pricebreakup> {
                       Text(
                         'AUTOMOTIVE',
                         style: TextStyle(
-                          fontSize: isMobile ? 12 : fontSize,
+                          fontSize: isMobile ? 15 : fontSize,
                           fontWeight: FontWeight.bold,
                           fontFamily: "DMSans",
                         ),
@@ -2504,7 +2486,11 @@ class _PricebreakupState extends State<Pricebreakup> {
                                                                                 Container(
                                                                                   color: Color.fromRGBO(248, 249, 251, 1),
                                                                                   child: SizedBox(
-                                                                                    height: 190,
+                                                                                    height: MediaQuery.of(context).size.width < 600
+                                                                                      ? 70 // Mobile height
+                                                                                      : MediaQuery.of(context).size.width < 1024
+                                                                                          ? 120 // Tablet height
+                                                                                          : 180, // Desktop/Web height
                                                                                     child: Padding(
                                                                                       padding: const EdgeInsets.all(10),
                                                                                       child: CustomPaint(
@@ -2684,7 +2670,7 @@ class _PricebreakupState extends State<Pricebreakup> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => Viewcardetails(
-                                        car: cars[index],
+                                        car: cars[innerCurrentPage],
                                       ),
                                     ),
                                   );
@@ -2768,7 +2754,6 @@ class _PricebreakupState extends State<Pricebreakup> {
                           isSelectedIndex = 0;
                         });
                         Navigator.push(context, MaterialPageRoute(builder: (context) => Webdesign()));
-                        Navigator.pop(context);
                       },
                     ),
                     ListTile(

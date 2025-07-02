@@ -43,76 +43,65 @@ class _ViewcardetailsState extends State<Viewcardetails> {
   };
 
 
-  final List<Map<String, dynamic>> cars = [
-    {
-      "id": "1", // Convert int to String for consistency
-      "name": "E 200",
-      "image": "assets/blackCar.png",
-      "viewImage": "assets/degrees.png",
-      "compareImage": "assets/compare.png",
-      "compareText": "Add to compare",
-      "moreDetails1": "Starting at",
-      "details1": "Rs. 3.07 Crore",
-      "details12": "onwards On-Road",
-      "details13": "Price, Mumbai",
-      "moreDetails2": "Engine Options",
-      "dieselImage": "assets/diesel.webp",
-      "details2": "Diesel",
-      "moreDetails3": "Transmission",
-      "moreDetails31": "Available",
-      "manualImage": "assets/manuel.png",
-      "details3": "Manual",
-      "button1": "Learn More",
-      "button2": "Book a Test Drive",
-    },
-    {
-      "id": "2",
-      "name": "E 300",
-      "image": "assets/whiteCar.png",
-      "viewImage": "assets/degrees.png",
-      "compareImage": "assets/compare.png",
-      "compareText": "Add to compare",
-      "moreDetails1": "Starting at",
-      "details1": "Rs. 3.07 Crore",
-      "details12": "onwards On-Road",
-      "details13": "Price, Mumbai",
-      "moreDetails2": "Engine Options",
-      "dieselImage": "assets/diesel.webp",
-      "details2": "Diesel",
-      "moreDetails3": "Transmission",
-      "moreDetails31": "Available",
-      "manualImage": "assets/manuel.png",
-      "details3": "Manual",
-      "button1": "Learn More",
-      "button2": "Book a Test Drive",
-    },
-    {
-      "id": "3",
-      "name": "E 400",
-      "image": "assets/redCar.png",
-      "viewImage": "assets/degrees.png",
-      "compareImage": "assets/compare.png",
-      "compareText": "Add to compare",
-      "moreDetails1": "Starting at",
-      "details1": "Rs. 3.07 Crore",
-      "details12": "onwards On-Road",
-      "details13": "Price, Mumbai",
-      "moreDetails2": "Engine Options",
-      "dieselImage": "assets/diesel.webp",
-      "details2": "Diesel",
-      "moreDetails3": "Transmission",
-      "moreDetails31": "Available",
-      "manualImage": "assets/manuel.png",
-      "details3": "Manual",
-      "button1": "Learn More",
-      "button2": "Book a Test Drive",
-    },
-  ];
+  List<Map<String, dynamic>> cars = [];
+  bool isLoading = true;
+  String? errorMessage;
+
+  Future<void> fetchCars() async {
+  try {
+    final response = await http.get(
+      Uri.parse('$apiUrl/carData/getAll'),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data['success'] && data['cars'] != null) {
+        setState(() {
+          cars = List<Map<String, dynamic>>.from(data['cars']);
+          // Set selectedCar and carouselCars after fetching
+          selectedCar = widget.car.isNotEmpty ? widget.car : (cars.isNotEmpty ? cars[0] : null);
+          final selectedCarId = selectedCar?['id']?.toString() ?? '';
+          carouselCars = cars.where((car) => car["id"] != selectedCarId).toList();
+          if (carouselCars.isEmpty) {
+            carouselCars = cars;
+          }
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          errorMessage = data['message'] ?? 'No cars found';
+          isLoading = false;
+        });
+      }
+    } else {
+      setState(() {
+        errorMessage = 'Failed to load cars: ${response.statusCode}';
+        isLoading = false;
+      });
+    }
+  } catch (e) {
+    setState(() {
+      errorMessage = 'Error fetching cars: $e';
+      isLoading = false;
+    });
+  }
+}
 
   final List<Map<String, dynamic>> colors = [
-    {"name": "Sleek Black", "color": const Color(0xFF212121)},
-    {"name": "Pearl White", "color": const Color(0xFFFAF9F6)},
-    {"name": "Glossy Red", "color": const Color(0xFFD32F2F)},
+    {"name": "Polar White", "color": const Color(0xFFFFFFFF)},
+    {"name": "Jet Black", "color": const Color(0xFF212121)},
+    {"name": "Quicksand", "color": const Color(0xFFD4A017)},
+    {"name": "Deep Blue Pearl", "color": const Color(0xFF003087)},
+    {"name": "Fiery Red", "color": const Color(0xFFFF4500)},
+    {"name": "Agate Grey Metallic", "color": const Color(0xFF6D6D6D)},
+    {"name": "Obsidian Black Metallic", "color": const Color(0xFF1C2526)},
+    {"name": "Glacier White Metallic", "color": const Color(0xFFF5F5F5)},
+    {"name": "Platinum Pearl White", "color": Colors.white},
+    {"name": "Magnetic Silver with Brown Hue", "color": Colors.brown},
+    {"name": "Eternal Blue Mica", "color": Colors.blue},
+    {"name": "Diamond White", "color": Colors.white},
+    {"name": "Napoli Black", "color": Colors.black},
     
   ];
 
@@ -140,14 +129,7 @@ class _ViewcardetailsState extends State<Viewcardetails> {
   void initState() {
     super.initState();
     selectedColor = colors[0];
-    selectedCar = widget.car;
-    final selectedCarId = selectedCar?['id']?.toString() ?? '';
-    carouselCars = cars
-        .where((car) => car["id"] != selectedCarId)
-        .toList();
-    if (carouselCars.isEmpty) {
-      carouselCars = cars;
-    }
+     fetchCars();
     _calculatePrincipal();
     _performBookings();
   }
@@ -1985,8 +1967,8 @@ Widget _headerElevatedButton(String title, VoidCallback onPressed, {bool isOutli
               bool isDesktop = constraints.maxWidth >= 1024;
               bool showMenu = isMobile || isTablet;
 
-              imageHeight = isMobile ? 30 : isTablet ? 40 : 50;
-              imageWidth = isMobile ? 30 : isTablet ? 40 : 50;
+              imageHeight = isMobile ? 30 : isTablet ? 40 : 70;
+              imageWidth = isMobile ? 30 : isTablet ? 40 : 70;
               fontSize = isMobile ? 12 : isTablet ? 12 : 12;
 
               return AppBar(
@@ -2048,8 +2030,8 @@ Widget _headerElevatedButton(String title, VoidCallback onPressed, {bool isOutli
                     children: [
                       Image.asset(
                         'assets/image.png',
-                        height: isMobile ? 30 : imageHeight,
-                        width: isMobile ? 30 : imageWidth,
+                        height: isMobile ? 40 : imageHeight,
+                        width: isMobile ? 40 : imageWidth,
                         fit: BoxFit.contain,
                       ),
                       SizedBox(width: 8),
@@ -2057,7 +2039,7 @@ Widget _headerElevatedButton(String title, VoidCallback onPressed, {bool isOutli
                         'AROUSE',
                         style: TextStyle(
                           color: Color(0xFF004C90),
-                          fontSize: isMobile ? 12 : fontSize,
+                          fontSize: isMobile ? 15 : fontSize,
                           fontWeight: FontWeight.bold,
                           fontFamily: "DMSans",
                         ),
@@ -2065,7 +2047,7 @@ Widget _headerElevatedButton(String title, VoidCallback onPressed, {bool isOutli
                       Text(
                         'AUTOMOTIVE',
                         style: TextStyle(
-                          fontSize: isMobile ? 12 : fontSize,
+                          fontSize: isMobile ? 15 : fontSize,
                           fontWeight: FontWeight.bold,
                           fontFamily: "DMSans",
                         ),
@@ -2510,7 +2492,11 @@ Widget _headerElevatedButton(String title, VoidCallback onPressed, {bool isOutli
                                                                                 Container(
                                                                                   color: Color.fromRGBO(248, 249, 251, 1),
                                                                                   child: SizedBox(
-                                                                                    height: 190,
+                                                                                    height: MediaQuery.of(context).size.width < 600
+                                                                                      ? 70 // Mobile height
+                                                                                      : MediaQuery.of(context).size.width < 1024
+                                                                                          ? 120 // Tablet height
+                                                                                          : 180, // Desktop/Web height
                                                                                     child: Padding(
                                                                                       padding: const EdgeInsets.all(10),
                                                                                       child: CustomPaint(
@@ -2774,7 +2760,6 @@ Widget _headerElevatedButton(String title, VoidCallback onPressed, {bool isOutli
                           isSelectedIndex = 0;
                         });
                         Navigator.push(context, MaterialPageRoute(builder: (context) => Webdesign()));
-                        Navigator.pop(context);
                       },
                     ),
                     ListTile(
@@ -3159,7 +3144,6 @@ Widget _headerElevatedButton(String title, VoidCallback onPressed, {bool isOutli
                             ),
                           ),
                         );
-                        Navigator.pop(context);
                       },
                     ),
                   ],
@@ -3272,19 +3256,51 @@ Widget _headerElevatedButton(String title, VoidCallback onPressed, {bool isOutli
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
+                            screenWidth < 1024
+                                ? Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         selectedCar?["name"] ?? "Unknown Car",
                                         style: TextStyle(
                                           fontSize: screenWidth < 600
                                               ? 22 // Mobile
-                                              : screenWidth < 1024
-                                                  ? 22 // Tablet
-                                                  : screenWidth * 0.03, // Desktop/Web
+                                              : 22, // Tablet
                                           fontWeight: FontWeight.bold,
                                           fontFamily: "DMSans",
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      const SizedBox(height: 6),
+                                      GestureDetector(
+                                        onTap: () {},
+                                        child: Text(
+                                          "Change Model >>",
+                                          style: TextStyle(
+                                            fontSize: screenWidth < 600 ? 15 : 13,
+                                            fontWeight: FontWeight.w600,
+                                            fontFamily: "DMSans",
+                                            color: Color.fromRGBO(26, 76, 142, 1),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          selectedCar?["name"] ?? "Unknown Car",
+                                          style: TextStyle(
+                                            fontSize: screenWidth * 0.03, // Desktop/Web
+                                            fontWeight: FontWeight.bold,
+                                            fontFamily: "DMSans",
+                                          ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
                                       const SizedBox(width: 10),
@@ -3293,11 +3309,7 @@ Widget _headerElevatedButton(String title, VoidCallback onPressed, {bool isOutli
                                         child: Text(
                                           "Change Model >>",
                                           style: TextStyle(
-                                            fontSize: screenWidth < 600
-                                                ? 15 // Mobile
-                                                : screenWidth < 1024
-                                                    ? 13 // Tablet
-                                                    : 13, // Desktop/Web
+                                            fontSize: 13,
                                             fontWeight: FontWeight.w600,
                                             fontFamily: "DMSans",
                                             color: Color.fromRGBO(26, 76, 142, 1),
@@ -3350,7 +3362,6 @@ Widget _headerElevatedButton(String title, VoidCallback onPressed, {bool isOutli
                                           setState(() {
                                             innerCurrentPage = index;
                                             selectedCar = carouselCars[index];
-                                            selectedColor = colors[index];
                                           });
                                         },
                                       ),
@@ -3566,6 +3577,7 @@ Widget _headerElevatedButton(String title, VoidCallback onPressed, {bool isOutli
                       
                                 ],
                               ),
+                              
                               SizedBox(height: screenHeight * 0.03,),
                             ],
                           );
@@ -3899,311 +3911,354 @@ Widget _headerElevatedButton(String title, VoidCallback onPressed, {bool isOutli
                                                       showDialog(
                                                         context: context,
                                                         builder: (BuildContext context) {
-                                                          double dialogWidth = screenWidth * 0.98;
-                                                          double dialogHeight = screenHeight * 0.98;
                                                           return Center(
                                                             child: SingleChildScrollView(
-                                                              child: Dialog(
-                                                                backgroundColor: Colors.white,
-                                                                shape: RoundedRectangleBorder(
-                                                                  borderRadius: BorderRadius.circular(10),
-                                                                ),
-                                                                child: Container(
-                                                                  width: dialogWidth,
-                                                                  height: dialogHeight,
-                                                                  padding: EdgeInsets.all(12),
-                                                                  child: SingleChildScrollView(
-                                                                    child: Column(
-                                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                                      children: [
-                                                                        Row(
-                                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                              child: Column(
+                                                                children: [
+                                                                  SizedBox(
+                                                                    width: screenHeight * 1.2,
+                                                                    child: Dialog(
+                                                                      backgroundColor: Colors.white,
+                                                                      shape: RoundedRectangleBorder(
+                                                                        borderRadius: BorderRadius.circular(10),
+                                                                      ),
+                                                                      child: Padding(
+                                                                        padding: const EdgeInsets.all(16.0),
+                                                                        child: Column(
+                                                                          crossAxisAlignment: CrossAxisAlignment.start,
                                                                           children: [
-                                                                            Text(
-                                                                              'Choose your EMI Options',
-                                                                              style: TextStyle(
-                                                                                fontSize: 18,
-                                                                                fontWeight: FontWeight.w700,
-                                                                                color: Color.fromRGBO(74, 74, 74, 1),
-                                                                                fontFamily: "DMSans",
-                                                                              ),
-                                                                            ),
-                                                                            IconButton(
-                                                                              onPressed: () {
-                                                                                Navigator.pop(context);
-                                                                              },
-                                                                              icon: Icon(
-                                                                                Icons.close,
-                                                                                color: Color.fromRGBO(0, 0, 0, 1),
-                                                                              ),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                        const SizedBox(height: 8),
-                                                                        Text(
-                                                                          'Standard EMI',
-                                                                          style: TextStyle(
-                                                                            fontSize: 14,
-                                                                            fontWeight: FontWeight.w600,
-                                                                            fontFamily: "DMSans",
-                                                                            color: Color.fromRGBO(109, 109, 109, 1),
-                                                                          ),
-                                                                        ),
-                                                                        const SizedBox(height: 8),
-                                                                        Row(
-                                                                          children: [
-                                                                            Container(
-                                                                              width: 60,
-                                                                              height: 2,
-                                                                              color: Color.fromRGBO(0, 76, 144, 1),
-                                                                            ),
-                                                                            Expanded(
-                                                                              child: Container(
-                                                                                height: 2,
-                                                                                color: const Color.fromRGBO(189, 189, 189, 1),
-                                                                              ),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                        const SizedBox(height: 16),
-                                                                        // Input Section
-                                                                        Text(
-                                                                          'Enter Estimated Price of the Car',
-                                                                          style: TextStyle(
-                                                                            fontSize: 12,
-                                                                            fontWeight: FontWeight.bold,
-                                                                            color: Color.fromRGBO(26, 76, 142, 1),
-                                                                            fontFamily: "Inter",
-                                                                          ),
-                                                                        ),
-                                                                        const SizedBox(height: 8),
-                                                                        TextField(
-                                                                          controller: _carPriceController,
-                                                                          keyboardType: TextInputType.number,
-                                                                          decoration: InputDecoration(
-                                                                            border: OutlineInputBorder(),
-                                                                            hintText: 'Rs. 18,79,000',
-                                                                            prefixText: 'Rs. ',
-                                                                          ),
-                                                                          onChanged: (value) {
-                                                                            _calculatePrincipal();
-                                                                          },
-                                                                        ),
-                                                                        const SizedBox(height: 16),
-                                                                        Text(
-                                                                          'Enter Down Payment',
-                                                                          style: TextStyle(
-                                                                            fontSize: 12,
-                                                                            fontWeight: FontWeight.bold,
-                                                                            color: Color.fromRGBO(26, 76, 142, 1),
-                                                                            fontFamily: "Inter",
-                                                                          ),
-                                                                        ),
-                                                                        const SizedBox(height: 8),
-                                                                        TextField(
-                                                                          controller: _downPaymentController,
-                                                                          keyboardType: TextInputType.number,
-                                                                          decoration: const InputDecoration(
-                                                                            border: OutlineInputBorder(),
-                                                                            hintText: 'Rs. 5,00,000',
-                                                                            prefixText: 'Rs. ',
-                                                                          ),
-                                                                          onChanged: (value) {
-                                                                            _calculatePrincipal();
-                                                                          },
-                                                                        ),
-                                                                        const SizedBox(height: 8),
-                                                                        Text(
-                                                                          'Your loan amount will be Rs. ${_principal == 0 ? '13,79,000' : _principal.toStringAsFixed(0)}',
-                                                                          style: TextStyle(fontSize: 10),
-                                                                        ),
-                                                                        const SizedBox(height: 16),
-                                                                        Text(
-                                                                          'Select Tenure',
-                                                                          style: TextStyle(
-                                                                            fontSize: 12,
-                                                                            fontWeight: FontWeight.bold,
-                                                                            color: Color.fromRGBO(26, 76, 142, 1),
-                                                                            fontFamily: "Inter",
-                                                                          ),
-                                                                        ),
-                                                                        const SizedBox(height: 8),
-                                                                        DropdownButton<String>(
-                                                                          isExpanded: true,
-                                                                          value: _selectedTenure,
-                                                                          items: _tenureOptions.map((String value) {
-                                                                            return DropdownMenuItem<String>(
-                                                                              value: value,
-                                                                              child: Text(value),
-                                                                            );
-                                                                          }).toList(),
-                                                                          onChanged: (newValue) {
-                                                                            setState(() {
-                                                                              _selectedTenure = newValue!;
-                                                                              _calculateEMI();
-                                                                            });
-                                                                          },
-                                                                        ),
-                                                                        const SizedBox(height: 16),
-                                                                        Text(
-                                                                          'Select Interest Rate',
-                                                                          style: TextStyle(
-                                                                            fontSize: 12,
-                                                                            fontWeight: FontWeight.bold,
-                                                                            color: Color.fromRGBO(26, 76, 142, 1),
-                                                                            fontFamily: "Inter",
-                                                                          ),
-                                                                        ),
-                                                                        const SizedBox(height: 8),
-                                                                        DropdownButton<String>(
-                                                                          isExpanded: true,
-                                                                          value: _selectedInterestRate,
-                                                                          items: _interestRateOptions.map((String value) {
-                                                                            return DropdownMenuItem<String>(
-                                                                              value: value,
-                                                                              child: Text(value),
-                                                                            );
-                                                                          }).toList(),
-                                                                          onChanged: (newValue) {
-                                                                            setState(() {
-                                                                              _selectedInterestRate = newValue!;
-                                                                              _calculateEMI();
-                                                                            });
-                                                                          },
-                                                                        ),
-                                                                        const SizedBox(height: 16),
-                                                                        SizedBox(
-                                                                          width: double.infinity,
-                                                                          child: ElevatedButton(
-                                                                            onPressed: _calculateEMI,
-                                                                            style: ElevatedButton.styleFrom(
-                                                                              backgroundColor: Color.fromRGBO(0, 76, 144, 1),
-                                                                              foregroundColor: Colors.white,
-                                                                              shape: RoundedRectangleBorder(
-                                                                                borderRadius: BorderRadius.circular(40),
-                                                                              ),
-                                                                            ),
-                                                                            child: const Text('Calculate EMI'),
-                                                                          ),
-                                                                        ),
-                                                                        const SizedBox(height: 20),
-                                                                        // Results Section
-                                                                        Text(
-                                                                          'Rs. ${_emi == 0 ? '60,000' : _emi.toStringAsFixed(0)} EMI FOR ${_selectedTenure.toLowerCase()}',
-                                                                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                                                                        ),
-                                                                        const SizedBox(height: 11),
-                                                                        Container(
-                                                                          width: double.infinity,
-                                                                          height: 2,
-                                                                          color: Color.fromRGBO(189, 189, 189, 1),
-                                                                        ),
-                                                                        const SizedBox(height: 7),
-                                                                        Container(
-                                                                          color: Color.fromRGBO(248, 249, 251, 1),
-                                                                          child: SizedBox(
-                                                                            height: 120,
-                                                                            child: Padding(
-                                                                              padding: const EdgeInsets.all(10),
-                                                                              child: CustomPaint(
-                                                                                painter: EMISemiCircleChart(
-                                                                                  principal: _principal,
-                                                                                  totalInterest: _totalInterest,
-                                                                                ),
-                                                                                child: const SizedBox.expand(),
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                        const SizedBox(height: 16),
-                                                                        Row(
-                                                                          children: [
-                                                                            Container(
-                                                                              width: 10,
-                                                                              height: 10,
-                                                                              decoration: const BoxDecoration(
-                                                                                shape: BoxShape.circle,
-                                                                                color: Color.fromRGBO(34, 53, 119, 1),
-                                                                              ),
-                                                                            ),
-                                                                            const SizedBox(width: 8),
-                                                                            const Text('Principal Loan Amount'),
-                                                                            const Spacer(),
-                                                                            Text('Rs. ${_principal == 0 ? '18,79,000' : _principal.toStringAsFixed(0)}'),
-                                                                          ],
-                                                                        ),
-                                                                        const SizedBox(height: 8),
-                                                                        Row(
-                                                                          children: [
-                                                                            Container(
-                                                                              width: 10,
-                                                                              height: 10,
-                                                                              decoration: const BoxDecoration(
-                                                                                shape: BoxShape.circle,
-                                                                                color: Color.fromRGBO(39, 153, 227, 1),
-                                                                              ),
-                                                                            ),
-                                                                            const SizedBox(width: 8),
-                                                                            const Text('Total Interest Amount'),
-                                                                            const Spacer(),
-                                                                            Text('Rs. ${_totalInterest == 0 ? '5,00,000' : _totalInterest.toStringAsFixed(0)}'),
-                                                                          ],
-                                                                        ),
-                                                                        const SizedBox(height: 16),
-                                                                        Container(
-                                                                          color: Color.fromRGBO(248, 249, 251, 1),
-                                                                          child: Padding(
-                                                                            padding: const EdgeInsets.all(10.0),
-                                                                            child: Row(
+                                                                            Row(
+                                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                                               children: [
                                                                                 const Text(
-                                                                                  'Total Amount Payable',
-                                                                                  style: TextStyle(fontFamily: "DMSans", fontWeight: FontWeight.w400, color: Color.fromRGBO(0, 0, 0, 1)),
+                                                                                  'Choose your EMI Options',
+                                                                                  style: TextStyle(
+                                                                                    fontSize: 26, 
+                                                                                    fontWeight: FontWeight.w700,
+                                                                                    color: Color.fromRGBO(74, 74, 74, 1),
+                                                                                    fontFamily: "DMSans",
+                                                                                  ),
                                                                                 ),
-                                                                                const Spacer(),
-                                                                                Text(
-                                                                                  'Rs. ${_totalPayable == 0 ? '23,79,000' : _totalPayable.toStringAsFixed(0)}',
-                                                                                  style: const TextStyle(fontFamily: "Poppins", fontWeight: FontWeight.w500, color: Color.fromRGBO(31, 31, 31, 1)),
+                                                                                IconButton(
+                                                                                  onPressed: (){
+                                                                                    Navigator.pop(context);
+                                                                                  },
+                                                                                  icon: Icon(
+                                                                                    Icons.close, 
+                                                                                    color: Color.fromRGBO(0, 0, 0, 1),
+                                                                                  ),
                                                                                 ),
                                                                               ],
                                                                             ),
-                                                                          ),
-                                                                        ),
-                                                                        const SizedBox(height: 16),
-                                                                        SizedBox(
-                                                                          width: double.infinity,
-                                                                          child: OutlinedButton(
-                                                                            onPressed: () {},
-                                                                            style: OutlinedButton.styleFrom(
-                                                                              side: const BorderSide(width: 2, color: Color.fromRGBO(0, 76, 144, 1)),
-                                                                              shape: RoundedRectangleBorder(
-                                                                                borderRadius: BorderRadius.circular(40),
+                                                                            const SizedBox(height: 8),
+                                                                            const Text(
+                                                                              'Standard EMI',
+                                                                              style: TextStyle(
+                                                                                fontSize: 20, 
+                                                                                fontWeight: FontWeight.w600,
+                                                                                fontFamily: "DMSans",
+                                                                                color: Color.fromRGBO(109, 109, 109, 1),
                                                                               ),
                                                                             ),
-                                                                            child: Padding(
-                                                                              padding: const EdgeInsets.all(5.0),
-                                                                              child: const Text(
-                                                                                'Get EMI Offers',
-                                                                                style: TextStyle(
-                                                                                  fontSize: 16,
-                                                                                  fontFamily: "DMSans",
+                                                                            const SizedBox(height: 8),
+                                                                            Row(
+                                                                              children: [
+                                                                                Container(
+                                                                                  width: 100,
+                                                                                  height: 2,
                                                                                   color: Color.fromRGBO(0, 76, 144, 1),
-                                                                                  fontWeight: FontWeight.w600,
                                                                                 ),
-                                                                              ),
+                                                                                Expanded(
+                                                                                  child: Container(
+                                                                                    height: 2,
+                                                                                    color: const Color.fromRGBO(189, 189, 189, 1),
+                                                                                  ),
+                                                                                ),
+                                                                              ],
                                                                             ),
-                                                                          ),
+                                                                            const SizedBox(height: 16),
+                                                                    
+                                                                            Row(
+                                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                                              children: [
+                                                                                
+                                                                                Expanded(
+                                                                                  child: Column(
+                                                                                    mainAxisSize: MainAxisSize.min,
+                                                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                    children: [
+                                                                                      
+                                                                                      const Text(
+                                                                                        'Enter Estimated Price of the Car', 
+                                                                                        style: TextStyle(
+                                                                                          fontSize: 14, 
+                                                                                          fontWeight: FontWeight.bold,
+                                                                                          color: Color.fromRGBO(26, 76, 142, 1),
+                                                                                          fontFamily: "Inter",
+                                                                                        ),
+                                                                                      ),
+                                                                                      const SizedBox(height: 8),
+                                                                                      TextField(
+                                                                                        controller: _carPriceController,
+                                                                                        keyboardType: TextInputType.number,
+                                                                                        decoration: InputDecoration(
+                                                                                          border: OutlineInputBorder(),
+                                                                                          hintText: 'Rs. 18,79,000',
+                                                                                          prefixText: 'Rs. ',
+                                                                                        ),
+                                                                                        onChanged: (value) {
+                                                                                          _calculatePrincipal();
+                                                                                        },
+                                                                                      ),
+                                                                                      const SizedBox(height: 16),
+                                                                                      const Text(
+                                                                                        'Enter Down Payement',
+                                                                                        style: TextStyle(
+                                                                                            fontSize: 14, 
+                                                                                            fontWeight: FontWeight.bold,
+                                                                                            color: Color.fromRGBO(26, 76, 142, 1),
+                                                                                            fontFamily: "Inter",
+                                                                                          ),
+                                                                                        ),
+                                                                                      const SizedBox(height: 8),
+                                                                                      TextField(
+                                                                                        controller: _downPaymentController,
+                                                                                        keyboardType: TextInputType.number,
+                                                                                        decoration: const InputDecoration(
+                                                                                          border: OutlineInputBorder(),
+                                                                                          hintText: 'Rs. 5,00,000',
+                                                                                          prefixText: 'Rs. ',
+                                                                                        ),
+                                                                                        onChanged: (value) {
+                                                                                          _calculatePrincipal();
+                                                                                        },
+                                                                                      ),
+                                                                                      const SizedBox(height: 8),
+                                                                                      Text(
+                                                                                        'Your loan amount will be Rs. ${_principal == 0 ? '13,79,000' : _principal.toStringAsFixed(0)}',
+                                                                                        style: const TextStyle(fontSize: 12),
+                                                                                      ),
+                                                                                      const SizedBox(height: 16),
+                                                                                      const Text(
+                                                                                        'Select Tenure',
+                                                                                        style: TextStyle(
+                                                                                          fontSize: 14, 
+                                                                                          fontWeight: FontWeight.bold,
+                                                                                          color: Color.fromRGBO(26, 76, 142, 1),
+                                                                                          fontFamily: "Inter",
+                                                                                        ),  
+                                                                                      ),
+                                                                                      const SizedBox(height: 8),
+                                                                                      DropdownButton<String>(
+                                                                                        isExpanded: true,
+                                                                                        value: _selectedTenure,
+                                                                                        items: _tenureOptions.map((String value) {
+                                                                                          return DropdownMenuItem<String>(
+                                                                                            value: value,
+                                                                                            child: Text(value),
+                                                                                          );
+                                                                                        }).toList(),
+                                                                                        onChanged: (newValue) {
+                                                                                          setState(() {
+                                                                                            _selectedTenure = newValue!;
+                                                                                            _calculateEMI();
+                                                                                          });
+                                                                                        },
+                                                                                      ),
+                                                                                      const SizedBox(height: 16),
+                                                                                      const Text(
+                                                                                        'Select Interest Rate',
+                                                                                        style: TextStyle(
+                                                                                          fontSize: 14, 
+                                                                                          fontWeight: FontWeight.bold,
+                                                                                          color: Color.fromRGBO(26, 76, 142, 1),
+                                                                                          fontFamily: "Inter",
+                                                                                        ),  
+                                                                                      ),
+                                                                                      const SizedBox(height: 8),
+                                                                                      DropdownButton<String>(
+                                                                                        isExpanded: true,
+                                                                                        value: _selectedInterestRate,
+                                                                                        items: _interestRateOptions.map((String value) {
+                                                                                          return DropdownMenuItem<String>(
+                                                                                            value: value,
+                                                                                            child: Text(value),
+                                                                                          );
+                                                                                        }).toList(),
+                                                                                        onChanged: (newValue) {
+                                                                                          setState(() {
+                                                                                            _selectedInterestRate = newValue!;
+                                                                                            _calculateEMI();
+                                                                                          });
+                                                                                        },
+                                                                                      ),
+                                                                                      const SizedBox(height: 16),
+                                                                                      SizedBox(
+                                                                                        width: double.infinity,
+                                                                                        child: ElevatedButton(
+                                                                                          onPressed: _calculateEMI,
+                                                                                          style: ElevatedButton.styleFrom(
+                                                                                            backgroundColor: Color.fromRGBO(0, 76, 144, 1),
+                                                                                            foregroundColor: Colors.white,
+                                                                                            shape: RoundedRectangleBorder(
+                                                                                              borderRadius: BorderRadius.circular(40),
+                                                                                            ),
+                                                                                          ),
+                                                                                          child: const Text('Calculate EMI'),
+                                                                                        ),
+                                                                                      ),
+                                                                                    ],
+                                                                                  ),
+                                                                                ),
+                                                                                const SizedBox(width: 20),
+
+                                                                                Container(
+                                                                                  width: 2,
+                                                                                  height: 450,
+                                                                                  color: Color.fromRGBO(189, 189, 189, 1),
+                                                                                ),
+
+                                                                                const SizedBox(width: 30,),
+                                                                                
+                                                                                // Right Section: EMI Results
+                                                                                Expanded(
+                                                                                  child: Column(
+                                                                                    mainAxisSize: MainAxisSize.min,
+                                                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                    children: [
+                                                                                      Text(
+                                                                                        'Rs. ${_emi == 0 ? '60,000' : _emi.toStringAsFixed(0)} EMI FOR ${_selectedTenure.toLowerCase()}',
+                                                                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                                                                      ),
+
+                                                                                      const SizedBox(height: 11),
+                                                                                      Padding(
+                                                                                        padding: EdgeInsets.zero,
+                                                                                        child: Container(
+                                                                                          width: 500,
+                                                                                          height: 2,
+                                                                                          color: Color.fromRGBO(189, 189, 189, 1),
+                                                                                        ),
+                                                                                      ),
+                                                                                      const SizedBox(height: 7),
+
+                                                                                      Container(
+                                                                                        color: Color.fromRGBO(248, 249, 251, 1),
+                                                                                        child: SizedBox(
+                                                                                          height: MediaQuery.of(context).size.width < 600
+                                                                                            ? 70 // Mobile height
+                                                                                            : MediaQuery.of(context).size.width < 1024
+                                                                                                ? 120 // Tablet height
+                                                                                                : 180, // Desktop/Web height
+                                                                                          child: Padding(
+                                                                                            padding: const EdgeInsets.all(10),
+                                                                                            child: CustomPaint(
+                                                                                              painter: EMISemiCircleChart(
+                                                                                                principal: _principal,
+                                                                                                totalInterest: _totalInterest,
+                                                                                              ),
+                                                                                              child: const SizedBox.expand(),
+                                                                                            ),
+                                                                                          ),
+                                                                                        ),
+                                                                                      ),
+                                                                                      const SizedBox(height: 16),
+                                                                                      
+                                                                                      Row(
+                                                                                        children: [
+                                                                                          Container(
+                                                                                            width: 10,
+                                                                                            height: 10,
+                                                                                            decoration: const BoxDecoration(
+                                                                                              shape: BoxShape.circle,
+                                                                                              color: Color.fromRGBO(34, 53, 119, 1),
+                                                                                            ),
+                                                                                          ),
+                                                                                          const SizedBox(width: 8),
+                                                                                          const Text('Principal Loan Amount'),
+                                                                                          const Spacer(),
+                                                                                          Text('Rs. ${_principal == 0 ? '18,79,000' : _principal.toStringAsFixed(0)}'),
+                                                                                        ],
+                                                                                      ),
+                                                                                      const SizedBox(height: 8),
+                                                                                      Row(
+                                                                                        children: [
+                                                                                          Container(
+                                                                                            width: 10,
+                                                                                            height: 10,
+                                                                                            decoration: const BoxDecoration(
+                                                                                              shape: BoxShape.circle,
+                                                                                              color: Color.fromRGBO(39, 153, 227, 1),
+                                                                                            ),
+                                                                                          ),
+                                                                                          const SizedBox(width: 8),
+                                                                                          const Text('Total Interest Amount'),
+                                                                                          const Spacer(),
+                                                                                          Text('Rs. ${_totalInterest == 0 ? '5,00,000' : _totalInterest.toStringAsFixed(0)}'),
+                                                                                        ],
+                                                                                      ),
+                                                                                      const SizedBox(height: 16),
+                                                                                      Container(
+                                                                                        color: Color.fromRGBO(248, 249, 251, 1),
+                                                                                        child: Padding(
+                                                                                          padding: const EdgeInsets.all(10.0),
+                                                                                          child: Row(
+                                                                                            children: [
+                                                                                              const Text(
+                                                                                                'Total Amount Payable',
+                                                                                                style: TextStyle(fontFamily: "DMSans",fontWeight: FontWeight.w400, color: Color.fromRGBO(0, 0, 0, 1)),
+                                                                                              ),
+                                                                                              const Spacer(),
+                                                                                              Text(
+                                                                                                'Rs. ${_totalPayable == 0 ? '23,79,000' : _totalPayable.toStringAsFixed(0)}',
+                                                                                                style: const TextStyle(fontFamily: "Poppins",fontWeight: FontWeight.w500, color: Color.fromRGBO(31, 31, 31, 1)),
+                                                                                              ),
+                                                                                            ],
+                                                                                          ),
+                                                                                        ),
+                                                                                      ),
+                                                                                      const SizedBox(height: 16),
+                                                                                      SizedBox(
+                                                                                        width: double.infinity,
+                                                                                        child: OutlinedButton(
+                                                                                          onPressed: () {},
+                                                                                          style: OutlinedButton.styleFrom(
+                                                                                            side: const BorderSide(width: 2, color: Color.fromRGBO(0, 76, 144, 1)),
+                                                                                            shape: RoundedRectangleBorder(
+                                                                                              borderRadius: BorderRadius.circular(40),
+                                                                                            ),
+                                                                                          ),
+                                                                                          child: Padding(
+                                                                                            padding: const EdgeInsets.all(5.0),
+                                                                                            child: const Text(
+                                                                                              'Get EMI Offers',
+                                                                                              style: TextStyle(
+                                                                                                fontSize: 16,
+                                                                                                fontFamily: "DMSans",
+                                                                                                color: Color.fromRGBO(0, 76, 144, 1),
+                                                                                                fontWeight: FontWeight.w600,
+                                                                                              ),
+                                                                                            ),
+                                                                                          ),
+                                                                                        ),
+                                                                                      ),
+                                                                                    ],
+                                                                                  ),
+                                                                                ),
+                                                                              ],
+                                                                            ),
+                                                                          ],
                                                                         ),
-                                                                      ],
+                                                                      ),
                                                                     ),
                                                                   ),
-                                                                ),
+                                                                ],
                                                               ),
                                                             ),
                                                           );
-                                                        },
+                                                        }
                                                       );
-                                                    
+                                              
                                                     },
                                                     child: Text(
                                                       "EMI Calculator >",
@@ -4236,284 +4291,354 @@ Widget _headerElevatedButton(String title, VoidCallback onPressed, {bool isOutli
                                                       showDialog(
                                                         context: context,
                                                         builder: (BuildContext context) {
-                                                          double dialogWidth = screenWidth < 1024
-                                                              ? screenWidth * 0.9
-                                                              : screenWidth * 0.7;
-                                                          double dialogHeight = screenWidth < 1024
-                                                              ? screenHeight * 0.95
-                                                              : screenHeight * 0.85;
                                                           return Center(
                                                             child: SingleChildScrollView(
-                                                              child: Dialog(
-                                                                backgroundColor: Colors.white,
-                                                                shape: RoundedRectangleBorder(
-                                                                  borderRadius: BorderRadius.circular(10),
-                                                                ),
-                                                                child: Container(
-                                                                  width: dialogWidth,
-                                                                  height: dialogHeight,
-                                                                  padding: EdgeInsets.all(screenWidth < 600 ? 8 : 16),
-                                                                  child: Row(
-                                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                                    children: [
-                                                                      // Input Section
-                                                                      Expanded(
-                                                                        flex: 2,
+                                                              child: Column(
+                                                                children: [
+                                                                  SizedBox(
+                                                                    width: screenHeight * 1.2,
+                                                                    child: Dialog(
+                                                                      backgroundColor: Colors.white,
+                                                                      shape: RoundedRectangleBorder(
+                                                                        borderRadius: BorderRadius.circular(10),
+                                                                      ),
+                                                                      child: Padding(
+                                                                        padding: const EdgeInsets.all(16.0),
                                                                         child: Column(
                                                                           crossAxisAlignment: CrossAxisAlignment.start,
                                                                           children: [
-                                                                            Text(
-                                                                              'Enter Estimated Price of the Car',
-                                                                              style: TextStyle(
-                                                                                fontSize: 14,
-                                                                                fontWeight: FontWeight.bold,
-                                                                                color: Color.fromRGBO(26, 76, 142, 1),
-                                                                                fontFamily: "Inter",
-                                                                              ),
-                                                                            ),
-                                                                            const SizedBox(height: 8),
-                                                                            TextField(
-                                                                              controller: _carPriceController,
-                                                                              keyboardType: TextInputType.number,
-                                                                              decoration: InputDecoration(
-                                                                                border: OutlineInputBorder(),
-                                                                                hintText: 'Rs. 18,79,000',
-                                                                                prefixText: 'Rs. ',
-                                                                              ),
-                                                                              onChanged: (value) {
-                                                                                _calculatePrincipal();
-                                                                              },
-                                                                            ),
-                                                                            const SizedBox(height: 16),
-                                                                            Text(
-                                                                              'Enter Down Payment',
-                                                                              style: TextStyle(
-                                                                                fontSize: 14,
-                                                                                fontWeight: FontWeight.bold,
-                                                                                color: Color.fromRGBO(26, 76, 142, 1),
-                                                                                fontFamily: "Inter",
-                                                                              ),
-                                                                            ),
-                                                                            const SizedBox(height: 8),
-                                                                            TextField(
-                                                                              controller: _downPaymentController,
-                                                                              keyboardType: TextInputType.number,
-                                                                              decoration: const InputDecoration(
-                                                                                border: OutlineInputBorder(),
-                                                                                hintText: 'Rs. 5,00,000',
-                                                                                prefixText: 'Rs. ',
-                                                                              ),
-                                                                              onChanged: (value) {
-                                                                                _calculatePrincipal();
-                                                                              },
-                                                                            ),
-                                                                            const SizedBox(height: 8),
-                                                                            Text(
-                                                                              'Your loan amount will be Rs. ${_principal == 0 ? '13,79,000' : _principal.toStringAsFixed(0)}',
-                                                                              style: const TextStyle(fontSize: 12),
-                                                                            ),
-                                                                            const SizedBox(height: 16),
-                                                                            Text(
-                                                                              'Select Tenure',
-                                                                              style: TextStyle(
-                                                                                fontSize: 14,
-                                                                                fontWeight: FontWeight.bold,
-                                                                                color: Color.fromRGBO(26, 76, 142, 1),
-                                                                                fontFamily: "Inter",
-                                                                              ),
-                                                                            ),
-                                                                            const SizedBox(height: 8),
-                                                                            DropdownButton<String>(
-                                                                              isExpanded: true,
-                                                                              value: _selectedTenure,
-                                                                              items: _tenureOptions.map((String value) {
-                                                                                return DropdownMenuItem<String>(
-                                                                                  value: value,
-                                                                                  child: Text(value),
-                                                                                );
-                                                                              }).toList(),
-                                                                              onChanged: (newValue) {
-                                                                                setState(() {
-                                                                                  _selectedTenure = newValue!;
-                                                                                  _calculateEMI();
-                                                                                });
-                                                                              },
-                                                                            ),
-                                                                            const SizedBox(height: 16),
-                                                                            Text(
-                                                                              'Select Interest Rate',
-                                                                              style: TextStyle(
-                                                                                fontSize: 14,
-                                                                                fontWeight: FontWeight.bold,
-                                                                                color: Color.fromRGBO(26, 76, 142, 1),
-                                                                                fontFamily: "Inter",
-                                                                              ),
-                                                                            ),
-                                                                            const SizedBox(height: 8),
-                                                                            DropdownButton<String>(
-                                                                              isExpanded: true,
-                                                                              value: _selectedInterestRate,
-                                                                              items: _interestRateOptions.map((String value) {
-                                                                                return DropdownMenuItem<String>(
-                                                                                  value: value,
-                                                                                  child: Text(value),
-                                                                                );
-                                                                              }).toList(),
-                                                                              onChanged: (newValue) {
-                                                                                setState(() {
-                                                                                  _selectedInterestRate = newValue!;
-                                                                                  _calculateEMI();
-                                                                                });
-                                                                              },
-                                                                            ),
-                                                                            const SizedBox(height: 16),
-                                                                            SizedBox(
-                                                                              width: double.infinity,
-                                                                              child: ElevatedButton(
-                                                                                onPressed: _calculateEMI,
-                                                                                style: ElevatedButton.styleFrom(
-                                                                                  backgroundColor: Color.fromRGBO(0, 76, 144, 1),
-                                                                                  foregroundColor: Colors.white,
-                                                                                  shape: RoundedRectangleBorder(
-                                                                                    borderRadius: BorderRadius.circular(40),
-                                                                                  ),
-                                                                                ),
-                                                                                child: const Text('Calculate EMI'),
-                                                                              ),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                      ),
-                                                                      const SizedBox(width: 20),
-                                                                      Container(
-                                                                        width: 2,
-                                                                        height: 450,
-                                                                        color: Color.fromRGBO(189, 189, 189, 1),
-                                                                      ),
-                                                                      const SizedBox(width: 30),
-                                                                      // Results Section
-                                                                      Expanded(
-                                                                        flex: 3,
-                                                                        child: Column(
-                                                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                                                          children: [
-                                                                            Text(
-                                                                              'Rs. ${_emi == 0 ? '60,000' : _emi.toStringAsFixed(0)} EMI FOR ${_selectedTenure.toLowerCase()}',
-                                                                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                                                            ),
-                                                                            const SizedBox(height: 11),
-                                                                            Container(
-                                                                              width: 500,
-                                                                              height: 2,
-                                                                              color: Color.fromRGBO(189, 189, 189, 1),
-                                                                            ),
-                                                                            const SizedBox(height: 7),
-                                                                            Container(
-                                                                              color: Color.fromRGBO(248, 249, 251, 1),
-                                                                              child: SizedBox(
-                                                                                height: 190,
-                                                                                child: Padding(
-                                                                                  padding: const EdgeInsets.all(10),
-                                                                                  child: CustomPaint(
-                                                                                    painter: EMISemiCircleChart(
-                                                                                      principal: _principal,
-                                                                                      totalInterest: _totalInterest,
-                                                                                    ),
-                                                                                    child: const SizedBox.expand(),
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                            const SizedBox(height: 16),
                                                                             Row(
+                                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                                               children: [
-                                                                                Container(
-                                                                                  width: 10,
-                                                                                  height: 10,
-                                                                                  decoration: const BoxDecoration(
-                                                                                    shape: BoxShape.circle,
-                                                                                    color: Color.fromRGBO(34, 53, 119, 1),
+                                                                                const Text(
+                                                                                  'Choose your EMI Options',
+                                                                                  style: TextStyle(
+                                                                                    fontSize: 26, 
+                                                                                    fontWeight: FontWeight.w700,
+                                                                                    color: Color.fromRGBO(74, 74, 74, 1),
+                                                                                    fontFamily: "DMSans",
                                                                                   ),
                                                                                 ),
-                                                                                const SizedBox(width: 8),
-                                                                                const Text('Principal Loan Amount'),
-                                                                                const Spacer(),
-                                                                                Text('Rs. ${_principal == 0 ? '18,79,000' : _principal.toStringAsFixed(0)}'),
+                                                                                IconButton(
+                                                                                  onPressed: (){
+                                                                                    Navigator.pop(context);
+                                                                                  },
+                                                                                  icon: Icon(
+                                                                                    Icons.close, 
+                                                                                    color: Color.fromRGBO(0, 0, 0, 1),
+                                                                                  ),
+                                                                                ),
                                                                               ],
+                                                                            ),
+                                                                            const SizedBox(height: 8),
+                                                                            const Text(
+                                                                              'Standard EMI',
+                                                                              style: TextStyle(
+                                                                                fontSize: 20, 
+                                                                                fontWeight: FontWeight.w600,
+                                                                                fontFamily: "DMSans",
+                                                                                color: Color.fromRGBO(109, 109, 109, 1),
+                                                                              ),
                                                                             ),
                                                                             const SizedBox(height: 8),
                                                                             Row(
                                                                               children: [
                                                                                 Container(
-                                                                                  width: 10,
-                                                                                  height: 10,
-                                                                                  decoration: const BoxDecoration(
-                                                                                    shape: BoxShape.circle,
-                                                                                    color: Color.fromRGBO(39, 153, 227, 1),
+                                                                                  width: 100,
+                                                                                  height: 2,
+                                                                                  color: Color.fromRGBO(0, 76, 144, 1),
+                                                                                ),
+                                                                                Expanded(
+                                                                                  child: Container(
+                                                                                    height: 2,
+                                                                                    color: const Color.fromRGBO(189, 189, 189, 1),
                                                                                   ),
                                                                                 ),
-                                                                                const SizedBox(width: 8),
-                                                                                const Text('Total Interest Amount'),
-                                                                                const Spacer(),
-                                                                                Text('Rs. ${_totalInterest == 0 ? '5,00,000' : _totalInterest.toStringAsFixed(0)}'),
                                                                               ],
                                                                             ),
                                                                             const SizedBox(height: 16),
-                                                                            Container(
-                                                                              color: Color.fromRGBO(248, 249, 251, 1),
-                                                                              child: Padding(
-                                                                                padding: const EdgeInsets.all(10.0),
-                                                                                child: Row(
-                                                                                  children: [
-                                                                                    const Text(
-                                                                                      'Total Amount Payable',
-                                                                                      style: TextStyle(fontFamily: "DMSans", fontWeight: FontWeight.w400, color: Color.fromRGBO(0, 0, 0, 1)),
-                                                                                    ),
-                                                                                    const Spacer(),
-                                                                                    Text(
-                                                                                      'Rs. ${_totalPayable == 0 ? '23,79,000' : _totalPayable.toStringAsFixed(0)}',
-                                                                                      style: const TextStyle(fontFamily: "Poppins", fontWeight: FontWeight.w500, color: Color.fromRGBO(31, 31, 31, 1)),
-                                                                                    ),
-                                                                                  ],
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                            const SizedBox(height: 16),
-                                                                            SizedBox(
-                                                                              width: double.infinity,
-                                                                              child: OutlinedButton(
-                                                                                onPressed: () {},
-                                                                                style: OutlinedButton.styleFrom(
-                                                                                  side: const BorderSide(width: 2, color: Color.fromRGBO(0, 76, 144, 1)),
-                                                                                  shape: RoundedRectangleBorder(
-                                                                                    borderRadius: BorderRadius.circular(40),
+                                                                    
+                                                                            Row(
+                                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                                              children: [
+                                                                                
+                                                                                Expanded(
+                                                                                  child: Column(
+                                                                                    mainAxisSize: MainAxisSize.min,
+                                                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                    children: [
+                                                                                      
+                                                                                      const Text(
+                                                                                        'Enter Estimated Price of the Car', 
+                                                                                        style: TextStyle(
+                                                                                          fontSize: 14, 
+                                                                                          fontWeight: FontWeight.bold,
+                                                                                          color: Color.fromRGBO(26, 76, 142, 1),
+                                                                                          fontFamily: "Inter",
+                                                                                        ),
+                                                                                      ),
+                                                                                      const SizedBox(height: 8),
+                                                                                      TextField(
+                                                                                        controller: _carPriceController,
+                                                                                        keyboardType: TextInputType.number,
+                                                                                        decoration: InputDecoration(
+                                                                                          border: OutlineInputBorder(),
+                                                                                          hintText: 'Rs. 18,79,000',
+                                                                                          prefixText: 'Rs. ',
+                                                                                        ),
+                                                                                        onChanged: (value) {
+                                                                                          _calculatePrincipal();
+                                                                                        },
+                                                                                      ),
+                                                                                      const SizedBox(height: 16),
+                                                                                      const Text(
+                                                                                        'Enter Down Payement',
+                                                                                        style: TextStyle(
+                                                                                            fontSize: 14, 
+                                                                                            fontWeight: FontWeight.bold,
+                                                                                            color: Color.fromRGBO(26, 76, 142, 1),
+                                                                                            fontFamily: "Inter",
+                                                                                          ),
+                                                                                        ),
+                                                                                      const SizedBox(height: 8),
+                                                                                      TextField(
+                                                                                        controller: _downPaymentController,
+                                                                                        keyboardType: TextInputType.number,
+                                                                                        decoration: const InputDecoration(
+                                                                                          border: OutlineInputBorder(),
+                                                                                          hintText: 'Rs. 5,00,000',
+                                                                                          prefixText: 'Rs. ',
+                                                                                        ),
+                                                                                        onChanged: (value) {
+                                                                                          _calculatePrincipal();
+                                                                                        },
+                                                                                      ),
+                                                                                      const SizedBox(height: 8),
+                                                                                      Text(
+                                                                                        'Your loan amount will be Rs. ${_principal == 0 ? '13,79,000' : _principal.toStringAsFixed(0)}',
+                                                                                        style: const TextStyle(fontSize: 12),
+                                                                                      ),
+                                                                                      const SizedBox(height: 16),
+                                                                                      const Text(
+                                                                                        'Select Tenure',
+                                                                                        style: TextStyle(
+                                                                                          fontSize: 14, 
+                                                                                          fontWeight: FontWeight.bold,
+                                                                                          color: Color.fromRGBO(26, 76, 142, 1),
+                                                                                          fontFamily: "Inter",
+                                                                                        ),  
+                                                                                      ),
+                                                                                      const SizedBox(height: 8),
+                                                                                      DropdownButton<String>(
+                                                                                        isExpanded: true,
+                                                                                        value: _selectedTenure,
+                                                                                        items: _tenureOptions.map((String value) {
+                                                                                          return DropdownMenuItem<String>(
+                                                                                            value: value,
+                                                                                            child: Text(value),
+                                                                                          );
+                                                                                        }).toList(),
+                                                                                        onChanged: (newValue) {
+                                                                                          setState(() {
+                                                                                            _selectedTenure = newValue!;
+                                                                                            _calculateEMI();
+                                                                                          });
+                                                                                        },
+                                                                                      ),
+                                                                                      const SizedBox(height: 16),
+                                                                                      const Text(
+                                                                                        'Select Interest Rate',
+                                                                                        style: TextStyle(
+                                                                                          fontSize: 14, 
+                                                                                          fontWeight: FontWeight.bold,
+                                                                                          color: Color.fromRGBO(26, 76, 142, 1),
+                                                                                          fontFamily: "Inter",
+                                                                                        ),  
+                                                                                      ),
+                                                                                      const SizedBox(height: 8),
+                                                                                      DropdownButton<String>(
+                                                                                        isExpanded: true,
+                                                                                        value: _selectedInterestRate,
+                                                                                        items: _interestRateOptions.map((String value) {
+                                                                                          return DropdownMenuItem<String>(
+                                                                                            value: value,
+                                                                                            child: Text(value),
+                                                                                          );
+                                                                                        }).toList(),
+                                                                                        onChanged: (newValue) {
+                                                                                          setState(() {
+                                                                                            _selectedInterestRate = newValue!;
+                                                                                            _calculateEMI();
+                                                                                          });
+                                                                                        },
+                                                                                      ),
+                                                                                      const SizedBox(height: 16),
+                                                                                      SizedBox(
+                                                                                        width: double.infinity,
+                                                                                        child: ElevatedButton(
+                                                                                          onPressed: _calculateEMI,
+                                                                                          style: ElevatedButton.styleFrom(
+                                                                                            backgroundColor: Color.fromRGBO(0, 76, 144, 1),
+                                                                                            foregroundColor: Colors.white,
+                                                                                            shape: RoundedRectangleBorder(
+                                                                                              borderRadius: BorderRadius.circular(40),
+                                                                                            ),
+                                                                                          ),
+                                                                                          child: const Text('Calculate EMI'),
+                                                                                        ),
+                                                                                      ),
+                                                                                    ],
                                                                                   ),
                                                                                 ),
-                                                                                child: Padding(
-                                                                                  padding: const EdgeInsets.all(5.0),
-                                                                                  child: const Text(
-                                                                                    'Get EMI Offers',
-                                                                                    style: TextStyle(
-                                                                                      fontSize: 16,
-                                                                                      fontFamily: "DMSans",
-                                                                                      color: Color.fromRGBO(0, 76, 144, 1),
-                                                                                      fontWeight: FontWeight.w600,
-                                                                                    ),
+                                                                                const SizedBox(width: 20),
+
+                                                                                Container(
+                                                                                  width: 2,
+                                                                                  height: 450,
+                                                                                  color: Color.fromRGBO(189, 189, 189, 1),
+                                                                                ),
+
+                                                                                const SizedBox(width: 30,),
+                                                                                
+                                                                                // Right Section: EMI Results
+                                                                                Expanded(
+                                                                                  child: Column(
+                                                                                    mainAxisSize: MainAxisSize.min,
+                                                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                    children: [
+                                                                                      Text(
+                                                                                        'Rs. ${_emi == 0 ? '60,000' : _emi.toStringAsFixed(0)} EMI FOR ${_selectedTenure.toLowerCase()}',
+                                                                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                                                                      ),
+
+                                                                                      const SizedBox(height: 11),
+                                                                                      Padding(
+                                                                                        padding: EdgeInsets.zero,
+                                                                                        child: Container(
+                                                                                          width: 500,
+                                                                                          height: 2,
+                                                                                          color: Color.fromRGBO(189, 189, 189, 1),
+                                                                                        ),
+                                                                                      ),
+                                                                                      const SizedBox(height: 7),
+
+                                                                                      Container(
+                                                                                        color: Color.fromRGBO(248, 249, 251, 1),
+                                                                                        child: SizedBox(
+                                                                                          height: MediaQuery.of(context).size.width < 600
+                                                                                            ? 70 // Mobile height
+                                                                                            : MediaQuery.of(context).size.width < 1024
+                                                                                                ? 120 // Tablet height
+                                                                                                : 180, // Desktop/Web height
+                                                                                          child: Padding(
+                                                                                            padding: const EdgeInsets.all(10),
+                                                                                            child: CustomPaint(
+                                                                                              painter: EMISemiCircleChart(
+                                                                                                principal: _principal,
+                                                                                                totalInterest: _totalInterest,
+                                                                                              ),
+                                                                                              child: const SizedBox.expand(),
+                                                                                            ),
+                                                                                          ),
+                                                                                        ),
+                                                                                      ),
+                                                                                      const SizedBox(height: 16),
+                                                                                      
+                                                                                      Row(
+                                                                                        children: [
+                                                                                          Container(
+                                                                                            width: 10,
+                                                                                            height: 10,
+                                                                                            decoration: const BoxDecoration(
+                                                                                              shape: BoxShape.circle,
+                                                                                              color: Color.fromRGBO(34, 53, 119, 1),
+                                                                                            ),
+                                                                                          ),
+                                                                                          const SizedBox(width: 8),
+                                                                                          const Text('Principal Loan Amount'),
+                                                                                          const Spacer(),
+                                                                                          Text('Rs. ${_principal == 0 ? '18,79,000' : _principal.toStringAsFixed(0)}'),
+                                                                                        ],
+                                                                                      ),
+                                                                                      const SizedBox(height: 8),
+                                                                                      Row(
+                                                                                        children: [
+                                                                                          Container(
+                                                                                            width: 10,
+                                                                                            height: 10,
+                                                                                            decoration: const BoxDecoration(
+                                                                                              shape: BoxShape.circle,
+                                                                                              color: Color.fromRGBO(39, 153, 227, 1),
+                                                                                            ),
+                                                                                          ),
+                                                                                          const SizedBox(width: 8),
+                                                                                          const Text('Total Interest Amount'),
+                                                                                          const Spacer(),
+                                                                                          Text('Rs. ${_totalInterest == 0 ? '5,00,000' : _totalInterest.toStringAsFixed(0)}'),
+                                                                                        ],
+                                                                                      ),
+                                                                                      const SizedBox(height: 16),
+                                                                                      Container(
+                                                                                        color: Color.fromRGBO(248, 249, 251, 1),
+                                                                                        child: Padding(
+                                                                                          padding: const EdgeInsets.all(10.0),
+                                                                                          child: Row(
+                                                                                            children: [
+                                                                                              const Text(
+                                                                                                'Total Amount Payable',
+                                                                                                style: TextStyle(fontFamily: "DMSans",fontWeight: FontWeight.w400, color: Color.fromRGBO(0, 0, 0, 1)),
+                                                                                              ),
+                                                                                              const Spacer(),
+                                                                                              Text(
+                                                                                                'Rs. ${_totalPayable == 0 ? '23,79,000' : _totalPayable.toStringAsFixed(0)}',
+                                                                                                style: const TextStyle(fontFamily: "Poppins",fontWeight: FontWeight.w500, color: Color.fromRGBO(31, 31, 31, 1)),
+                                                                                              ),
+                                                                                            ],
+                                                                                          ),
+                                                                                        ),
+                                                                                      ),
+                                                                                      const SizedBox(height: 16),
+                                                                                      SizedBox(
+                                                                                        width: double.infinity,
+                                                                                        child: OutlinedButton(
+                                                                                          onPressed: () {},
+                                                                                          style: OutlinedButton.styleFrom(
+                                                                                            side: const BorderSide(width: 2, color: Color.fromRGBO(0, 76, 144, 1)),
+                                                                                            shape: RoundedRectangleBorder(
+                                                                                              borderRadius: BorderRadius.circular(40),
+                                                                                            ),
+                                                                                          ),
+                                                                                          child: Padding(
+                                                                                            padding: const EdgeInsets.all(5.0),
+                                                                                            child: const Text(
+                                                                                              'Get EMI Offers',
+                                                                                              style: TextStyle(
+                                                                                                fontSize: 16,
+                                                                                                fontFamily: "DMSans",
+                                                                                                color: Color.fromRGBO(0, 76, 144, 1),
+                                                                                                fontWeight: FontWeight.w600,
+                                                                                              ),
+                                                                                            ),
+                                                                                          ),
+                                                                                        ),
+                                                                                      ),
+                                                                                    ],
                                                                                   ),
                                                                                 ),
-                                                                              ),
+                                                                              ],
                                                                             ),
                                                                           ],
                                                                         ),
                                                                       ),
-                                                                    ],
+                                                                    ),
                                                                   ),
-                                                                ),
+                                                                ],
                                                               ),
                                                             ),
                                                           );
-                                                        },
+                                                        }
                                                       );
+                                              
                                                     },
                                                     child: Text(
                                                       "EMI Calculator >",

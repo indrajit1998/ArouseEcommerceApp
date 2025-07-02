@@ -2140,8 +2140,8 @@ Widget build(BuildContext context) {
           bool isDesktop = constraints.maxWidth >= 1024;
           bool showMenu = isMobile || isTablet;
 
-          imageHeight = isMobile ? 30 : isTablet ? 40 : 50;
-          imageWidth = isMobile ? 30 : isTablet ? 40 : 50;
+          imageHeight = isMobile ? 30 : isTablet ? 40 : 70;
+          imageWidth = isMobile ? 30 : isTablet ? 40 : 70;
           fontSize = isMobile ? 12 : isTablet ? 12 : 12;
 
           return AppBar(
@@ -2203,8 +2203,8 @@ Widget build(BuildContext context) {
                     children: [
                       Image.asset(
                         'assets/image.png',
-                        height: isMobile ? 30 : imageHeight,
-                        width: isMobile ? 30 : imageWidth,
+                        height: isMobile ? 40 : imageHeight,
+                        width: isMobile ? 40 : imageWidth,
                         fit: BoxFit.contain,
                       ),
                       SizedBox(width: 8),
@@ -2212,7 +2212,7 @@ Widget build(BuildContext context) {
                         'AROUSE',
                         style: TextStyle(
                           color: Color(0xFF004C90),
-                          fontSize: isMobile ? 12 : fontSize,
+                          fontSize: isMobile ? 15 : fontSize,
                           fontWeight: FontWeight.bold,
                           fontFamily: "DMSans",
                         ),
@@ -2220,7 +2220,7 @@ Widget build(BuildContext context) {
                       Text(
                         'AUTOMOTIVE',
                         style: TextStyle(
-                          fontSize: isMobile ? 12 : fontSize,
+                          fontSize: isMobile ? 15 : fontSize,
                           fontWeight: FontWeight.bold,
                           fontFamily: "DMSans",
                         ),
@@ -2228,7 +2228,7 @@ Widget build(BuildContext context) {
                     ],
                   ),
                 ),
-            actions: isDesktop
+                actions: isDesktop
                     ? [
                         // Home Button
                             TextButton(
@@ -2665,7 +2665,11 @@ Widget build(BuildContext context) {
                                                                                 Container(
                                                                                   color: Color.fromRGBO(248, 249, 251, 1),
                                                                                   child: SizedBox(
-                                                                                    height: 190,
+                                                                                    height: MediaQuery.of(context).size.width < 600
+                                                                                      ? 70 // Mobile height
+                                                                                      : MediaQuery.of(context).size.width < 1024
+                                                                                          ? 120 // Tablet height
+                                                                                          : 180, // Desktop/Web height
                                                                                     child: Padding(
                                                                                       padding: const EdgeInsets.all(10),
                                                                                       child: CustomPaint(
@@ -2840,14 +2844,12 @@ Widget build(BuildContext context) {
                                   setState(() {
                                     _showNewContent = true;
                                   });
-                                  // Navigator.push(
-                                  //   context,
-                                  //   MaterialPageRoute(
-                                  //     builder: (context) => Viewcardetails(
-                                  //       car: cars[index],
-                                  //     ),
-                                  //   ),
-                                  // );
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => Webdesign(),
+                                    ),
+                                  );
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Color.fromRGBO(26, 76, 142, 1),
@@ -2928,7 +2930,6 @@ Widget build(BuildContext context) {
                       isSelectedIndex = 0;
                     });
                     Navigator.push(context, MaterialPageRoute(builder: (context) => Webdesign()));
-                    Navigator.pop(context);
                   },
                 ),
                 ListTile(

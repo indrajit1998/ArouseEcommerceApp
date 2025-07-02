@@ -96,9 +96,9 @@ Widget _buildHeaderButton(String title, int index) {
               bool isTablet = constraints.maxWidth >= 600 && constraints.maxWidth < 1024;
               bool isWeb = constraints.maxWidth >= 1024;
 
-              imageHeight = isMobile ? 30 : isTablet ? 40 : 50;
-              imageWidth = isMobile ? 30 : isTablet ? 40 : 50;
-              fontSize = isMobile ? 12 : isTablet ? 12 : 12;
+              imageHeight = isMobile ? 30 : isTablet ? 40 : 70;
+              imageWidth = isMobile ? 30 : isTablet ? 40 : 70;
+              fontSize = isMobile ? 15 : isTablet ? 12 : 12;
 
               if (isMobile || isTablet) {
                 // Mobile/Tablet: Use AppBar with Drawer and center title/logo
